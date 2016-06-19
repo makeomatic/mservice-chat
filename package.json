@@ -1,0 +1,39 @@
+{
+  "name": "mservice-chat",
+  "version": "0.0.1",
+  "description": "mservice-chat",
+  "main": "./lib/chat.js",
+  "scripts": {
+    "compile": "babel -d ./lib ./src",
+    "lint": "eslint ./src"
+  },
+  "private": true,
+  "dependencies": {
+    "bluebird": "^3.4.1",
+    "bunyan": "^1.8.1",
+    "common-errors": "^0.5.7",
+    "express-cassandra": "^1.0.1",
+    "glob": "^7.0.4",
+    "is": "^3.1.0",
+    "lodash": "^4.13.1",
+    "ms-amqp-transport": "^2.0.0",
+    "ms-users-restify": "^0.16.0",
+    "ms-validation": "^2.0.0",
+    "mservice": "^2.3.0",
+    "restify": "^4.1.1",
+    "restify-utils": "^0.13.1",
+    "server-destroy": "^1.0.1",
+    "socket.io": "^1.4.6"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.5.1",
+    "babel-eslint": "^6.0.4",
+    "babel-plugin-transform-es2015-spread": "^6.6.5",
+    "babel-plugin-transform-object-rest-spread": "^6.6.5",
+    "babel-plugin-transform-strict-mode": "^6.6.5",
+    "eslint": "^2.13.0",
+    "eslint-config-airbnb-base": "^3.0.1",
+    "eslint-plugin-import": "^1.8.1",
+    "eslint-plugin-mocha": "^3.0.0"
+  }
+}
