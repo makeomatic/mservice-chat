@@ -1,20 +1,26 @@
 const AbstractAction = require('./../../abstractAction');
+const Promise = require('bluebird');
 
+/**
+ *
+ */
 class RoomsListAction extends AbstractAction
 {
+  /**
+   *
+   */
   handler() {
     const Room = this.service.cassandra.instance.room;
-    Room.find({}, (error, rooms) => {
-      if (error) {
-        this.socket.error(error.message);
-      } else {
-        this.socket.emit('rooms.list', rooms);
-      }
-    });
+    const find = Promise.promisify(Room.find, { context: Room });
+
+    return find({});
   }
 
-  get allowed() {
-    return true;
+  /**
+   * @returns {Promise.<boolean>}
+   */
+  allowed() {
+    return Promise.resolve(true);
   }
 }
 

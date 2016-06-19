@@ -1,7 +1,20 @@
+const Service = require('mservice');
 const Errors = require('common-errors');
+const is = require('is');
 const Promise = require('bluebird');
+const Socket = require('socket.io/lib/socket');
 
-class Action {
+/**
+ * @abstract
+ */
+class AbstractAction {
+  /**
+   * Converts class name from camelcase to dot separated format
+   * and removes trailing action part
+   * e.g. MySuperAction => my.super
+   *
+   * @returns {string}
+   */
   static get actionName() {
     return this.name
       .replace(/([A-Z])/g, path => `.${path.toLowerCase()}`)
@@ -9,63 +22,81 @@ class Action {
       .replace('.action', '');
   }
 
-  static get validatorName() {
-    return `socketio_actions_${ this.actionName }`;
-  }
-
-  constructor(socket, params, service) {
-    this.socket = socket;
-    this.params = params;
-    this.service = service;
-
-    if (this.constructor.schema) {
-      this.enableValidation();
+  constructor(socket, params, callback, service) {
+    if (this.constructor === AbstractAction) {
+      throw new Errors.InvalidOperationError('Can\'t construct abstract class');
     }
 
-    this.enablePermissionsCheck();
+    if (this.handler === AbstractAction.prototype.handler) {
+      throw new Errors.InvalidOperationError('Method \'handler\' must be implemented');
+    }
+
+    if (socket.constructor !== Socket) {
+      throw new Errors.ArgumentError('socket');
+    }
+
+    if (is.undefined(params) === true) {
+      throw new Errors.ArgumentError('params');
+    }
+
+    if (is.fn(callback) !== true) {
+      throw new Errors.ArgumentError('callback');
+    }
+
+    if (is.instanceof(service, Service) !== true) {
+      throw new Errors.ArgumentError('service');
+    }
+
+    this.socket = socket;
+    this.params = params;
+    this.callback = callback;
+    this.service = service;
   }
 
-  enableValidation() {
-    this.use(next => {
-      this.service.validator.validate(this.constructor.validatorName, this.params)
-        .then(params => {
-          this.params = params;
-          next();
-        })
-        .catch(error => {
-          if (error.name === 'ValidationError') {
-            this.socket.error(error);
-          } else {
-            throw error;
-          }
-        });
-    });
+  /**
+   * @returns {Promise}
+   */
+  handler() {
+    throw new Errors.InvalidOperationError('Method \'handler\' must be implemented');
   }
 
-  enablePermissionsCheck() {
-    this.use(next => {
-      Promise.resolve(this.allowed)
-        .then(isAllowed => {
-          if (isAllowed) {
-            next();
-          } else {
-            this.socket.error(new Errors.NotPermittedError(this.constructor.actionName));
-          }
-        });
-    });
+  /**
+   * @returns {Promise}
+   */
+  validate() {
+    return this.service.validator.validate(this.constructor.actionName, this.params);
   }
 
-  use(fn) {
-    this.run = ((stack) => (next) => stack(() => fn.call(this, next.bind(this))))(this.run);
+  /**
+   * Must returns promise that returns boolean
+   *
+   * @returns {Promise.<boolean>}
+   */
+  allowed() {
+    return Promise.resolve(false);
   }
 
-  run(next) {
-    next.call(this);
-  }
-
+  /**
+   *
+   */
   dispatch() {
-    this.run(this.handler);
+    return this.validate().bind(this)
+      .then(params => this.params = params)
+      .then(this.allowed)
+      .then(isAllowed => {
+        if (isAllowed === true) {
+          return Promise.resolve();
+        }
+
+        return Promise.reject(new Errors.NotPermittedError(this.constructor.actionName));
+      })
+      .then(this.handler)
+      .then(result => this.callback(null, result))
+      .catch(Errors.ValidationError, Errors.NotPermittedError, (error) => {
+        this.callback(error);
+      })
+      .catch(error => this.service.logger.error(error));
   }
 }
 
-module.exports = Action;
+module.exports = AbstractAction;

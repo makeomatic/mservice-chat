@@ -4,6 +4,7 @@
   "description": "mservice-chat",
   "main": "./lib/chat.js",
   "scripts": {
+    "test:unit": "mocha --recursive -R nyan ./src",
     "compile": "babel -d ./lib ./src",
     "lint": "eslint ./src"
   },
@@ -17,11 +18,8 @@
     "is": "^3.1.0",
     "lodash": "^4.13.1",
     "ms-amqp-transport": "^2.0.0",
-    "ms-users-restify": "^0.16.0",
     "ms-validation": "^2.0.0",
     "mservice": "^2.3.0",
-    "restify": "^4.1.1",
-    "restify-utils": "^0.13.1",
     "server-destroy": "^1.0.1",
     "socket.io": "^1.4.6"
   },
@@ -31,9 +29,12 @@
     "babel-plugin-transform-es2015-spread": "^6.6.5",
     "babel-plugin-transform-object-rest-spread": "^6.6.5",
     "babel-plugin-transform-strict-mode": "^6.6.5",
+    "chai": "^3.5.0",
     "eslint": "^2.13.0",
     "eslint-config-airbnb-base": "^3.0.1",
     "eslint-plugin-import": "^1.8.1",
-    "eslint-plugin-mocha": "^3.0.0"
+    "eslint-plugin-mocha": "^3.0.0",
+    "mocha": "^2.5.3",
+    "restify": "^4.1.1"
   }
 }

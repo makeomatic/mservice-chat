@@ -1,20 +1,7 @@
 const ActionsBinder = require('./services/socket/actionsBinder');
 const authMiddleware = require('./middlewares/socket/auth');
-const users = require('ms-users-restify');
 
 function hooks(service) {
-  service.on('plugin:connect:amqp', amqp => {
-    const config = service.config;
-
-    service.http.use((req, res, next) => {
-      req.amqp = amqp;
-      return next();
-    });
-    users.reconfigure(config.users);
-    users(service.http, config.users.prefix, config.api.prefix);
-    users.attachModels();
-  });
-
   service.on('plugin:start:http', () => {
     const chat = service.socketio.of(service.config.chat.namespace);
     const actionsBinder = new ActionsBinder(chat, service);
