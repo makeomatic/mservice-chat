@@ -16,21 +16,19 @@ class ActionsBinder
       throw new Errors.ArgumentError('actionsDirectory', error);
     }
 
-    function actionsReducer(actions, file) {
-      const Action = require(file);
-      actions[Action.actionName] = Action;
+    const actions = glob.sync('**/*.js', {cwd: actionsDirectory, realpath: true})
+      .reduce((actions, file) => {
+        const Action = require(file);
+        const action = new Action(this.service);
+        actions[Action.actionName] = function dispatch(params, callback) {
+          return action.dispatch(this, params, callback);
+        };
 
-      return actions;
-    }
-
-    const actions = glob.sync('**/*.js', { cwd: actionsDirectory, realpath: true })
-      .reduce(actionsReducer, {});
+        return actions;
+      }, {});
 
     this.namespace.on('connection', socket => {
-      Object.keys(actions).forEach((actionName) => socket.on(actionName, (params, callback) => {
-        const action = new actions[actionName](socket, params, callback, this.service);
-        return action.dispatch();
-      }));
+      Object.keys(actions).forEach(actionName => socket.on(actionName, actions[actionName]));
     });
   }
 }

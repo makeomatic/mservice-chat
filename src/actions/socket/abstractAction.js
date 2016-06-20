@@ -22,7 +22,7 @@ class AbstractAction {
       .replace('.action', '');
   }
 
-  constructor(socket, params, callback, service) {
+  constructor(service) {
     if (this.constructor === AbstractAction) {
       throw new Errors.InvalidOperationError('Can\'t construct abstract class');
     }
@@ -31,40 +31,25 @@ class AbstractAction {
       throw new Errors.InvalidOperationError('Method \'handler\' must be implemented');
     }
 
-    if (socket.constructor !== Socket) {
-      throw new Errors.ArgumentError('socket');
-    }
-
-    if (is.undefined(params) === true) {
-      throw new Errors.ArgumentError('params');
-    }
-
-    if (is.fn(callback) !== true) {
-      throw new Errors.ArgumentError('callback');
-    }
-
     if (is.instanceof(service, Service) !== true) {
       throw new Errors.ArgumentError('service');
     }
 
-    this.socket = socket;
-    this.params = params;
-    this.callback = callback;
     this.service = service;
   }
 
   /**
    * @returns {Promise}
    */
-  handler() {
+  handler(socket, params) {
     throw new Errors.InvalidOperationError('Method \'handler\' must be implemented');
   }
 
   /**
    * @returns {Promise}
    */
-  validate() {
-    return this.service.validator.validate(this.constructor.actionName, this.params);
+  validate(socket, params, callback) {
+    return this.service.validator.validate(this.constructor.actionName, params);
   }
 
   /**
@@ -72,30 +57,47 @@ class AbstractAction {
    *
    * @returns {Promise.<boolean>}
    */
-  allowed() {
+  allowed(socket, params, callback) {
     return Promise.resolve(false);
   }
 
   /**
    *
    */
-  dispatch() {
-    return this.validate().bind(this)
-      .then(params => this.params = params)
-      .then(this.allowed)
+  dispatch(socket, params, callback) {
+    if (socket.constructor !== Socket) {
+      throw new Errors.ArgumentError('socket');
+    }
+
+    if (is.fn(callback) !== true) {
+      throw new Errors.ArgumentError('callback');
+    }
+
+    return this.validate(socket, params, callback).bind(this)
+      .then(sanitizedParams => [socket, params = sanitizedParams, callback])
+      .spread(this.allowed)
       .then(isAllowed => {
         if (isAllowed === true) {
-          return Promise.resolve();
+          return [socket, params, callback];
         }
 
         return Promise.reject(new Errors.NotPermittedError(this.constructor.actionName));
       })
       .then(this.handler)
-      .then(result => this.callback(null, result))
-      .catch(Errors.ValidationError, Errors.NotPermittedError, (error) => {
-        this.callback(error);
-      })
-      .catch(error => this.service.logger.error(error));
+      .asCallback((error, result) => {
+        if (error) {
+          switch (error.constructor) {
+            case Errors.ValidationError:
+            case Errors.NotPermittedError:
+              return callback(error);
+            default:
+              this.service.log.error(error);
+              return callback(new Errors.Error('Something went wrong'));
+          }
+        }
+
+        callback(null, result);
+      });
   }
 }
 
