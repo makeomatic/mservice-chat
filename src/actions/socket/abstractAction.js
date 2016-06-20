@@ -22,7 +22,7 @@ class AbstractAction {
       .replace('.action', '');
   }
 
-  constructor(service) {
+  constructor(application) {
     if (this.constructor === AbstractAction) {
       throw new Errors.InvalidOperationError('Can\'t construct abstract class');
     }
@@ -31,25 +31,25 @@ class AbstractAction {
       throw new Errors.InvalidOperationError('Method \'handler\' must be implemented');
     }
 
-    if (is.instanceof(service, Service) !== true) {
-      throw new Errors.ArgumentError('service');
+    if (is.instanceof(application, Service) !== true) {
+      throw new Errors.ArgumentError('application');
     }
 
-    this.service = service;
+    this.application = application;
   }
 
   /**
    * @returns {Promise}
    */
-  handler(socket, params) {
+  handler(socket, context, callback) {
     throw new Errors.InvalidOperationError('Method \'handler\' must be implemented');
   }
 
   /**
    * @returns {Promise}
    */
-  validate(socket, params, callback) {
-    return this.service.validator.validate(this.constructor.actionName, params);
+  validate(socket, context, callback) {
+    return this.application.validator.validate(this.constructor.actionName, context.params);
   }
 
   /**
@@ -57,7 +57,7 @@ class AbstractAction {
    *
    * @returns {Promise.<boolean>}
    */
-  allowed(socket, params, callback) {
+  allowed(socket, context, callback) {
     return Promise.resolve(false);
   }
 
@@ -73,25 +73,36 @@ class AbstractAction {
       throw new Errors.ArgumentError('callback');
     }
 
-    return this.validate(socket, params, callback).bind(this)
-      .then(sanitizedParams => [socket, params = sanitizedParams, callback])
+    let context = {
+      user: socket.user,
+      params,
+    };
+
+    return this.validate(socket, context, callback).bind(this)
+      .then(sanitizedParams => {
+        context.params = sanitizedParams;
+
+        return [socket, context, callback]
+      })
       .spread(this.allowed)
       .then(isAllowed => {
         if (isAllowed === true) {
-          return [socket, params, callback];
+          return [socket, context, callback];
         }
 
         return Promise.reject(new Errors.NotPermittedError(this.constructor.actionName));
       })
-      .then(this.handler)
+      .spread(this.handler)
       .asCallback((error, result) => {
+        context = null;
+
         if (error) {
           switch (error.constructor) {
             case Errors.ValidationError:
             case Errors.NotPermittedError:
               return callback(error);
             default:
-              this.service.log.error(error);
+              this.application.log.error(error);
               return callback(new Errors.Error('Something went wrong'));
           }
         }

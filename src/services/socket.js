@@ -3,14 +3,23 @@ const fs = require('fs');
 const glob = require('glob');
 const is = require('is');
 
-class ActionsBinder
-{
-  constructor(namespase, service) {
-    this.namespace = namespase;
-    this.service = service;
+/**
+ * @param {Chat} application
+ */
+class SocketService {
+
+  /**
+   * @param {Chat} application
+   */
+  constructor(application) {
+    this.application = application;
   }
 
-  bind(actionsDirectory) {
+  /**
+   * @param namespace
+   * @param actionsDirectory
+   */
+  bindActions(namespace, actionsDirectory) {
     if (!fs.existsSync(actionsDirectory)) {
       const error = new Errors.Error(`${ actionsDirectory } does not exist`);
       throw new Errors.ArgumentError('actionsDirectory', error);
@@ -19,7 +28,7 @@ class ActionsBinder
     const actions = glob.sync('**/*.js', {cwd: actionsDirectory, realpath: true})
       .reduce((actions, file) => {
         const Action = require(file);
-        const action = new Action(this.service);
+        const action = new Action(this.application);
         actions[Action.actionName] = function dispatch(params, callback) {
           return action.dispatch(this, params, callback);
         };
@@ -27,10 +36,10 @@ class ActionsBinder
         return actions;
       }, {});
 
-    this.namespace.on('connection', socket => {
+    namespace.on('connection', socket => {
       Object.keys(actions).forEach(actionName => socket.on(actionName, actions[actionName]));
     });
   }
 }
 
-module.exports = ActionsBinder;
+module.exports = SocketService;

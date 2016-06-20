@@ -1,16 +1,16 @@
-const AbstractAction = require('./../../abstractAction');
+const AbstractAction = require('./../abstractAction');
 const Promise = require('bluebird');
 
 /**
  *
  */
-class RoomsListAction extends AbstractAction
+class MeAction extends AbstractAction
 {
   /**
    * @returns {Promise.<Object[]>}
    */
-  handler() {
-    return this.application.services.room.find();
+  handler(socket, context) {
+    return Promise.resolve(context.user);
   }
 
   /**
@@ -21,4 +21,4 @@ class RoomsListAction extends AbstractAction
   }
 }
 
-module.exports = RoomsListAction;
+module.exports = MeAction;

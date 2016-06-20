@@ -1,0 +1,5 @@
+{
+  "id": "me",
+  "additionalProperties": false,
+  "type": "object"
+}
