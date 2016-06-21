@@ -1,38 +1,40 @@
 const AbstractAction = require('./../../abstractAction');
 const Promise = require('bluebird');
-const Room = require('./../../../../services/room');
 
+/**
+ *
+ */
 class RoomsDeleteAction extends AbstractAction
 {
-  handler() {
-    const roomName = this.room.name;
-
-    Promise.fromCallback(callback => this.room.delete(callback))
-      .then(() => this.socket.emit('rooms.delete', roomName))
-      .catch(error => this.socket.error(error));
+  /**
+   * @param socket
+   * @param context
+   * @returns {*}
+   */
+  handler(socket, context) {
+    return context.room.deleteAsync()
+      .then(() => true);
   }
 
-  static get schema() {
-    return {
-      type: "object",
-      required: ['id'],
-      properties: {
-        "id": {
-          "type": "string"
-        }
-      }
-    }
-  }
-
-  get allowed() {
-    if (this.socket.user.isAdmin === false) {
-      return false;
+  /**
+   * @param socket
+   * @param context
+   * @returns {Promise.<boolean>}
+   */
+  allowed(socket, context) {
+    if (context.user.isAdmin === false) {
+      return Promise.resolve(false);
     }
 
-    return Room.factory(this.service.cassandra).getById(this.params.id)
+    return this.application.services.room.getById(context.params.id)
       .then(room => {
-        this.room = room;
-        return room.createdBy === this.socket.user.id;
+        if (!room) {
+          return Promise.resolve(false);
+        }
+
+        context.room = room;
+
+        return Promise.resolve(room.createdBy === context.user.id);
       });
   }
 }

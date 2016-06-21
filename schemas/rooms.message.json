@@ -1,0 +1,63 @@
+{
+  "id": "rooms.message",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["id", "message"],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string"
+        }
+      },
+      "switch": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "constant": "simple"
+              }
+            }
+          },
+          "then": {
+            "required": ["message"],
+            "properties": {
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "constant": "color"
+              }
+            }
+          },
+          "then": {
+            "required": ["message", "color"],
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "color": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "then": false
+        }
+      ]
+    }
+  }
+}

@@ -1,4 +1,5 @@
 const AbstractAction = require('./../../abstractAction');
+const Promise = require('bluebird');
 
 /**
  *
@@ -6,49 +7,29 @@ const AbstractAction = require('./../../abstractAction');
 class RoomsMessageAction extends AbstractAction
 {
   /**
-   *
+   * @param socket
+   * @param context
+   * @returns {Promise.<boolean>}
    */
-  handler() {
-    this.socket.nsp.in(this.params.id).emit('rooms.message', this.socket.user.name, this.params);
+  handler(socket, context) {
+    socket.nsp.in(context.params.id).emit('rooms.message', context.user, context.params);
+
+    return Promise.resolve(true);
   }
 
   /**
-   * @returns {{type: string, required: string[], properties: {message: {type: string}, type: {type: string}}}}
+   * @param socket
+   * @param context
+   * @returns {Promise.<boolean>}
    */
-  static get schema() {
-    return {
-      type: 'object',
-      required: ['id', 'message'],
-      properties: {
-        id: {
-          type: 'string',
-        },
-        message: {
-          type: 'object',
-          required: ['message'],
-          properties: {
-            message: {
-              type: 'string'
-            },
-            type: {
-              type: 'string'
-            }
-          }
-        }
-      }
-    }
-  }
+  allowed(socket, context) {
+    let allowed = socket.rooms.hasOwnProperty(context.params.id);
 
-  /**
-   * @returns {boolean}
-   * @returns {Promise}
-   */
-  get allowed() {
-    if (this.params.message.type) {
-      return this.socket.user.isAdmin;
+    if (context.params.message.type !== 'simple') {
+      allowed = allowed && context.user.isAdmin;
     }
 
-    return this.socket.rooms.hasOwnProperty(this.params.id);
+    return Promise.resolve(allowed);
   }
 }
 

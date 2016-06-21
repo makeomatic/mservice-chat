@@ -23,6 +23,13 @@ class RoomService
 
     this.cassandraClient = cassandraClient;
     this.model = Promise.promisifyAll(cassandraClient.modelInstance.room);
+    /** @todo remove it then https://github.com/masumsoft/express-cassandra/issues/53 will be done */
+    this.model.prototype.toJSON = function toSimpleObject() {
+      const simpleObject = Object.assign({}, this);
+      delete simpleObject._validators;
+
+      return simpleObject;
+    };
   }
 
   /**
@@ -61,7 +68,9 @@ class RoomService
    * @returns {*}
    */
   create(properties) {
-    const room = new this.model(properties);
+    const room = new this.model(Object.assign({
+      id: this.cassandraClient.uuid(),
+    }, properties));
 
     return room.saveAsync()
       .then(() => room);
