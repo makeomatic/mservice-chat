@@ -1,0 +1,31 @@
+version: '2'
+services:
+  cassandra:
+    image: cassandra:3.5
+    container_name: cassandra
+    hostname: cassandra
+
+  rabbitmq:
+      expose:
+        - "5672"
+      image: makeomatic/rabbitmq:3.6.2
+      container_name: rabbitmq
+      hostname: rabbitmq
+      volumes:
+        - ./rabbitmq/rabbitmq.config:/usr/lib/rabbitmq/etc/rabbitmq/rabbitmq.config
+
+  tester:
+    links:
+      - cassandra
+      - rabbitmq
+    image: makeomatic/node:6.2.2-tester-glibc
+    container_name: tester
+    command: tail -f /dev/null
+    environment:
+      BLUEBIRD_DEBUG: '1'
+      DEBUG: ${DEBUG}
+      NCONF_NAMESPACE: CHAT
+      DOTENV_NOT_SILENT: "FALSE"
+    working_dir: /src
+    volumes:
+      - ${PWD}:/src

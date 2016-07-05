@@ -1,20 +1,20 @@
 module.exports = {
   fields: {
     id: {
-      type: 'uuid'
+      type: 'uuid',
     },
     name: {
-      type: 'varchar'
+      type: 'varchar',
     },
     createdAt: {
       type: 'timestamp',
       default: {
-        "$db_function": 'toTimestamp(now())'
-      }
+        $db_function: 'toTimestamp(now())',
+      },
     },
     createdBy: {
-      type: 'varchar'
-    }
+      type: 'varchar',
+    },
   },
   key: [['id']],
 };

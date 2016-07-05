@@ -5,15 +5,15 @@
   "required": ["id", "message"],
   "properties": {
     "id": {
-      "type": "string"
+      "type": "string",
+      "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
     },
     "message": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["type"],
       "properties": {
         "type": {
-          "type": "string"
+          "type": "string",
+          "default": "simple"
         }
       },
       "switch": [
@@ -26,9 +26,13 @@
             }
           },
           "then": {
-            "required": ["message"],
+            "additionalProperties": false,
+            "required": ["type", "text"],
             "properties": {
-              "message": {
+              "text": {
+                "type": "string"
+              },
+              "type": {
                 "type": "string"
               }
             }
@@ -43,12 +47,16 @@
             }
           },
           "then": {
-            "required": ["message", "color"],
+            "additionalProperties": false,
+            "required": ["type", "color", "text"],
             "properties": {
-              "message": {
+              "color": {
                 "type": "string"
               },
-              "color": {
+              "text": {
+                "type": "string"
+              },
+              "type": {
                 "type": "string"
               }
             }

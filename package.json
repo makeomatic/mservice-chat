@@ -4,37 +4,39 @@
   "description": "mservice-chat",
   "main": "./lib/chat.js",
   "scripts": {
-    "test:unit": "mocha --recursive -R nyan ./src",
     "compile": "babel -d ./lib ./src",
-    "lint": "eslint ./src"
+    "lint": "eslint ./src",
+    "test": "npm run lint && ./test/docker.sh"
   },
   "private": true,
   "dependencies": {
     "bluebird": "^3.4.1",
     "bunyan": "^1.8.1",
     "common-errors": "^0.5.7",
-    "express-cassandra": "^1.0.1",
-    "glob": "^7.0.4",
+    "express-cassandra": "^1.0.3",
+    "glob": "^7.0.5",
     "is": "^3.1.0",
     "lodash": "^4.13.1",
-    "ms-amqp-transport": "^2.0.0",
+    "ms-conf": "^2.1.0",
+    "ms-socket.io-adapter-amqp": "../ms-socket.io-adapter-amqp",
     "ms-validation": "^2.0.0",
-    "mservice": "^2.3.0",
+    "mservice": "^2.5.1",
     "server-destroy": "^1.0.1",
-    "socket.io": "^1.4.6"
+    "socket.io": "^1.4.8"
   },
   "devDependencies": {
     "babel-cli": "^6.5.1",
-    "babel-eslint": "^6.0.4",
+    "babel-eslint": "^6.1.0",
     "babel-plugin-transform-es2015-spread": "^6.6.5",
     "babel-plugin-transform-object-rest-spread": "^6.6.5",
     "babel-plugin-transform-strict-mode": "^6.6.5",
     "chai": "^3.5.0",
-    "eslint": "^2.13.0",
+    "eslint": "^3.0.0",
     "eslint-config-airbnb-base": "^3.0.1",
-    "eslint-plugin-import": "^1.8.1",
-    "eslint-plugin-mocha": "^3.0.0",
+    "eslint-plugin-import": "^1.10.2",
+    "eslint-plugin-mocha": "^4.0.0",
     "mocha": "^2.5.3",
-    "restify": "^4.1.1"
+    "restify": "^4.1.1",
+    "socket.io-client": "^1.4.8"
   }
 }

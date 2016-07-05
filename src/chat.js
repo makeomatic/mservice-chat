@@ -1,9 +1,13 @@
+const _ = require('lodash');
 const authMiddleware = require('./middlewares/socket/auth');
-const ConfigLoader = require('./configLoader');
+const confidence = require('ms-conf');
+const { globFiles } = require('ms-conf/lib/load-config');
 const MService = require('mservice');
 const path = require('path');
 const RoomService = require('./services/room');
 const SocketService = require('./services/socket');
+
+const defaultConfig = globFiles(path.resolve(__dirname, 'configs'));
 
 /**
  * @param {Chat} application
@@ -28,7 +32,7 @@ class Chat extends MService {
    * @param config
    */
   constructor(config = {}) {
-    super(ConfigLoader.fromDirectory(path.resolve(__dirname, 'configs'), config));
+    super(_.merge({}, defaultConfig, config, confidence.get('/')));
     initServices(this);
 
     this.on('plugin:start:http', () => {

@@ -1,4 +1,3 @@
-const assert = require('assert');
 const Errors = require('common-errors');
 const is = require('is');
 const Promise = require('bluebird');
@@ -14,22 +13,15 @@ class RoomService
    */
   constructor(cassandraClient) {
     if (is.object(cassandraClient.modelInstance) === false) {
-      throw Errors.Argument('cassandraClient');
+      throw new Errors.Argument('cassandraClient');
     }
 
     if (is.fn(cassandraClient.modelInstance.room) === false) {
-      throw Errors.Argument('cassandraClient', 'Model \'room\' not found');
+      throw new Errors.Argument('cassandraClient', 'Model \'room\' not found');
     }
 
     this.cassandraClient = cassandraClient;
     this.model = Promise.promisifyAll(cassandraClient.modelInstance.room);
-    /** @todo remove it then https://github.com/masumsoft/express-cassandra/issues/53 will be done */
-    this.model.prototype.toJSON = function toSimpleObject() {
-      const simpleObject = Object.assign({}, this);
-      delete simpleObject._validators;
-
-      return simpleObject;
-    };
   }
 
   /**
@@ -38,7 +30,7 @@ class RoomService
    */
   getById(id) {
     if (is.string(id) === false) {
-      throw Errors.Argument('id');
+      throw new Errors.Argument('id');
     }
 
     return this.model.findOneAsync({
@@ -53,11 +45,11 @@ class RoomService
    */
   find(query = {}, options = {}) {
     if (is.object(query) === false) {
-      throw Errors.Argument('query');
+      throw new Errors.Argument('query');
     }
 
     if (is.object(options) === false) {
-      throw Errors.Argument('options');
+      throw new Errors.Argument('options');
     }
 
     return this.model.findAsync(query, options);
@@ -68,7 +60,8 @@ class RoomService
    * @returns {*}
    */
   create(properties) {
-    const room = new this.model(Object.assign({
+    const RoomModel = this.model;
+    const room = new RoomModel(Object.assign({
       id: this.cassandraClient.uuid(),
     }, properties));
 

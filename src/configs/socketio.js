@@ -1,8 +1,13 @@
+const AdapterFactory = require('ms-socket.io-adapter-amqp');
+
 module.exports = {
-  server: {
-    options: {
-      transports: ['polling', 'websocket']
-    }
+  socketio: {
+    server: {
+      options: {
+        transports: ['polling', 'websocket'],
+        adapter: AdapterFactory.fromOptions(),
+      },
+    },
+    service: {},
   },
-  service: {},
 };

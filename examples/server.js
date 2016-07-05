@@ -1,10 +1,18 @@
-const Chat = require('./../src/chat');
+const Chat = require('./../src');
 const chat = new Chat();
 
 chat.connect()
-  .then(() => console.log('connected'))
-  .catch(console.error);
+  .then(() => {
+    console.log(`connected on ${chat.http.address().port}`);
+  })
+  .catch(error => {
+    throw error;
+  });
 
 process.on('uncaughtException', error => {
-  console.log(error);
+  throw error;
+});
+
+process.on('unhandledRejection', error => {
+  throw error;
 });

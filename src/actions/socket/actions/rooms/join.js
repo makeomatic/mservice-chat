@@ -1,4 +1,5 @@
 const AbstractAction = require('./../../abstractAction');
+const Errors = require('common-errors');
 
 /**
  *
@@ -31,7 +32,19 @@ class RoomsJoinAction extends AbstractAction
     return this.application.services.room.getById(context.params.id)
       .then(room => {
         if (!room) {
-          return Promise.resolve(false);
+          return Promise.reject(
+            /**
+             * @todo realize fetch objects?
+             * e.g. const fetch = [
+             *  {
+             *    query: 'id',
+             *    model: 'Room',
+             *    toProperty: 'room'
+             *  }
+             * ]
+             */
+            new Errors.NotFoundError('Room')
+          );
         }
 
         context.room = room;

@@ -1,4 +1,5 @@
 const AbstractAction = require('./../../abstractAction');
+const Errors = require('common-errors');
 
 class RoomsLeaveAction extends AbstractAction
 {
@@ -22,7 +23,7 @@ class RoomsLeaveAction extends AbstractAction
    */
   allowed(socket, context) {
     if (socket.rooms.hasOwnProperty(context.params.id) === false) {
-      return Promise.resolve(false);
+      return Promise.reject(new Errors.NotPermittedError('Not in the room'));
     }
 
     return this.application.services.room.getById(context.params.id)

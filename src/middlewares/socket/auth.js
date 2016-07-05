@@ -15,18 +15,32 @@ class LightUserModel
   }
 }
 
+/**
+ * @todo realize it
+ *
+ * @param socket
+ * @param next
+ * @returns {*}
+ */
 function authMiddleware(socket, next) {
   if (socket.handshake.query.token) {
-    return this.amqp.publishAndWait('users.verify', {token : socket.handshake.query.token }, { timeout: 5000 })
-      .then(reply => {
-        socket.user = new LightUserModel(reply.id, `${reply.firstName} ${reply.lastName}`, reply.roles);
-        next();
-      })
+    return this.amqp.publishAndWait(
+      'users.verify',
+      { token: socket.handshake.query.token },
+      { timeout: 5000 }
+    ).then(reply => {
+      socket.user = new LightUserModel(
+        reply.id,
+        `${reply.firstName} ${reply.lastName}`,
+        reply.roles
+      );
+      next();
+    })
       .catch(error => socket.error(error));
-  } else {
-    socket.user = new LightUserModel(socket.id, 'Guest' + socket.id.slice(-4), ['admin']);
-    next();
   }
+
+  socket.user = new LightUserModel(socket.id, `Guest${socket.id.slice(-4)}`, ['admin']);
+  return next();
 }
 
 module.exports = authMiddleware;

@@ -39,16 +39,16 @@ class AbstractAction {
   }
 
   /**
-   * @returns {Promise}
+   *
    */
-  handler(socket, context, callback) {
+  handler() {
     throw new Errors.InvalidOperationError('Method \'handler\' must be implemented');
   }
 
   /**
    * @returns {Promise}
    */
-  validate(socket, context, callback) {
+  validate(socket, context) {
     return this.application.validator.validate(this.constructor.actionName, context.params);
   }
 
@@ -57,7 +57,7 @@ class AbstractAction {
    *
    * @returns {Promise.<boolean>}
    */
-  allowed(socket, context, callback) {
+  allowed() {
     return Promise.resolve(false);
   }
 
@@ -82,7 +82,7 @@ class AbstractAction {
       .then(sanitizedParams => {
         context.params = sanitizedParams;
 
-        return [socket, context, callback]
+        return [socket, context, callback];
       })
       .spread(this.allowed)
       .then(isAllowed => {
@@ -100,6 +100,7 @@ class AbstractAction {
           switch (error.constructor) {
             case Errors.ValidationError:
             case Errors.NotPermittedError:
+            case Errors.NotFoundError:
               return callback(error);
             default:
               this.application.log.error(error);
@@ -107,7 +108,7 @@ class AbstractAction {
           }
         }
 
-        callback(null, result);
+        return callback(null, result);
       });
   }
 }

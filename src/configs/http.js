@@ -1,6 +1,8 @@
 module.exports = {
-  server: {
-    handler: 'restify',
-    attachSocketIO: true
-  }
+  http: {
+    server: {
+      handler: 'restify',
+      attachSocketIO: true,
+    },
+  },
 };

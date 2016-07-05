@@ -7,8 +7,18 @@
 <body>
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script>
+  function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+      results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  }
+
   //var socket = io('http://localhost:3000/simpleChat', { query: 'token=myJWT' });
-  var socket = io('http://localhost:3000/simpleChat');
+  var socket = io('http://localhost:' + (getParameterByName('port') || 3000) + '/simpleChat');
 
   function appendMessage(message) {
     document.body.innerHTML += '<div>' + message + '</div>'
@@ -78,6 +88,10 @@
 
   socket.on('rooms.leave', function(data) {
     appendMessage('User ' + data.user.name + ' left room ' + data.room.name);
+  });
+
+  socket.on('rooms.message', function(user, params) {
+    appendMessage('User ' + user.name + ' in room ' + params.id + ' say ' + params.message.message);
   });
 
   socket.on('connect', function() {

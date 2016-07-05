@@ -1,4 +1,5 @@
 const AbstractAction = require('./../../abstractAction');
+const Errors = require('common-errors');
 const Promise = require('bluebird');
 
 /**
@@ -12,7 +13,11 @@ class RoomsMessageAction extends AbstractAction
    * @returns {Promise.<boolean>}
    */
   handler(socket, context) {
-    socket.nsp.in(context.params.id).emit('rooms.message', context.user, context.params);
+    socket.nsp.in(context.params.id).emit('rooms.message', {
+      user: context.user,
+      room: context.params.id,
+      message: context.params.message,
+    });
 
     return Promise.resolve(true);
   }
@@ -23,13 +28,15 @@ class RoomsMessageAction extends AbstractAction
    * @returns {Promise.<boolean>}
    */
   allowed(socket, context) {
-    let allowed = socket.rooms.hasOwnProperty(context.params.id);
-
-    if (context.params.message.type !== 'simple') {
-      allowed = allowed && context.user.isAdmin;
+    if (socket.rooms.hasOwnProperty(context.params.id) === false) {
+      return Promise.reject(new Errors.NotPermittedError('Not in the room'));
     }
 
-    return Promise.resolve(allowed);
+    if (context.params.message.type !== 'simple' && context.user.isAdmin !== true) {
+      return Promise.reject(new Errors.NotPermittedError('Access denied'));
+    }
+
+    return Promise.resolve(true);
   }
 }
 
