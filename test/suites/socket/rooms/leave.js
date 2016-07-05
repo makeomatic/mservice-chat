@@ -49,13 +49,11 @@ describe('rooms.leave', function testSuite() {
 
     client.on('connect', () => {
       client.emit('rooms.join', { id: this.room.id.toString() }, () => {
-        Promise.delay(100).tap(() => {
-          client.emit('rooms.leave', { id: this.room.id.toString() }, (error, data) => {
-            expect(error).to.be.equals(null);
-            expect(data.id).to.be.equals(this.room.id.toString());
-            client.disconnect();
-            done();
-          });
+        client.emit('rooms.leave', { id: this.room.id.toString() }, (error, data) => {
+          expect(error).to.be.equals(null);
+          expect(data.id).to.be.equals(this.room.id.toString());
+          client.disconnect();
+          done();
         });
       });
     });
@@ -76,9 +74,7 @@ describe('rooms.leave', function testSuite() {
     client1.on('connect', () => {
       client1.emit('rooms.join', { id: this.room.id.toString() }, () => {
         client2.emit('rooms.join', { id: this.room.id.toString() }, () => {
-          Promise.delay(100).tap(() => {
-            client2.emit('rooms.leave', { id: this.room.id.toString() }, (error) => {});
-          });
+          client2.emit('rooms.leave', { id: this.room.id.toString() }, (error) => {});
         });
       });
     });

@@ -158,15 +158,13 @@ describe('rooms.message', function testSuite() {
 
     client.on('connect', () => {
       client.emit('rooms.join', { id: this.room.id.toString() }, () => {
-        Promise.delay(100).tap(() => {
-          client.emit('rooms.message', {
-            id: this.room.id.toString(),
-            message: { text: 'foo' }
-          }, (error, data) => {
-            expect(error).to.be.equals(null);
-            expect(data).to.be.equals(true);
-            done();
-          });
+        client.emit('rooms.message', {
+          id: this.room.id.toString(),
+          message: { text: 'foo' }
+        }, (error, data) => {
+          expect(error).to.be.equals(null);
+          expect(data).to.be.equals(true);
+          done();
         });
       });
     });
@@ -188,12 +186,10 @@ describe('rooms.message', function testSuite() {
     client1.on('connect', () => {
       client1.emit('rooms.join', { id: this.room.id.toString() }, () => {
         client2.emit('rooms.join', { id: this.room.id.toString() }, () => {
-          Promise.delay(100).tap(() => {
-            client2.emit('rooms.message', {
-              id: this.room.id.toString(),
-              message: { text: 'foo' }
-            }, () => {});
-          });
+          client2.emit('rooms.message', {
+            id: this.room.id.toString(),
+            message: { text: 'foo' }
+          }, () => {});
         });
       });
     });

@@ -1,5 +1,6 @@
 const AbstractAction = require('./../../abstractAction');
 const Errors = require('common-errors');
+const Promise = require('bluebird');
 
 /**
  *
@@ -10,13 +11,14 @@ class RoomsJoinAction extends AbstractAction
    *
    */
   handler(socket, context) {
-    socket.join(context.params.id);
-    socket.nsp.in(context.params.id).emit('rooms.join', {
-      user: context.user,
-      room: context.room,
-    });
-
-    return Promise.resolve(context.room);
+    return Promise.fromCallback(callback => socket.join(context.params.id, callback))
+      .tap(() => {
+        socket.nsp.in(context.params.id).emit('rooms.join', {
+          user: context.user,
+          room: context.room,
+        });
+      })
+      .return(context.room);
   }
 
   /**

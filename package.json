@@ -18,7 +18,7 @@
     "is": "^3.1.0",
     "lodash": "^4.13.1",
     "ms-conf": "^2.1.0",
-    "ms-socket.io-adapter-amqp": "../ms-socket.io-adapter-amqp",
+    "ms-socket.io-adapter-amqp": "^1.0.0",
     "ms-validation": "^2.0.0",
     "mservice": "^2.5.1",
     "server-destroy": "^1.0.1",

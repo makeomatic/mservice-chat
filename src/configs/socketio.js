@@ -5,7 +5,12 @@ module.exports = {
     server: {
       options: {
         transports: ['polling', 'websocket'],
-        adapter: AdapterFactory.fromOptions(),
+        adapter: AdapterFactory.fromOptions({
+          connection: {
+            host: '0.0.0.0',
+            port: 5672,
+          },
+        }),
       },
     },
     service: {},

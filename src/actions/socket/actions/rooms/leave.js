@@ -1,5 +1,6 @@
 const AbstractAction = require('./../../abstractAction');
 const Errors = require('common-errors');
+const Promise = require('bluebird');
 
 class RoomsLeaveAction extends AbstractAction
 {
@@ -7,13 +8,14 @@ class RoomsLeaveAction extends AbstractAction
    *
    */
   handler(socket, context) {
-    socket.leave(context.params.id);
-    socket.nsp.in(context.params.id).emit('rooms.leave', {
-      user: context.user,
-      room: context.room,
-    });
-
-    return Promise.resolve(context.room);
+    return Promise.fromCallback(callback => socket.leave(context.params.id, callback))
+      .tap(() => {
+        socket.nsp.in(context.params.id).emit('rooms.leave', {
+          user: context.user,
+          room: context.room,
+        });
+      })
+      .return(context.room);
   }
 
   /**
