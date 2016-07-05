@@ -5,6 +5,43 @@ services:
     container_name: cassandra
     hostname: cassandra
 
+  redis-1:
+    image: makeomatic/alpine-redis
+    container_name: redis-1
+    hostname: redis-1
+    expose:
+      - "6379"
+      - "16379"
+
+  redis-2:
+    image: makeomatic/alpine-redis
+    container_name: redis-2
+    hostname: redis-2
+    expose:
+      - "6379"
+      - "16379"
+
+  redis-3:
+    image: makeomatic/alpine-redis
+    container_name: redis-3
+    hostname: redis-3
+    expose:
+      - "6379"
+      - "16379"
+
+  redis_client:
+    links:
+      - redis-1
+      - redis-2
+      - redis-3
+      - rabbitmq
+    container_name: redis_client
+    image: makeomatic/redis-trib
+    environment:
+      - REDIS_1=redis-1
+      - REDIS_2=redis-2
+      - REDIS_3=redis-3
+
   rabbitmq:
       expose:
         - "5672"
@@ -12,7 +49,25 @@ services:
       container_name: rabbitmq
       hostname: rabbitmq
       volumes:
-        - ./rabbitmq/rabbitmq.config:/usr/lib/rabbitmq/etc/rabbitmq/rabbitmq.config
+        - ./configs/rabbitmq/rabbitmq.config:/usr/lib/rabbitmq/etc/rabbitmq/rabbitmq.config
+
+  ms-users:
+    links:
+      - redis-1
+      - redis-2
+      - redis-3
+      - rabbitmq
+      - redis_client
+    image: makeomatic/ms-users:5.6.0
+    hostname: ms-users
+    container_name: ms-users
+    volumes:
+      - ${PWD}/test/configs:/src/configs:ro
+    environment:
+      NODE_ENV: 'production'
+      NCONF_FILE_PATH: '["/src/configs/ms-users/config.js"]'
+      MS_USERS__LOGGER: 'true'
+      MS_USERS__INIT_ADMIN_ACCOUNTS_DELAY: '1'
 
   tester:
     links:

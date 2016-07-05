@@ -2,7 +2,7 @@ const AbstractAction = require('./../abstractAction');
 const Promise = require('bluebird');
 
 /**
- * @todo remove, use ms-users
+ *
  */
 class MeAction extends AbstractAction
 {

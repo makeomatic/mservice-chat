@@ -5,7 +5,7 @@ const path = require('path');
 module.exports = {
   cassandra: {
     service: {
-      models: path.resolve(__dirname, '../models'),
+      models: path.resolve(__dirname, '../models/cassandra'),
     },
     client: {
       clientOptions: {

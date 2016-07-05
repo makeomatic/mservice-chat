@@ -1,5 +1,5 @@
 --require babel-register
---require ./test/config.js
+--require ./test/configs/config.js
 --bail
 --timeout 10000
 -R spec

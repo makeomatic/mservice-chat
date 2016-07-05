@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 
 describe('rooms.message', function testSuite() {
   const SocketIOClient = require('socket.io-client');
-  const Chat = require('../../../../src');
+  const Chat = require('../../../../../src');
 
   before('start up chat', () => {
     const chat = this.chat = new Chat(global.SERVICES);

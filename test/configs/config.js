@@ -1,6 +1,11 @@
 const AdapterFactory = require('ms-socket.io-adapter-amqp');
 
 global.SERVICES = {
+  amqp: {
+    connection: {
+      host: 'rabbitmq',
+    },
+  },
   cassandra: {
     client: {
       clientOptions: {
@@ -22,5 +27,13 @@ global.SERVICES = {
         }),
       },
     },
-  }
+  },
+  plugins: [
+    'validator', // keep it first
+    // 'logger',
+    'amqp',
+    'cassandra',
+    'http',
+    'socketio',
+  ],
 };

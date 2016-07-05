@@ -22,6 +22,6 @@ fi
 $COMPOSE up -d
 
 # make sure that services are up
-sleep 40
+#sleep 40
 
 docker exec tester ./node_modules/.bin/_mocha --recursive "./test/suites"
