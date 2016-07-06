@@ -14,7 +14,9 @@ describe('me', function testSuite() {
     client.on('connect', () => {
       client.emit('me', {}, (error, user) => {
         expect(error).to.be.equals(null);
-        expect(user.name.startsWith('Guest')).to.be.true;
+        expect(user.id).to.be.equal(null);
+        expect(user.name.startsWith('Guest')).to.be.equal(true);
+        expect(user.roles).to.be.deep.equal([]);
         client.disconnect();
         done();
       });
@@ -31,25 +33,28 @@ describe('me', function testSuite() {
     });
   });
 
-  it.skip('should auth as an admin', done => {
+  it('should auth as an admin', done => {
     this.chat.amqp
       .publishAndWait(
         'users.login',
         {
           username: 'test@test.ru',
           password: 'megalongsuperpasswordfortest',
-          audience: '*'
-        },
-        { timeout: 5000 }
+          audience: '*.localhost'
+        }
       )
       .then(reply => {
-        console.log(reply)
-        const client = SocketIOClient('http://0.0.0.0:3000/testChat', { query: 'token=1' });
+        const client = SocketIOClient(
+          'http://0.0.0.0:3000/testChat',
+          { query: `token=${reply.jwt}` }
+        );
 
         client.on('connect', () => {
           client.emit('me', {}, (error, user) => {
-            console.log(user)
             expect(error).to.be.equals(null);
+            expect(user.id).to.be.equal('test@test.ru');
+            expect(user.name).to.be.equal('Admin Admin');
+            expect(user.roles).to.be.deep.equal(['admin']);
             client.disconnect();
             done();
           });

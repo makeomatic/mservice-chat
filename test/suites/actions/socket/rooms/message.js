@@ -137,18 +137,20 @@ describe('rooms.message', function testSuite() {
     });
   });
 
-  it.skip('should returns error if message is not simple and user is not admin', done => {
+  it('should returns error if message is not simple and user is not admin', done => {
     const client = SocketIOClient('http://0.0.0.0:3000/testChat');
     client.on('connect', () => {
-      client.emit('rooms.message', {
-        id: this.room.id,
-        message: { type: 'color', text: 'foo', color: 'red' },
-      }, error => {
-        expect(error.name).to.be.equals('NotPermittedError');
-        expect(error.message).to.be.equals('An attempt was made to perform an operation that is '
-          + 'not permitted: Access denied');
-        client.disconnect();
-        done();
+      client.emit('rooms.join', { id: this.room.id.toString() }, () => {
+        client.emit('rooms.message', {
+          id: this.room.id,
+          message: { type: 'color', text: 'foo', color: 'red' },
+        }, error => {
+          expect(error.name).to.be.equals('NotPermittedError');
+          expect(error.message).to.be.equals('An attempt was made to perform an operation that is '
+            + 'not permitted: Access denied');
+          client.disconnect();
+          done();
+        });
       });
     });
   });

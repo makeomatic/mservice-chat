@@ -4,6 +4,7 @@ module.exports = {
       host: 'rabbitmq',
       port: 5672,
     },
+    debug: true,
   },
   redis: {
     hosts: [
@@ -21,14 +22,12 @@ module.exports = {
       },
     ]
   },
-  users: {
-    admins: [
-      {
-        username: 'test@test.ru',
-        password: 'megalongsuperpasswordfortest',
-        firstName: 'Unit',
-        lastName: 'Test',
-      },
-    ]
-  }
+  admins: [
+    {
+      username: 'test@test.ru',
+      password: 'megalongsuperpasswordfortest',
+      firstName: 'Admin',
+      lastName: 'Admin',
+    },
+  ]
 };

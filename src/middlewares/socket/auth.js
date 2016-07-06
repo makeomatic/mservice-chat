@@ -12,15 +12,16 @@ function authMiddleware(socket, callback) {
   let promise;
 
   if (socket.handshake.query.token) {
-    promise = this.amqp
-      .publishAndWait(
-        'users.verify',
-        { token: socket.handshake.query.token, audience: '*' },
-        { timeout: 5000 }
-      )
+    const action = `${this.config.users.prefix}.${this.config.users.postfix['verify']}`;
+    const audience = this.config.users.audience;
+    const timeout = this.config.users.timeouts['verify'];
+    const token = socket.handshake.query.token;
+
+    promise = this.amqp.publishAndWait(action, { token, audience }, { timeout })
       .then(reply => {
-        const name = `${reply.firstName} ${reply.lastName}`;
-        return new LightUserModel(reply.id, name, reply.roles);
+        const user = reply.metadata[audience];
+        const name = `${user.firstName} ${user.lastName}`;
+        return new LightUserModel(user.username, name, user.roles);
       });
   } else {
     promise = Promise.resolve(new LightUserModel(null, `Guest${uid2(8)}`));
