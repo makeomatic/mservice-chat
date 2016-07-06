@@ -24,7 +24,7 @@ class RoomsLeaveAction extends AbstractAction
    * @returns {*}
    */
   allowed(socket, context) {
-    if (socket.rooms.hasOwnProperty(context.params.id) === false) {
+    if (!socket.rooms[context.params.id]) {
       return Promise.reject(new Errors.NotPermittedError('Not in the room'));
     }
 

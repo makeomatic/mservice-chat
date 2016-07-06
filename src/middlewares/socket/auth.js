@@ -12,9 +12,9 @@ function authMiddleware(socket, callback) {
   let promise;
 
   if (socket.handshake.query.token) {
-    const action = `${this.config.users.prefix}.${this.config.users.postfix['verify']}`;
+    const action = `${this.config.users.prefix}.${this.config.users.postfix.verify}`;
     const audience = this.config.users.audience;
-    const timeout = this.config.users.timeouts['verify'];
+    const timeout = this.config.users.timeouts.verify;
     const token = socket.handshake.query.token;
 
     promise = this.amqp.publishAndWait(action, { token, audience }, { timeout })

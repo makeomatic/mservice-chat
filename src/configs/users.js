@@ -8,5 +8,5 @@ module.exports = {
       verify: 2000,
     },
     audience: '*.localhost',
-  }
+  },
 };

@@ -27,8 +27,8 @@ class RoomsJoinAction extends AbstractAction
    * @returns {*}
    */
   allowed(socket, context) {
-    if (socket.rooms.hasOwnProperty(context.params.id)) {
-      return Promise.resolve(false);
+    if (socket.rooms[context.params.id]) {
+      return Promise.reject(new Errors.NotPermittedError('Already in the room'));
     }
 
     return this.application.services.room.getById(context.params.id)
