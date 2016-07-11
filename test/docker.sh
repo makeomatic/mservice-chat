@@ -29,6 +29,9 @@ fi
 # bring compose up
 $COMPOSE up -d
 
+# make sure that services are up
+sleep 40
+
 echo "cleaning old coverage"
 rm -rf ./coverage
 
