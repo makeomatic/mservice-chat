@@ -28,12 +28,4 @@ global.SERVICES = {
       },
     },
   },
-  plugins: [
-    'validator', // keep it first
-    // 'logger',
-    'amqp',
-    'cassandra',
-    'http',
-    'socketio',
-  ],
 };

@@ -68,7 +68,8 @@ describe('rooms.message', function testSuite() {
         message: { color: 'red' }
       }, error => {
         expect(error.name).to.be.equals('ValidationError');
-        expect(error.message).to.be.equals('rooms.message validation failed: data.message should NOT have additional properties, data.message should have required property \'text\'');
+        expect(error.message)
+          .to.be.equals('rooms.message validation failed: data.message should NOT have additional properties, data.message should have required property \'text\'');
         client.disconnect();
         done();
       });
@@ -98,7 +99,8 @@ describe('rooms.message', function testSuite() {
         message: { type: 'simple', text: 'foo', color: 'red' }
       }, error => {
         expect(error.name).to.be.equals('ValidationError');
-        expect(error.message).to.be.equals('rooms.message validation failed: data.message should NOT have additional properties');
+        expect(error.message)
+          .to.be.equals('rooms.message validation failed: data.message should NOT have additional properties');
         client.disconnect();
         done();
       });
@@ -113,8 +115,8 @@ describe('rooms.message', function testSuite() {
         message: { text: 'foo' }
       }, error => {
         expect(error.name).to.be.equals('ValidationError');
-        expect(error.message).to.be.equals('rooms.message validation failed: data.id should match pattern'
-          + ' "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"');
+        expect(error.message)
+          .to.be.equals('rooms.message validation failed: data.id should match format "uuid"');
         client.disconnect();
         done();
       });

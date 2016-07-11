@@ -1,14 +1,16 @@
 {
   "name": "mservice-chat",
-  "version": "0.0.1",
   "description": "mservice-chat",
-  "main": "./lib/chat.js",
+  "main": "./lib/index.js",
   "scripts": {
-    "compile": "babel -d ./lib ./src",
+    "compile": "rm -rf ./lib; babel -d ./lib ./src",
+    "docker-release": "./docker-release.sh",
     "lint": "eslint ./src",
+    "prepublish": "npm run lint && npm run compile",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "start": "node ./bin/server.js | bunyan -o short",
     "test": "npm run lint && ./test/docker.sh"
   },
-  "private": true,
   "dependencies": {
     "bluebird": "^3.4.1",
     "bunyan": "^1.8.1",
@@ -20,24 +22,41 @@
     "ms-conf": "^2.1.0",
     "ms-socket.io-adapter-amqp": "^1.0.0",
     "ms-validation": "^2.0.0",
-    "mservice": "^2.5.1",
+    "mservice": "^2.6.0",
     "server-destroy": "^1.0.1",
     "socket.io": "^1.4.8",
     "uid2": "0.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.5.1",
-    "babel-eslint": "^6.1.0",
+    "babel-eslint": "^6.1.2",
+    "babel-plugin-transform-es2015-destructuring": "^6.9.0",
     "babel-plugin-transform-es2015-spread": "^6.6.5",
     "babel-plugin-transform-object-rest-spread": "^6.6.5",
     "babel-plugin-transform-strict-mode": "^6.6.5",
+    "babel-register": "^6.9.0",
     "chai": "^3.5.0",
+    "cz-conventional-changelog": "^1.1.6",
     "eslint": "^3.0.1",
     "eslint-config-airbnb-base": "^4.0.0",
     "eslint-plugin-import": "^1.10.2",
     "eslint-plugin-mocha": "^4.0.0",
     "mocha": "^2.5.3",
     "restify": "^4.1.1",
+    "semantic-release": "^4.3.5",
     "socket.io-client": "^1.4.8"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/makeomatic/mservice-chat.git"
+  },
+  "release": {
+    "verifyConditions": []
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

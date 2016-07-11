@@ -23,8 +23,8 @@ describe('rooms.leave', function testSuite() {
     client.on('connect', () => {
       client.emit('rooms.leave', { id: '1' }, error => {
         expect(error.name).to.be.equals('ValidationError');
-        expect(error.message).to.be.equals('rooms.leave validation failed: data.id should match pattern'
-          + ' "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"');
+        expect(error.message)
+          .to.be.equals('rooms.leave validation failed: data.id should match format "uuid"');
         client.disconnect();
         done();
       });
