@@ -74,17 +74,16 @@ services:
       MS_USERS__INIT_ADMIN_ACCOUNTS_DELAY: '1'
 
   tester:
+    container_name: tester
+    image: makeomatic/node:6.2.2-tester
     links:
       - cassandra
       - rabbitmq
-    image: makeomatic/node:6.2.2-tester-glibc
-    container_name: tester
-    command: tail -f /dev/null
-    environment:
-      BLUEBIRD_DEBUG: '1'
-      DEBUG: ${DEBUG}
-      NCONF_NAMESPACE: CHAT
-      DOTENV_NOT_SILENT: "FALSE"
     working_dir: /src
     volumes:
       - ${PWD}:/src
+    environment:
+      NODE_ENV: "test"
+      DEBUG: ${DEBUG}
+      SKIP_REBUILD: ${SKIP_REBUILD}
+    command: tail -f /dev/null
