@@ -1,26 +1,27 @@
-const assert = require('assert');
+const Errors = require('common-errors');
 const is = require('is');
 const Promise = require('bluebird');
 
 /**
- *
+ * @property {CassandraClient} cassandraClient
+ * @property {BaseModel} model
  */
-class Room
+class RoomService
 {
   /**
-   * @param cassandra
+   * @param {CassandraClient} cassandraClient
    */
-  constructor(cassandra) {
-    this.cassandra = cassandra;
-    this.model = cassandra.instance.room;
-  }
+  constructor(cassandraClient) {
+    if (is.object(cassandraClient.modelInstance) === false) {
+      throw new Errors.Argument('cassandraClient');
+    }
 
-  /**
-   * @param cassandra
-   * @returns {Room}
-   */
-  static factory(cassandra) {
-    return new Room(cassandra);
+    if (is.fn(cassandraClient.modelInstance.room) === false) {
+      throw new Errors.Argument('cassandraClient', 'Model \'room\' not found');
+    }
+
+    this.cassandraClient = cassandraClient;
+    this.model = Promise.promisifyAll(cassandraClient.modelInstance.room);
   }
 
   /**
@@ -28,10 +29,45 @@ class Room
    * @returns {Promise}
    */
   getById(id) {
-    assert(is.string(id));
-    const findOne = Promise.promisify(this.model.findOne, { context: this.model });
-    return findOne({id: this.cassandra.datatypes.Uuid.fromString(id)});
+    if (is.string(id) === false) {
+      throw new Errors.Argument('id');
+    }
+
+    return this.model.findOneAsync({
+      id: this.cassandraClient.datatypes.Uuid.fromString(id),
+    });
+  }
+
+  /**
+   * @param {object} query
+   * @param {object} options
+   * @returns {Promise.<Object[]>}
+   */
+  find(query = {}, options = {}) {
+    if (is.object(query) === false) {
+      throw new Errors.Argument('query');
+    }
+
+    if (is.object(options) === false) {
+      throw new Errors.Argument('options');
+    }
+
+    return this.model.findAsync(query, options);
+  }
+
+  /**
+   * @param properties
+   * @returns {*}
+   */
+  create(properties) {
+    const RoomModel = this.model;
+    const room = new RoomModel(Object.assign({
+      id: this.cassandraClient.uuid(),
+    }, properties));
+
+    return room.saveAsync()
+      .then(() => room);
   }
 }
 
-module.exports = Room;
+module.exports = RoomService;

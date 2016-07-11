@@ -1,39 +1,58 @@
 const AbstractAction = require('./../../abstractAction');
+const Errors = require('common-errors');
+const Promise = require('bluebird');
 
+/**
+ *
+ */
 class RoomsJoinAction extends AbstractAction
 {
-  handler() {
-    const roomId = this.params.id;
-
-    if (this.socket.rooms[roomId]) {
-      return;
-    }
-
-    const Room = this.service.cassandra.instance.room;
-    Room.findOne({id: this.service.cassandra.datatypes.Uuid.fromString(this.params.id)}, (error, room) => {
-      if (error) {
-        return this.socket.error(error);
-      }
-
-      this.socket.join(room.id);
-      this.socket.nsp.in(room.id).emit('rooms.join', `${this.socket.user.name} joins to ${room.name}`);
-    });
+  /**
+   *
+   */
+  handler(socket, context) {
+    return Promise.fromCallback(callback => socket.join(context.params.id, callback))
+      .tap(() => {
+        socket.nsp.in(context.params.id).emit('rooms.join', {
+          user: context.user,
+          room: context.room,
+        });
+      })
+      .return(context.room);
   }
 
-  static get schema() {
-    return {
-      type: "object",
-      required: ['id'],
-      properties: {
-        id: {
-          type: "string"
+  /**
+   * @param socket
+   * @param context
+   * @returns {*}
+   */
+  allowed(socket, context) {
+    if (socket.rooms[context.params.id]) {
+      return Promise.reject(new Errors.NotPermittedError('Already in the room'));
+    }
+
+    return this.application.services.room.getById(context.params.id)
+      .then(room => {
+        if (!room) {
+          return Promise.reject(
+            /**
+             * @todo realize fetch objects?
+             * e.g. const fetch = [
+             *  {
+             *    query: 'id',
+             *    model: 'Room',
+             *    toProperty: 'room'
+             *  }
+             * ]
+             */
+            new Errors.NotFoundError('Room')
+          );
         }
-      }
-    }
-  }
 
-  get allowed() {
-    return true;
+        context.room = room;
+
+        return Promise.resolve(room.id.toString() === context.params.id);
+      });
   }
 }
 

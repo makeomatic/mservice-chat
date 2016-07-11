@@ -1,33 +1,27 @@
 const AbstractAction = require('./../../abstractAction');
 
+/**
+ *
+ */
 class RoomsCreateAction extends AbstractAction
 {
-  handler() {
-    const Room = this.service.cassandra.instance.room;
-    const room = new Room(Object.assign({ createdBy: this.socket.user.id }, this.params));
-    room.save(error => {
-      if (error) {
-        this.socket.emit('error', error.message);
-      } else {
-        this.socket.emit('rooms.create', room);
-      }
-    });
+  /**
+   * @param socket
+   * @param context
+   */
+  handler(socket, context) {
+    const properties = Object.assign({ createdBy: context.user.id }, context.params);
+
+    return this.application.services.room.create(properties);
   }
 
-  static get schema() {
-    return {
-      type: "object",
-      required: ['name'],
-      properties: {
-        "name": {
-          "type": "string"
-        }
-      }
-    }
-  }
-
-  get allowed() {
-    return this.socket.user.isAdmin;
+  /**
+   * @param socket
+   * @param context
+   * @returns {*}
+   */
+  allowed(socket, context) {
+    return Promise.resolve(context.user.isAdmin);
   }
 }
 

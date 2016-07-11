@@ -1,32 +1,57 @@
-class LightUserModel
-{
-  constructor(id, name, roles = []) {
-    this.id = id;
-    this.name = name;
-    this.roles = roles;
-  }
+const Errors = require('common-errors');
+const LightUserModel = require('./../../models/lightUserModel');
+const Promise = require('bluebird');
+const uid2 = require('uid2');
 
-  get isGuest() {
-    return this.roles.length === 0;
-  }
+/**
+ * @param socket
+ * @param callback
+ * @returns {*}
+ */
+function authMiddleware(socket, callback) {
+  let promise;
 
-  get isAdmin() {
-    return this.roles.indexOf('admin') !== -1;
-  }
-}
-
-function authMiddleware(socket, next) {
   if (socket.handshake.query.token) {
-    return this.amqp.publishAndWait('users.verify', {token : socket.handshake.query.token }, { timeout: 5000 })
+    const action = `${this.config.users.prefix}.${this.config.users.postfix.verify}`;
+    const audience = this.config.users.audience;
+    const timeout = this.config.users.timeouts.verify;
+    const token = socket.handshake.query.token;
+
+    promise = this.amqp.publishAndWait(action, { token, audience }, { timeout })
       .then(reply => {
-        socket.user = new LightUserModel(reply.id, `${reply.firstName} ${reply.lastName}`, reply.roles);
-        next();
-      })
-      .catch(error => socket.error(error));
+        const user = reply.metadata[audience];
+        const name = `${user.firstName} ${user.lastName}`;
+        return new LightUserModel(user.username, name, user.roles);
+      });
   } else {
-    socket.user = new LightUserModel(socket.id, 'Guest' + socket.id.slice(-4), ['admin']);
-    next();
+    promise = Promise.resolve(new LightUserModel(null, `Guest${uid2(8)}`));
   }
+
+  return promise
+    .then(user => {
+      socket.user = user;
+    })
+    .asCallback((error) => {
+      if (error) {
+        switch (error.constructor) {
+          case Errors.AuthenticationRequired:
+          case Errors.AuthenticationRequiredError:
+            return callback(error);
+          default:
+            if (error.name === 'HttpStatusError') {
+              return callback(error);
+            }
+
+            if (this._log) { // eslint-disable-line no-underscore-dangle
+              this.log.error(error);
+            }
+
+            return callback(new Errors.Error('Something went wrong'));
+        }
+      }
+
+      return callback();
+    });
 }
 
 module.exports = authMiddleware;

@@ -1,28 +1,12 @@
 module.exports = {
-  prefix: 'users',
-  postfix: {
-    register: 'register',
-    activate: 'activate',
-    ban: 'ban',
-    updatePassword: 'updatePassword',
-    requestPassword: 'requestPassword',
-    login: 'login',
-    challenge: 'challenge',
-    verify: 'verify',
-    getMetadata: 'getMetadata',
-    updateMetadata: 'updateMetadata',
+  users: {
+    prefix: 'users',
+    postfix: {
+      verify: 'verify',
+    },
+    timeouts: {
+      verify: 2000,
+    },
+    audience: '*.localhost',
   },
-  timeouts: {
-    register: 5000,
-    activate: 5000,
-    updatePassword: 5000,
-    requestPassword: 5000,
-    ban: 5000,
-    login: 5000,
-    challenge: 5000,
-    verify: 2000,
-    getMetadata: 5000,
-    updateMetadata: 5000,
-  },
-  audience: '*.localhost',
 };

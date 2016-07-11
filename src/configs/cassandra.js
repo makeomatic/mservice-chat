@@ -1,28 +1,31 @@
 const cassandra = require('express-cassandra');
 const chatConfig = require('./chat');
+const path = require('path');
 
 module.exports = {
-  service: {
-    models: `${__dirname}/../models`
-  },
-  client: {
-    clientOptions: {
-      contactPoints: ['0.0.0.0'],
-      protocolOptions: {
-        port: 9042
-      },
-      keyspace: chatConfig.namespace,
-      queryOptions: {
-        consistency: cassandra.consistencies.one
-      }
+  cassandra: {
+    service: {
+      models: path.resolve(__dirname, '../models/cassandra'),
     },
-    ormOptions: {
-      defaultReplicationStrategy: {
-        class: 'SimpleStrategy',
-        replication_factor: 1
+    client: {
+      clientOptions: {
+        contactPoints: ['0.0.0.0'],
+        protocolOptions: {
+          port: 9042,
+        },
+        keyspace: chatConfig.chat.namespace,
+        queryOptions: {
+          consistency: cassandra.consistencies.one,
+        },
       },
-      dropTableOnSchemaChange: true,
-      createKeyspace: true
-    }
-  }
+      ormOptions: {
+        defaultReplicationStrategy: {
+          class: 'SimpleStrategy',
+          replication_factor: 1,
+        },
+        dropTableOnSchemaChange: true,
+        createKeyspace: true,
+      },
+    },
+  },
 };
