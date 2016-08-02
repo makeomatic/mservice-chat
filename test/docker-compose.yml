@@ -71,6 +71,7 @@ services:
       NODE_ENV: 'production'
       NCONF_FILE_PATH: '["/src/configs/ms-users/config.js"]'
       MS_USERS__LOGGER: 'true'
+      MS_USERS__INIT_ADMIN_ACCOUNTS_DELAY: '1'
 
   tester:
     container_name: tester
