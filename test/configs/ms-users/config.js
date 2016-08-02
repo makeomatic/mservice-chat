@@ -29,5 +29,11 @@ module.exports = {
       firstName: 'Admin',
       lastName: 'Admin',
     },
+    {
+      username: 'foo@bar.ru',
+      password: 'bazbazbazbazbazbaz',
+      firstName: 'Foo',
+      lastName: 'Bar',
+    },
   ]
 };

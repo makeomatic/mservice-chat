@@ -5,15 +5,18 @@
   "required": ["id", "message"],
   "properties": {
     "id": {
-      "type": "string",
-      "format": "uuid"
+      "format": "uuid",
+      "description": "Room id",
+      "type": "string"
     },
     "message": {
       "type": "object",
+      "description": "Message object",
       "properties": {
         "type": {
-          "type": "string",
-          "default": "simple"
+          "default": "simple",
+          "description": "Message type",
+          "type": "string"
         }
       },
       "switch": [

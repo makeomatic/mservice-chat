@@ -1,11 +1,14 @@
 {
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "name"
-  ],
+  "required": ["name", "token"],
   "properties": {
     "name": {
+      "description": "Name of the room",
+      "type": "string"
+    },
+    "token": {
+      "description": "Auth token",
       "type": "string"
     }
   }

@@ -1,8 +1,11 @@
 module.exports = {
   http: {
     server: {
-      handler: 'restify',
+      handler: 'express',
       attachSocketIO: true,
+    },
+    router: {
+      enabled: true,
     },
   },
 };

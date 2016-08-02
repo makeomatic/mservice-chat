@@ -3,52 +3,55 @@ const { expect } = require('chai');
 describe('rooms.join', function testSuite() {
   const SocketIOClient = require('socket.io-client');
   const Chat = require('../../src');
+  const action = 'api.chat.rooms.join';
 
   before('start up chat', () => {
     const chat = this.chat = new Chat(global.SERVICES);
     return chat.connect();
   });
 
-  before('create room', () => {
-    return this.chat.services.room.create({
-      name: 'test'
-    }).then(room => {
+  before('create room', () => this.chat.services.room.create({ name: 'test' })
+    .then(room => {
       this.room = room
-    });
-  });
+    })
+  );
 
-  it('should returns validation error if invalid room id', done => {
-    const client = SocketIOClient('http://0.0.0.0:3000/testChat');
+  it('should return validation error if invalid room id', done => {
+    const client = SocketIOClient('http://0.0.0.0:3000');
+    client.on('error', done);
     client.on('connect', () => {
-      client.emit('rooms.join', { id: '1' }, error => {
+      client.emit('action', { action, id: '1' }, error => {
         expect(error.name).to.be.equals('ValidationError');
-        expect(error.message)
-          .to.be.equals('rooms.join validation failed: data.id should match format "uuid"');
+        expect(error.message).to.be
+          .equals('rooms.join validation failed: data.id should match format "uuid"');
         client.disconnect();
         done();
       });
     });
   });
 
-  it('should returns not found error if room is not exists', done => {
-    const client = SocketIOClient('http://0.0.0.0:3000/testChat');
+  it('should return not found error if room is not exists', done => {
+    const client = SocketIOClient('http://0.0.0.0:3000');
+    client.on('error', done);
     client.on('connect', () => {
-      client.emit('rooms.join', { id: '00000000-0000-0000-0000-000000000000' }, error => {
+      client.emit('action', { action, id: '00000000-0000-0000-0000-000000000000' }, error => {
         expect(error.name).to.be.equals('NotFoundError');
-        expect(error.message).to.be.equals('Not Found: "Room"');
+        expect(error.message).to.be.equals('Not Found: "Room #00000000-0000-0000-0000-000000000000 not found"');
         client.disconnect();
         done();
       });
     });
   });
 
-  it('should join to room', done => {
-    const client = SocketIOClient('http://0.0.0.0:3000/testChat');
+  it('should return not permitted error if already in the room');
 
+  it.only('should join to room', done => {
+    const client = SocketIOClient('http://0.0.0.0:3000');
+    client.on('error', done);
     client.on('connect', () => {
-      client.emit('rooms.join', { id: this.room.id.toString() }, (error, data) => {
+      client.emit('action', { action, id: this.room.id.toString() }, (error, response) => {
         expect(error).to.be.equals(null);
-        expect(data.id).to.be.equals(this.room.id.toString());
+        expect(response.room).to.be.equals(this.room.id.toString());
         client.disconnect();
         done();
       });
@@ -56,25 +59,27 @@ describe('rooms.join', function testSuite() {
   });
 
   it('should emit when join to room', done => {
-    const client1 = SocketIOClient('http://0.0.0.0:3000/testChat');
-    const client2 = SocketIOClient('http://0.0.0.0:3000/testChat');
+    const client1 = SocketIOClient('http://0.0.0.0:3000');
+    const client2 = SocketIOClient('http://0.0.0.0:3000');
 
-    client1.on('rooms.join', data => {
-      expect(data).to.have.property('user').that.is.an('object');
-      expect(data.room.id).to.be.equals(this.room.id.toString());
+    client1.on('rooms.join', response => {
+      expect(response).to.have.property('user').that.is.an('object');
+      expect(response.room).to.be.equals(this.room.id.toString());
       client1.disconnect();
       client2.disconnect();
       done();
     });
 
     client1.on('connect', () => {
-      client1.emit('rooms.join', { id: this.room.id.toString() }, () => {
-        client2.emit('rooms.join', { id: this.room.id.toString() }, () => {});
+      client1.emit('action', { action, id: this.room.id.toString() }, (error) => {
+        expect(error).to.be.equals(null);
+        client2.emit('action', { action, id: this.room.id.toString() }, (error) => {
+          expect(error).to.be.equals(null);
+        });
       });
     });
   });
 
   after('delete room', () => this.room.deleteAsync());
-
   after('shutdown chat', () => this.chat.close());
 });
