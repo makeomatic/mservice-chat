@@ -10,15 +10,13 @@ describe('rooms.create', function testSuite() {
     return chat.connect();
   });
 
-  before('login admin', done => {
-    this.chat.amqp.publishAndWait('users.login', {
-        username: 'test@test.ru',
-        password: 'megalongsuperpasswordfortest',
-        audience: '*.localhost'
-      }).tap(reply => {
-        this.adminToken = reply.jwt;
-      }).asCallback(done);
-    }
+  before('login admin', () => this.chat.amqp.publishAndWait('users.login', {
+      username: 'test@test.ru',
+      password: 'megalongsuperpasswordfortest',
+      audience: '*.localhost'
+    }).tap(reply => {
+      this.adminToken = reply.jwt;
+    })
   );
 
   it('should return error if request is not valid', done => {
