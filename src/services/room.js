@@ -33,9 +33,14 @@ class RoomService
       throw new Errors.Argument('id');
     }
 
-    return this.model.findOneAsync({
-      id: this.cassandraClient.datatypes.Uuid.fromString(id),
-    });
+    return this.model.findOneAsync({ id: this.cassandraClient.datatypes.Uuid.fromString(id) })
+      .then(room => {
+        if (!room) {
+          return Promise.reject(new Errors.NotFoundError(`Room #${id} not found`));
+        }
+
+        return Promise.resolve(room);
+      });
   }
 
   /**

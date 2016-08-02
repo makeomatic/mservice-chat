@@ -1,5 +1,5 @@
 {
-  "id": "me",
+  "id": "users.me",
   "additionalProperties": false,
   "type": "object"
 }

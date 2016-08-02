@@ -1,5 +1,4 @@
 const cassandra = require('express-cassandra');
-const chatConfig = require('./chat');
 const path = require('path');
 
 module.exports = {
@@ -13,7 +12,7 @@ module.exports = {
         protocolOptions: {
           port: 9042,
         },
-        keyspace: chatConfig.chat.namespace,
+        keyspace: 'mservice-chat',
         queryOptions: {
           consistency: cassandra.consistencies.one,
         },
@@ -23,7 +22,7 @@ module.exports = {
           class: 'SimpleStrategy',
           replication_factor: 1,
         },
-        dropTableOnSchemaChange: true,
+        dropTableOnSchemaChange: false,
         createKeyspace: true,
       },
     },

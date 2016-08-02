@@ -2,10 +2,12 @@
   "id": "rooms.leave",
   "additionalProperties": false,
   "type": "object",
+  "required": ["id"],
   "properties": {
     "id": {
-      "type": "string",
-      "format": "uuid"
+      "format": "uuid",
+      "description": "Room id",
+      "type": "string"
     }
   }
 }

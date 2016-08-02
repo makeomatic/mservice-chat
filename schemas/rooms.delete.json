@@ -2,10 +2,16 @@
   "id": "rooms.delete",
   "additionalProperties": false,
   "type": "object",
+  "required": ["id", "token"],
   "properties": {
     "id": {
+      "description": "Room id",
       "type": "string",
       "format": "uuid"
+    },
+    "token": {
+      "description": "Auth token",
+      "type": "string"
     }
   }
 }

@@ -1,10 +1,12 @@
 module.exports = {
   amqp: {
-    connection: {
-      host: 'rabbitmq',
-      port: 5672,
+    transport: {
+      connection: {
+        host: 'rabbitmq',
+        port: 5672,
+      },
+      debug: true,
     },
-    debug: true,
   },
   redis: {
     hosts: [
@@ -28,6 +30,12 @@ module.exports = {
       password: 'megalongsuperpasswordfortest',
       firstName: 'Admin',
       lastName: 'Admin',
+    },
+    {
+      username: 'foo@bar.ru',
+      password: 'bazbazbazbazbazbaz',
+      firstName: 'Foo',
+      lastName: 'Bar',
     },
   ]
 };
