@@ -19,11 +19,12 @@ describe('rooms.create', function testSuite() {
     })
   );
 
-  it('should return error if request is not valid', done => {
+  it.only('should return error if request is not valid', done => {
     const token = this.adminToken;
 
     request(uri, { token })
       .then(response => {
+        console.log(response)
         expect(response.statusCode).to.be.equals(400);
         expect(response.body.name).to.be.equals('ValidationError');
         expect(response.body.message).to.be.equals('rooms.create validation failed: data should have required property \'name\'');
