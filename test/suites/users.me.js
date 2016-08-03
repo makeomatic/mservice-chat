@@ -3,7 +3,7 @@ const {expect} = require('chai');
 describe('users.me', function testSuite() {
   const SocketIOClient = require('socket.io-client');
   const Chat = require('../../src');
-  const action = 'api.chat.users.me';
+  const action = 'chat.users.me';
 
   before('start up chat', () => {
     const chat = this.chat = new Chat(global.SERVICES);

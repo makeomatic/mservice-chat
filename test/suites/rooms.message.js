@@ -3,7 +3,7 @@ const { expect } = require('chai');
 describe('message', function testSuite() {
   const SocketIOClient = require('socket.io-client');
   const Chat = require('../../src');
-  const action = 'api.chat.rooms.message';
+  const action = 'chat.rooms.message';
 
   before('start up chat', () => {
     const chat = this.chat = new Chat(global.SERVICES);
@@ -148,7 +148,7 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', { action: 'api.chat.rooms.join', id: this.room.id.toString() }, error => {
+      client.emit('action', { action: 'chat.rooms.join', id: this.room.id.toString() }, error => {
         expect(error).to.be.equals(null);
         client.emit('action', { action, id: this.room.id.toString(), message: { type: 'color', text: 'foo', color: 'red' } }, error => {
           expect(error.name).to.be.equals('NotPermittedError');
@@ -164,7 +164,7 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', { action: 'api.chat.rooms.join', id: this.room.id.toString() }, error => {
+      client.emit('action', { action: 'chat.rooms.join', id: this.room.id.toString() }, error => {
         expect(error).to.be.equals(null);
         client.emit('action', { action, id: this.room.id.toString(), message: { text: 'foo' } }, (error, response) => {
           expect(error).to.be.equals(null);
@@ -189,9 +189,9 @@ describe('message', function testSuite() {
     });
 
     client1.on('connect', () => {
-      client1.emit('action', { action: 'api.chat.rooms.join', id: this.room.id.toString() }, error => {
+      client1.emit('action', { action: 'chat.rooms.join', id: this.room.id.toString() }, error => {
         expect(error).to.be.equals(null);
-        client2.emit('action', { action: 'api.chat.rooms.join', id: this.room.id.toString() }, error => {
+        client2.emit('action', { action: 'chat.rooms.join', id: this.room.id.toString() }, error => {
           expect(error).to.be.equals(null);
           client2.emit('action', { action, id: this.room.id.toString(), message: { text: 'foo' }}, error => {
             expect(error).to.be.equals(null);

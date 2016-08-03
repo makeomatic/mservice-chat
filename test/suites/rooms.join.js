@@ -3,7 +3,7 @@ const { expect } = require('chai');
 describe('rooms.join', function testSuite() {
   const SocketIOClient = require('socket.io-client');
   const Chat = require('../../src');
-  const action = 'api.chat.rooms.join';
+  const action = 'chat.rooms.join';
 
   before('start up chat', () => {
     const chat = this.chat = new Chat(global.SERVICES);

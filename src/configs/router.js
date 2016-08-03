@@ -9,7 +9,7 @@ module.exports = {
   router: {
     routes: {
       directory: path.resolve(__dirname, './../actions'),
-      prefix: 'api.chat',
+      prefix: 'chat',
       transports: [http, socketIO],
     },
     extensions: {

@@ -1,5 +1,0 @@
-{
-  "id": "users.me",
-  "additionalProperties": false,
-  "type": "object"
-}

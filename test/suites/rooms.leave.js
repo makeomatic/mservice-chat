@@ -4,7 +4,7 @@ const Promise = require('bluebird');
 describe('rooms.leave', function testSuite() {
   const SocketIOClient = require('socket.io-client');
   const Chat = require('../../src');
-  const action = 'api.chat.rooms.leave';
+  const action = 'chat.rooms.leave';
 
   before('start up chat', () => {
     const chat = this.chat = new Chat(global.SERVICES);
@@ -62,7 +62,7 @@ describe('rooms.leave', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', { action: 'api.chat.rooms.join', id: this.room.id.toString() }, (error) => {
+      client.emit('action', { action: 'chat.rooms.join', id: this.room.id.toString() }, (error) => {
         expect(error).to.be.equals(null);
         client.emit('action', { action, id: this.room.id.toString() }, (error, response) => {
           expect(error).to.be.equals(null);
@@ -87,9 +87,9 @@ describe('rooms.leave', function testSuite() {
     });
 
     client1.on('connect', () => {
-      client1.emit('action', { action: 'api.chat.rooms.join', id: this.room.id.toString() }, (error) => {
+      client1.emit('action', { action: 'chat.rooms.join', id: this.room.id.toString() }, (error) => {
         expect(error).to.be.equals(null);
-        client2.emit('action', { action: 'api.chat.rooms.join', id: this.room.id.toString() }, (error) => {
+        client2.emit('action', { action: 'chat.rooms.join', id: this.room.id.toString() }, (error) => {
           expect(error).to.be.equals(null);
           client2.emit('action', { action, id: this.room.id.toString() }, (error) => {
             expect(error).to.be.equals(null);
