@@ -13,7 +13,7 @@ global.SERVICES = {
     client: {
       clientOptions: {
         contactPoints: ['cassandra'],
-        keyspace: 'testChat',
+        keyspace: 'test_chat',
         queryOptions: {
           consistency: cassandra.consistencies.all,
         },

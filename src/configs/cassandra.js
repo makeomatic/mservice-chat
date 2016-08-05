@@ -12,7 +12,7 @@ module.exports = {
         protocolOptions: {
           port: 9042,
         },
-        keyspace: 'mservice-chat',
+        keyspace: 'mservice_chat',
         queryOptions: {
           consistency: cassandra.consistencies.one,
         },

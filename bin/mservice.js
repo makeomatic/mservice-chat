@@ -16,7 +16,7 @@ const chat = new Chat(configuration.get('/'));
 
 chat.connect()
   .then(() => {
-    const address = chat.http.address();
+    const address = chat.http.info;
     chat.log.info(`connected on ${address.address}:${address.port}`);
   })
   .catch(err => {
