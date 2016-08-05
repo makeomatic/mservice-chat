@@ -1,4 +1,3 @@
-const AdapterFactory = require('ms-socket.io-adapter-amqp');
 const cassandra = require('express-cassandra');
 
 global.SERVICES = {
@@ -13,21 +12,18 @@ global.SERVICES = {
     client: {
       clientOptions: {
         contactPoints: ['cassandra'],
-        keyspace: 'test_chat',
-        queryOptions: {
-          consistency: cassandra.consistencies.all,
-        },
       },
     },
   },
   socketIO: {
     options: {
-      adapter: AdapterFactory.fromOptions({
-        connection: {
-          host: 'rabbitmq',
-          port: 5672,
-        }
-      }),
+      adapter: {
+        options: {
+          connection: {
+            host: 'rabbitmq',
+          }
+        },
+      },
     },
   },
 };
