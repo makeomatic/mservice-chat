@@ -9,7 +9,7 @@
     "lint": "eslint ./src",
     "prepublish": "npm run lint && npm run compile",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "start": "node ./bin/server.js | bunyan -o short",
+    "start": "node ./bin/mservice.js | bunyan -o short",
     "test": "npm run lint && ./test/docker.sh"
   },
   "dependencies": {

@@ -30,3 +30,7 @@ src
 # test dir
 test
 Makefile
+.env
+
+# client specific code
+lib/custom

@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const getAuthMiddleware = require('./middlewares/socketIO/auth');
-const confidence = require('ms-conf');
 const { globFiles } = require('ms-conf/lib/load-config');
 const MService = require('mservice');
 const path = require('path');
@@ -17,7 +16,7 @@ class Chat extends MService {
    * @param config
    */
   constructor(config = {}) {
-    super(_.merge({}, defaultConfig, config, confidence.get('/')));
+    super(_.merge({}, defaultConfig, config));
 
     this.on('plugin:connect:cassandra', cassandra => {
       this.services = { room: new RoomService(cassandra) };
