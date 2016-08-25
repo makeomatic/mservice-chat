@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const Errors = require('common-errors');
 const is = require('is');
 const Promise = require('bluebird');
@@ -66,12 +67,14 @@ class RoomService
    */
   create(properties) {
     const RoomModel = this.model;
-    const room = new RoomModel(Object.assign({
+    const roomParams = Object.assign({}, properties, {
       id: this.cassandraClient.uuid(),
-    }, properties));
+      createdAt: _.now(),
+    });
+    const room = new RoomModel(roomParams);
 
     return room.saveAsync()
-      .then(() => room);
+      .return(room);
   }
 }
 

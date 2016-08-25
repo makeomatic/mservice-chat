@@ -45,7 +45,7 @@ describe('rooms.join', function testSuite() {
 
   it('should return not permitted error if already in the room');
 
-  it.only('should join to room', done => {
+  it('should join to room', done => {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {

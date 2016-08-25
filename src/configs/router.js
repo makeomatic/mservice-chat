@@ -3,14 +3,14 @@ const auth = require('./../auth/token');
 const path = require('path');
 const Promise = require('bluebird');
 
-const { http, socketIO } = ActionTransport;
+const { amqp, http, socketIO } = ActionTransport;
 
 module.exports = {
   router: {
     routes: {
       directory: path.resolve(__dirname, './../actions'),
       prefix: 'chat',
-      transports: [http, socketIO],
+      transports: [amqp, http, socketIO],
     },
     extensions: {
       enabled: ['preSocketIORequest', 'preAllowed'],
