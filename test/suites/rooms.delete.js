@@ -1,5 +1,8 @@
+const Chance = require('chance');
 const {expect} = require('chai');
 const request = require('./../helpers/request');
+
+const chance = new Chance();
 
 describe('rooms.delete', function testSuite() {
   const Chat = require('../../src');
@@ -47,14 +50,21 @@ describe('rooms.delete', function testSuite() {
       });
   });
 
-  it.skip('should return error if user is not admin', done => {
+  it('should return error if user is not admin', () => {
     const id = this.room.id.toString();
-    request(uri, { id })
+    const userParams = {
+      activate: true,
+      audience: '*.localhost',
+      password: 'mynicepassword',
+      username: chance.email(),
+    };
+
+    return this.chat.amqp.publishAndWait('users.register', userParams)
+      .then(response => request(uri, { id, token: response.jwt }))
       .then(response => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
         expect(response.body.message).to.be.equals('An attempt was made to perform an operation that is not permitted: Not an admin');
-        done();
       });
   });
 

@@ -1,3 +1,7 @@
+/**
+ * @todo add validation and defaults
+ * if `https://github.com/masumsoft/express-cassandra/issues/66` will be resolved
+ */
 module.exports = {
   fields: {
     id: {
@@ -8,9 +12,6 @@ module.exports = {
     },
     createdAt: {
       type: 'timestamp',
-      default: {
-        $db_function: 'toTimestamp(now())',
-      },
     },
     createdBy: {
       type: 'varchar',

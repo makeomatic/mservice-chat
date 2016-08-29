@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "createdBy"],
+  "properties": {
+    "name": {
+      "description": "Name of the room",
+      "type": "string"
+    },
+    "createdBy": {
+      "description": "User `id`",
+      "type": "string"
+    }
+  }
+}
