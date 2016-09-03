@@ -1,4 +1,4 @@
-const { ActionTransport } = require('mservice');
+const { ActionTransport, routerExtension } = require('mservice');
 const auth = require('./../auth/token');
 const path = require('path');
 const Promise = require('bluebird');
@@ -13,8 +13,9 @@ module.exports = {
       transports: [amqp, http, socketIO],
     },
     extensions: {
-      enabled: ['preSocketIORequest', 'preAllowed'],
+      enabled: ['preSocketIORequest', 'preAllowed', 'postRequest', 'preRequest', 'preResponse'],
       register: [
+        routerExtension('audit/log'),
         [
           {
             point: 'preSocketIORequest',
