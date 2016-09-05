@@ -1,0 +1,27 @@
+{
+  "id": "common.json",
+  "definitions": {
+    "user": {
+      "description": "User object",
+      "type": "object",
+      "required": ["id", "name", "roles"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "User identificator"
+        },
+        "name": {
+          "type": "string",
+          "description": "User name"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Array of user roles"
+        }
+      }
+    }
+  }
+}

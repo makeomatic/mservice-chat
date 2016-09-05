@@ -3,22 +3,33 @@ const fetchRoom = require('./../fetchers/room');
 const Promise = require('bluebird');
 
 /**
- * @api {socket.io} <prefix>.rooms.join Join to a room
+ * @api {socket.io} <prefix>.rooms.join Join a room
  * @apiVersion 1.0.0
  * @apiName rooms.join
  * @apiGroup Rooms
  * @apiSchema {jsonschema=../../schemas/rooms.join.json} apiParam
  */
+/**
+ * @api {socket.io} rooms.join.<roomId> Join a room
+ * @apiDescription Fired when somebody joins a room
+ * @apiVersion 1.0.0
+ * @apiName rooms.join.event
+ * @apiGroup SocketIO Events
+ * @apiSchema {jsonschema=../../schemas/rooms.join.event.json} apiSuccess
+ */
 function RoomsJoinAction(request) {
   const { room, socket } = request;
+  const roomId = room.id.toString();
 
-  return Promise.fromCallback(callback => socket.join(room.id.toString(), callback))
+  return Promise
+    .fromCallback(callback => socket.join(roomId, callback))
     .then(() => {
       const response = {
-        room: room.id.toString(),
         user: socket.user,
       };
-      socket.nsp.in(room.id.toString()).emit('rooms.join', response);
+
+      socket.nsp.in(roomId).emit(`rooms.join.${roomId}`, response);
+
       return Promise.resolve(response);
     });
 }

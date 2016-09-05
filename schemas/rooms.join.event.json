@@ -1,0 +1,11 @@
+{
+  "id": "rooms.join.event",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["user"],
+  "properties": {
+    "user": {
+      "$ref": "common.json#/definitions/user"
+    }
+  }
+}
