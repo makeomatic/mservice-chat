@@ -9,14 +9,24 @@ const Promise = require('bluebird');
  * @apiGroup Rooms
  * @apiSchema {jsonschema=../../schemas/rooms.message.json} apiParam
  */
+ /**
+  * @api {socket.io} rooms.message.<roomId> Send message to a room
+  * @apiDescription Fired when somebody sends message to a room
+  * @apiVersion 1.0.0
+  * @apiName rooms.message.event
+  * @apiGroup SocketIO Events
+  * @apiSchema {jsonschema=../../schemas/rooms.message.event.json} apiSuccess
+  */
 function RoomsMessageAction(request) {
   const { params, room, socket } = request;
+  const roomId = room.id.toString();
   const response = {
     user: socket.user,
-    room: room.id.toString(),
     message: params.message,
   };
-  socket.nsp.in(room.id.toString()).emit('message', response);
+
+  socket.nsp.in(roomId).emit(`rooms.message.${roomId}`, response);
+
   return Promise.resolve(response);
 }
 

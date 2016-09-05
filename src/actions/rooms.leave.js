@@ -9,16 +9,27 @@ const Promise = require('bluebird');
  * @apiGroup Rooms
  * @apiSchema {jsonschema=../../schemas/rooms.leave.json} apiParam
  */
+ /**
+  * @api {socket.io} rooms.leave.<roomId> Leave from a room
+  * @apiDescription Fired when somebody leaves a room
+  * @apiVersion 1.0.0
+  * @apiName rooms.leave.event
+  * @apiGroup SocketIO Events
+  * @apiSchema {jsonschema=../../schemas/rooms.leave.event.json} apiSuccess
+  */
 function RoomsLeaveAction(request) {
   const { room, socket } = request;
+  const roomId = room.id.toString();
 
-  return Promise.fromCallback(callback => socket.leave(room.id.toString(), callback))
+  return Promise
+    .fromCallback(callback => socket.leave(roomId, callback))
     .then(() => {
       const response = {
-        room: room.id.toString(),
         user: socket.user,
       };
-      socket.nsp.in(room.id.toString()).emit('rooms.leave', response);
+
+      socket.nsp.in(roomId).emit(`rooms.leave.${roomId}`, response);
+
       return Promise.resolve(response);
     });
 }

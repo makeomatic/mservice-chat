@@ -4,7 +4,8 @@
   "main": "./lib/index.js",
   "scripts": {
     "compile": "rm -rf ./lib; babel -d ./lib ./src",
-    "doc": "apidoc -i ./src/actions -v -o ./docs",
+    "doc": "cd schemas && apidoc -i ./../src/actions -v -o ./../docs",
+    "doc-open": "npm run doc && opn ./docs/index.html",
     "docker-release": "./docker-release.sh",
     "lint": "eslint ./src",
     "prepublish": "npm run lint && npm run compile",
@@ -52,6 +53,7 @@
     "json": "^9.0.4",
     "latest-version-cli": "^1.0.0",
     "mocha": "^3.0.2",
+    "opn-cli": "^3.1.0",
     "request-promise": "^4.1.1",
     "semantic-release": "^4.3.5",
     "socket.io-client": "^1.4.8"

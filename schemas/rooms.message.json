@@ -17,6 +17,10 @@
           "default": "simple",
           "description": "Message type",
           "type": "string"
+        },
+        "text": {
+          "type": "string",
+          "description": "Message text"
         }
       },
       "switch": [

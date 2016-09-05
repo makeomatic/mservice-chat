@@ -142,7 +142,19 @@ describe('message', function testSuite() {
     });
   });
 
-  it('should return not permitted error if not in the room');
+  it('should return not permitted error if not in the room', done => {
+    const client = SocketIOClient('http://0.0.0.0:3000');
+    client.on('error', done);
+    client.on('connect', () => {
+      client.emit('action', { action, id: this.room.id.toString(), message: { text: 'foo' } }, (error, response) => {
+        expect(error.name).to.be.equals('NotPermittedError');
+        expect(error.message).to.be.equals('An attempt was made to perform an operation that' +
+          ' is not permitted: Not in the room');
+        client.disconnect();
+        done();
+      });
+    });
+  });
 
   it('should return error if message is not simple and user is not admin', done => {
     const client = SocketIOClient('http://0.0.0.0:3000');
@@ -168,7 +180,9 @@ describe('message', function testSuite() {
         expect(error).to.be.equals(null);
         client.emit('action', { action, id: this.room.id.toString(), message: { text: 'foo' } }, (error, response) => {
           expect(error).to.be.equals(null);
+          expect(response).to.have.property('user').that.is.an('object');
           expect(response.message).to.be.deep.equals({ text: 'foo', type: 'simple' });
+          client.disconnect();
           done();
         });
       });
@@ -178,10 +192,10 @@ describe('message', function testSuite() {
   it('should emit when send message', done => {
     const client1 = SocketIOClient('http://0.0.0.0:3000');
     const client2 = SocketIOClient('http://0.0.0.0:3000');
+    const roomId = this.room.id.toString();
 
-    client1.on('message', response => {
+    client1.on(`rooms.message.${roomId}`, response => {
       expect(response).to.have.property('user').that.is.an('object');
-      expect(response.room).to.be.equals(this.room.id.toString());
       expect(response.message).to.be.deep.equals({ text: 'foo', type: 'simple' });
       client1.disconnect();
       client2.disconnect();
@@ -189,11 +203,11 @@ describe('message', function testSuite() {
     });
 
     client1.on('connect', () => {
-      client1.emit('action', { action: 'chat.rooms.join', id: this.room.id.toString() }, error => {
+      client1.emit('action', { action: 'chat.rooms.join', id: roomId }, error => {
         expect(error).to.be.equals(null);
-        client2.emit('action', { action: 'chat.rooms.join', id: this.room.id.toString() }, error => {
+        client2.emit('action', { action: 'chat.rooms.join', id: roomId }, error => {
           expect(error).to.be.equals(null);
-          client2.emit('action', { action, id: this.room.id.toString(), message: { text: 'foo' }}, error => {
+          client2.emit('action', { action, id: roomId, message: { text: 'foo' } }, error => {
             expect(error).to.be.equals(null);
           });
         });
