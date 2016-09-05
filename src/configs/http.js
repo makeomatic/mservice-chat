@@ -9,8 +9,8 @@ module.exports = {
           routes: {
             cors: {
               additionalHeaders: ['accept-language', 'x-xsrf-token'],
-              origin: [],
-              credentials: true,
+              origin: ['*'],
+              credentials: false,
             },
           },
         },
