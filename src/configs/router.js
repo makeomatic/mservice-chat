@@ -13,18 +13,9 @@ module.exports = {
       transports: [amqp, http, socketIO],
     },
     extensions: {
-      enabled: ['preSocketIORequest', 'preAllowed', 'postRequest', 'preRequest', 'preResponse'],
+      enabled: ['preAllowed', 'postRequest', 'preRequest', 'preResponse'],
       register: [
         routerExtension('audit/log'),
-        [
-          {
-            point: 'preSocketIORequest',
-            handler: (socket, request) => {
-              request.socket = socket;
-              return Promise.resolve([socket, request]);
-            },
-          },
-        ],
         [
           {
             point: 'preAllowed',

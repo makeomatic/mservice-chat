@@ -10,15 +10,13 @@ API [documentation](https://makeomatic.github.io/mservice-chat/).
 See `mservice` for more details about making requests. Some examples:
 
 * `HTTP`
-
 ```bash
 curl -H "Content-Type: application/json" -X POST -d '{"foo":"bar"}' http://localhost:3000/api/chat/rooms/list
 ```
 
 * `socket.io`
-
 ```js
-socketClient.emit('action', { action: 'api.chat.rooms.join', id: 'room-id'}, callback)
+socketClient.emit('api.chat.rooms.join', { id: '<roomId>'}, callback)
 ```
 
 ## Auth
@@ -30,7 +28,6 @@ curl -H "Content-Type: application/json" -X POST -d '{"token":"user-token"}' htt
 ```
 
 * `socket.io`
-
 ```js
 const client = SocketIOClient('http://0.0.0.0:3000', { query: 'token=user-token' });
 ```

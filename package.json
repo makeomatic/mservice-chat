@@ -26,8 +26,9 @@
     "ms-conf": "^2.1.0",
     "ms-socket.io-adapter-amqp": "^2.0.0",
     "ms-validation": "^3.0.0",
-    "mservice": "^3.7.1",
+    "mservice": "^4.0.0",
     "socket.io": "^1.4.8",
+    "socketio-wildcard": "^0.3.0",
     "uid2": "0.0.3"
   },
   "devDependencies": {

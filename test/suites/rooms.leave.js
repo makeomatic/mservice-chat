@@ -21,7 +21,7 @@ describe('rooms.leave', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', { action, id: '1' }, error => {
+      client.emit(action, { id: '1' }, error => {
         expect(error.name).to.be.equals('ValidationError');
         expect(error.message).to.be
           .equals('rooms.leave validation failed: data.id should match format "uuid"');
@@ -35,7 +35,7 @@ describe('rooms.leave', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', { action, id: '00000000-0000-0000-0000-000000000000' }, error => {
+      client.emit(action, { id: '00000000-0000-0000-0000-000000000000' }, error => {
         expect(error.name).to.be.equals('NotFoundError');
         expect(error.message).to.be.equals('Not Found: "Room #00000000-0000-0000-0000-000000000000 not found"');
         client.disconnect();
@@ -48,7 +48,7 @@ describe('rooms.leave', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', { action, id: this.room.id.toString() }, error => {
+      client.emit(action, { id: this.room.id.toString() }, error => {
         expect(error.name).to.be.equals('NotPermittedError');
         expect(error.message).to.be.equals('An attempt was made to perform an operation that is '
           + 'not permitted: Not in the room');
@@ -62,9 +62,9 @@ describe('rooms.leave', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', { action: 'chat.rooms.join', id: this.room.id.toString() }, (error) => {
+      client.emit('chat.rooms.join', { id: this.room.id.toString() }, (error) => {
         expect(error).to.be.equals(null);
-        client.emit('action', { action, id: this.room.id.toString() }, (error, response) => {
+        client.emit(action, { id: this.room.id.toString() }, (error, response) => {
           expect(error).to.be.equals(null);
           expect(response).to.have.property('user').that.is.an('object');
           client.disconnect();
@@ -87,11 +87,11 @@ describe('rooms.leave', function testSuite() {
     });
 
     client1.on('connect', () => {
-      client1.emit('action', { action: 'chat.rooms.join', id: roomId }, (error) => {
+      client1.emit('chat.rooms.join', { id: roomId }, (error) => {
         expect(error).to.be.equals(null);
-        client2.emit('action', { action: 'chat.rooms.join', id: roomId }, (error) => {
+        client2.emit('chat.rooms.join', { id: roomId }, (error) => {
           expect(error).to.be.equals(null);
-          client2.emit('action', { action, id: roomId }, (error) => {
+          client2.emit(action, { id: roomId }, (error) => {
             expect(error).to.be.equals(null);
           });
         });

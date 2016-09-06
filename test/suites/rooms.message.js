@@ -20,8 +20,7 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', {
-        action,
+      client.emit(action, {
         id: '00000000-0000-0000-0000-000000000000',
         message: { text: 'foo' }
       }, error => {
@@ -36,8 +35,7 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', {
-        action,
+      client.emit(action, {
         id: '00000000-0000-0000-0000-000000000000',
         message: { text: 'foo', type: 'simple' }
       }, error => {
@@ -52,8 +50,7 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', {
-        action,
+      client.emit(action, {
         id: '00000000-0000-0000-0000-000000000000',
         message: { text: 'foo', type: 'color', color: 'red' }
       }, error => {
@@ -68,8 +65,7 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', {
-        action,
+      client.emit(action, {
         id: '00000000-0000-0000-0000-000000000000',
         message: { color: 'red' }
       }, error => {
@@ -85,8 +81,7 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', {
-        action,
+      client.emit(action, {
         id: '00000000-0000-0000-0000-000000000000',
         message: { type: 'color', text: 'foo' }
       }, error => {
@@ -102,8 +97,7 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', {
-        action,
+      client.emit(action, {
         id: '00000000-0000-0000-0000-000000000000',
         message: { type: 'simple', text: 'foo', color: 'red' }
       }, error => {
@@ -120,7 +114,7 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', { action, id: '1', message: { text: 'foo' } }, error => {
+      client.emit(action, { id: '1', message: { text: 'foo' } }, error => {
         expect(error.name).to.be.equals('ValidationError');
         expect(error.message).to.be.equals('rooms.message validation failed: data.id should match format "uuid"');
         client.disconnect();
@@ -133,7 +127,7 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', { action, id: '00000000-0000-0000-0000-000000000000', message: { text: 'foo' } }, error => {
+      client.emit(action, { id: '00000000-0000-0000-0000-000000000000', message: { text: 'foo' } }, error => {
         expect(error.name).to.be.equals('NotFoundError');
         expect(error.message).to.be.equals('Not Found: "Room #00000000-0000-0000-0000-000000000000 not found"');
         client.disconnect();
@@ -146,7 +140,7 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', { action, id: this.room.id.toString(), message: { text: 'foo' } }, (error, response) => {
+      client.emit(action, { id: this.room.id.toString(), message: { text: 'foo' } }, (error, response) => {
         expect(error.name).to.be.equals('NotPermittedError');
         expect(error.message).to.be.equals('An attempt was made to perform an operation that' +
           ' is not permitted: Not in the room');
@@ -160,9 +154,9 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', { action: 'chat.rooms.join', id: this.room.id.toString() }, error => {
+      client.emit('chat.rooms.join', { id: this.room.id.toString() }, error => {
         expect(error).to.be.equals(null);
-        client.emit('action', { action, id: this.room.id.toString(), message: { type: 'color', text: 'foo', color: 'red' } }, error => {
+        client.emit(action, { id: this.room.id.toString(), message: { type: 'color', text: 'foo', color: 'red' } }, error => {
           expect(error.name).to.be.equals('NotPermittedError');
           expect(error.message).to.be.equals('An attempt was made to perform an operation that is not permitted: Access denied');
           client.disconnect();
@@ -176,9 +170,9 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', { action: 'chat.rooms.join', id: this.room.id.toString() }, error => {
+      client.emit('chat.rooms.join', { id: this.room.id.toString() }, error => {
         expect(error).to.be.equals(null);
-        client.emit('action', { action, id: this.room.id.toString(), message: { text: 'foo' } }, (error, response) => {
+        client.emit(action, { id: this.room.id.toString(), message: { text: 'foo' } }, (error, response) => {
           expect(error).to.be.equals(null);
           expect(response).to.have.property('user').that.is.an('object');
           expect(response.message).to.be.deep.equals({ text: 'foo', type: 'simple' });
@@ -203,11 +197,11 @@ describe('message', function testSuite() {
     });
 
     client1.on('connect', () => {
-      client1.emit('action', { action: 'chat.rooms.join', id: roomId }, error => {
+      client1.emit('chat.rooms.join', { id: roomId }, error => {
         expect(error).to.be.equals(null);
-        client2.emit('action', { action: 'chat.rooms.join', id: roomId }, error => {
+        client2.emit('chat.rooms.join', { id: roomId }, error => {
           expect(error).to.be.equals(null);
-          client2.emit('action', { action, id: roomId, message: { text: 'foo' } }, error => {
+          client2.emit(action, { id: roomId, message: { text: 'foo' } }, error => {
             expect(error).to.be.equals(null);
           });
         });
