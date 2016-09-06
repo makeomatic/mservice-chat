@@ -61,7 +61,7 @@ services:
       - redis-3
       - rabbitmq
       - redis-client
-    image: makeomatic/ms-users:6.2.2
+    image: makeomatic/ms-users:6.5.0
     hostname: ms-users
     container_name: ms-users
     volumes:

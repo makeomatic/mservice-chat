@@ -1,5 +1,6 @@
 const Errors = require('common-errors');
 const fetchRoom = require('./../fetchers/room');
+const isElevated = require('../services/roles/isElevated');
 const Promise = require('bluebird');
 
 /**
@@ -16,12 +17,8 @@ function RoomsDeleteAction(request) {
 const allowed = request => {
   const { auth, room } = request;
 
-  if (auth.credentials.isAdmin !== true) {
-    return Promise.reject(new Errors.NotPermittedError('Not an admin'));
-  }
-
-  if (room.createdBy !== auth.credentials.id) {
-    return Promise.reject(new Errors.NotPermittedError('Not an creator'));
+  if (isElevated(auth.credentials.user, room) !== true) {
+    return Promise.reject(new Errors.NotPermittedError('Has not access'));
   }
 
   return Promise.resolve(request);

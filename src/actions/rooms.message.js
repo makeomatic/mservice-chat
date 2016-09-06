@@ -45,7 +45,7 @@ function allowed(request) {
   }
 
   return Promise.resolve(request);
-};
+}
 
 RoomsMessageAction.allowed = allowed;
 RoomsMessageAction.fetch = fetchRoom;

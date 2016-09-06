@@ -16,7 +16,6 @@ describe('users.me', function testSuite() {
     client.on('connect', () => {
       client.emit(action, {}, (error, user) => {
         expect(error).to.be.equals(null);
-        expect(user.id).to.be.equal(null);
         expect(user.name.startsWith('Guest')).to.be.equal(true);
         expect(user.roles).to.be.deep.equal([]);
         client.disconnect();

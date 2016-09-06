@@ -10,7 +10,7 @@ describe('rooms.join', function testSuite() {
     return chat.connect();
   });
 
-  before('create room', () => this.chat.services.room.create({ name: 'test' })
+  before('create room', () => this.chat.services.room.create({ name: 'test', createdBy: 'test@test.ru' })
     .then(room => {
       this.room = room
     })

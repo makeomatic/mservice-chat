@@ -27,6 +27,7 @@
     "ms-socket.io-adapter-amqp": "^2.0.0",
     "ms-validation": "^3.0.0",
     "mservice": "^4.0.0",
+    "node-uuid": "^1.4.7",
     "socket.io": "^1.4.8",
     "socketio-wildcard": "^0.3.0",
     "uid2": "0.0.3"
