@@ -1,9 +1,12 @@
+const assert = require('assert');
 const { expect } = require('chai');
+const Chance = require('chance');
 
 describe('message', function testSuite() {
   const SocketIOClient = require('socket.io-client');
   const Chat = require('../../src');
-  const action = 'chat.rooms.message';
+  const chance = new Chance();
+  const action = 'chat.message.send';
   const fakeRoomId = '00000000-0000-0000-0000-000000000000';
 
   before('start up chat', () => {
@@ -12,9 +15,40 @@ describe('message', function testSuite() {
   });
 
   before('create room', () => {
-    return this.chat.services.room.create({ name: 'test', createdBy: 'test@test.ru' })
-      .then(room => {
+    return this.chat.services.room
+      .create({ name: 'test', createdBy: 'test@test.ru' })
+      .tap(room => {
         this.room = room
+      });
+  });
+
+  before('login admin', () => this.chat.amqp
+    .publishAndWait('users.login', {
+      username: 'test@test.ru',
+      password: 'megalongsuperpasswordfortest',
+      audience: '*.localhost'
+    })
+    .tap(reply => {
+      this.adminToken = reply.jwt;
+    })
+  );
+
+  before('create user', () => {
+    const userParams = {
+      username: chance.email(),
+      password: 'megalongsuperpasswordfortest',
+      audience: '*.localhost',
+      metadata: {
+        firstName: 'Simple',
+        lastName: 'User',
+        roles: ['user'],
+      },
+    };
+
+    return this.chat.amqp
+      .publishAndWait('users.register', userParams)
+      .tap(({ jwt }) => {
+        this.userToken = jwt;
       });
   });
 
@@ -63,7 +97,7 @@ describe('message', function testSuite() {
     client.on('connect', () => {
       client.emit(action, { id: '1', message: { text: 'foo' } }, error => {
         expect(error.name).to.be.equals('ValidationError');
-        expect(error.message).to.be.equals('rooms.message validation failed:' +
+        expect(error.message).to.be.equals('message.send validation failed:' +
           ' data.id should match format "uuid"');
         client.disconnect();
         done();
@@ -100,7 +134,8 @@ describe('message', function testSuite() {
   });
 
   it('should return error if sticky message and user is not admin', done => {
-    const client = SocketIOClient('http://0.0.0.0:3000');
+    const client = SocketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
+
     client.on('error', done);
     client.on('connect', () => {
       client.emit('chat.rooms.join', { id: this.room.id.toString() }, error => {
@@ -120,7 +155,8 @@ describe('message', function testSuite() {
   });
 
   it('should send message', done => {
-    const client = SocketIOClient('http://0.0.0.0:3000');
+    const client = SocketIOClient('http://0.0.0.0:3000', { query: `token=${this.adminToken}` });
+
     client.on('error', done);
     client.on('connect', () => {
       client.emit('chat.rooms.join', { id: this.room.id.toString() }, error => {
@@ -136,12 +172,59 @@ describe('message', function testSuite() {
     });
   });
 
-  it('should emit when send message', done => {
-    const client1 = SocketIOClient('http://0.0.0.0:3000');
-    const client2 = SocketIOClient('http://0.0.0.0:3000');
+  it('should save message', done => {
+    const client = SocketIOClient('http://0.0.0.0:3000', { query: `token=${this.adminToken}` });
     const roomId = this.room.id.toString();
 
-    client1.on(`rooms.message.${roomId}`, response => {
+    client.on('error', done);
+    client.on('connect', () => {
+      client.emit('chat.rooms.join', { id: roomId }, () => {
+        client.emit(action, { id: roomId, message: { text: 'foo' } }, () => {
+          client.emit(action, { id: roomId, message: { text: 'bar' } }, () => {
+            client.emit(action, { id: roomId, message: { text: 'baz' } }, () => {
+              this.chat.services.message
+                .find({ roomId }, { $desc: 'createdAt' }, 2)
+                .then(messages => {
+                  const [first, second] = messages;
+
+                  assert.ok(first.id);
+                  assert.equal(first.text, 'baz');
+                  assert.equal(first.roomId, roomId);
+                  assert.ok(first.createdAt);
+                  assert.equal(first.userId, 'test@test.ru');
+                  assert.equal(first.user.id, 'test@test.ru');
+                  assert.equal(first.user.name, 'Root Admin');
+                  assert.deepEqual(first.user.roles, ['admin', 'root']);
+                  assert.equal(first.properties, null);
+                  assert.equal(first.attachments, null);
+
+                  assert.ok(second.id);
+                  assert.equal(second.text, 'bar');
+                  assert.equal(second.roomId, roomId);
+                  assert.ok(second.createdAt);
+                  assert.equal(second.userId, 'test@test.ru');
+                  assert.equal(second.user.id, 'test@test.ru');
+                  assert.equal(second.user.name, 'Root Admin');
+                  assert.deepEqual(second.user.roles, ['admin', 'root']);
+                  assert.equal(second.properties, null);
+                  assert.equal(second.attachments, null);
+
+                  client.disconnect();
+                  done();
+                });
+            });
+          });
+        });
+      });
+    });
+  });
+
+  it('should emit when send message', done => {
+    const client1 = SocketIOClient('http://0.0.0.0:3000', { query: `token=${this.adminToken}` });
+    const client2 = SocketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
+    const roomId = this.room.id.toString();
+
+    client1.on(`message.send.${roomId}`, response => {
       expect(response).to.have.property('user').that.is.an('object');
       expect(response.message).to.be.deep.equals({ text: 'foo' });
       client1.disconnect();

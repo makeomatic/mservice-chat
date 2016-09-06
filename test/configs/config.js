@@ -13,6 +13,10 @@ global.SERVICES = {
       clientOptions: {
         contactPoints: ['cassandra'],
       },
+      ormOptions: {
+        createKeyspace: true,
+        migration: 'drop',
+      },
     },
   },
   socketIO: {

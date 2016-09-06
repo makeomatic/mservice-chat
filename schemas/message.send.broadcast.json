@@ -1,5 +1,5 @@
 {
-  "id": "rooms.message.event",
+  "id": "message.event.send.broadcast",
   "additionalProperties": false,
   "type": "object",
   "required": ["message", "user"],
