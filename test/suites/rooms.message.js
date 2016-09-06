@@ -4,106 +4,53 @@ describe('message', function testSuite() {
   const SocketIOClient = require('socket.io-client');
   const Chat = require('../../src');
   const action = 'chat.rooms.message';
+  const fakeRoomId = '00000000-0000-0000-0000-000000000000';
 
   before('start up chat', () => {
     const chat = this.chat = new Chat(global.SERVICES);
     return chat.connect();
   });
 
-  before('create room', () => this.chat.services.room.create({ name: 'test' })
-    .then(room => {
-      this.room = room
-    })
-  );
+  before('create room', () => {
+    return this.chat.services.room.create({ name: 'test', createdBy: 'test@test.ru' })
+      .then(room => {
+        this.room = room
+      });
+  });
 
-  it('should not return validation error: { "text": "foo" }', done => {
+  it('should return validation error if invalid params', done => {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, {
-        id: '00000000-0000-0000-0000-000000000000',
-        message: { text: 'foo' }
-      }, error => {
-        expect(error.name).to.be.equals('NotFoundError');
+      client.emit(action, { id: fakeRoomId, message: { foo: 'bar' } }, error => {
+        expect(error.name).to.be.equals('ValidationError');
         client.disconnect();
         done();
       });
     });
   });
 
-  it('should not return validation error: { "text": "foo", "type": "simple" }', done => {
+  it('should return validation error if invalid message', done => {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, {
-        id: '00000000-0000-0000-0000-000000000000',
-        message: { text: 'foo', type: 'simple' }
-      }, error => {
-        expect(error.name).to.be.equals('NotFoundError');
+      client.emit(action, { id: fakeRoomId, message: { text: 'bar', foo: 'baz' } }, error => {
+        expect(error.name).to.be.equals('ValidationError');
         client.disconnect();
         done();
       });
     });
   });
 
-  it('should not return validation error: { "text": "foo", "type": "simple", "color": "red" }', done => {
+  it('should return validation error if invalid sticky message', done => {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, {
         id: '00000000-0000-0000-0000-000000000000',
-        message: { text: 'foo', type: 'color', color: 'red' }
-      }, error => {
-        expect(error.name).to.be.equals('NotFoundError');
-        client.disconnect();
-        done();
-      });
-    });
-  });
-
-  it('should return validation error: { "color": "red" }', done => {
-    const client = SocketIOClient('http://0.0.0.0:3000');
-    client.on('error', done);
-    client.on('connect', () => {
-      client.emit(action, {
-        id: '00000000-0000-0000-0000-000000000000',
-        message: { color: 'red' }
+        message: { type: 'sticky', foo: 'bar' }
       }, error => {
         expect(error.name).to.be.equals('ValidationError');
-        expect(error.message).to.be.equals('rooms.message validation failed: data.message should NOT have additional properties, data.message should have required property \'text\'');
-        client.disconnect();
-        done();
-      });
-    });
-  });
-
-  it('should return validation error: { "type": "color", "text": "foo" }', done => {
-    const client = SocketIOClient('http://0.0.0.0:3000');
-    client.on('error', done);
-    client.on('connect', () => {
-      client.emit(action, {
-        id: '00000000-0000-0000-0000-000000000000',
-        message: { type: 'color', text: 'foo' }
-      }, error => {
-        expect(error.name).to.be.equals('ValidationError');
-        expect(error.message).to.be.equals('rooms.message validation failed: data.message should have required property \'color\'');
-        client.disconnect();
-        done();
-      });
-    });
-  });
-
-  it('should return validation error: { "type": "simple", "text": "foo", "color": "red" }', done => {
-    const client = SocketIOClient('http://0.0.0.0:3000');
-    client.on('error', done);
-    client.on('connect', () => {
-      client.emit(action, {
-        id: '00000000-0000-0000-0000-000000000000',
-        message: { type: 'simple', text: 'foo', color: 'red' }
-      }, error => {
-        expect(error.name).to.be.equals('ValidationError');
-        expect(error.message)
-          .to.be.equals('rooms.message validation failed: data.message should NOT have additional properties');
         client.disconnect();
         done();
       });
@@ -116,7 +63,8 @@ describe('message', function testSuite() {
     client.on('connect', () => {
       client.emit(action, { id: '1', message: { text: 'foo' } }, error => {
         expect(error.name).to.be.equals('ValidationError');
-        expect(error.message).to.be.equals('rooms.message validation failed: data.id should match format "uuid"');
+        expect(error.message).to.be.equals('rooms.message validation failed:' +
+          ' data.id should match format "uuid"');
         client.disconnect();
         done();
       });
@@ -127,9 +75,10 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, { id: '00000000-0000-0000-0000-000000000000', message: { text: 'foo' } }, error => {
+      client.emit(action, { id: fakeRoomId, message: { text: 'foo' } }, error => {
         expect(error.name).to.be.equals('NotFoundError');
-        expect(error.message).to.be.equals('Not Found: "Room #00000000-0000-0000-0000-000000000000 not found"');
+        expect(error.message).to.be.equals('Not Found:' +
+          ' "Room #00000000-0000-0000-0000-000000000000 not found"');
         client.disconnect();
         done();
       });
@@ -140,7 +89,7 @@ describe('message', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, { id: this.room.id.toString(), message: { text: 'foo' } }, (error, response) => {
+      client.emit(action, { id: this.room.id.toString(), message: { text: 'foo' } }, error => {
         expect(error.name).to.be.equals('NotPermittedError');
         expect(error.message).to.be.equals('An attempt was made to perform an operation that' +
           ' is not permitted: Not in the room');
@@ -150,15 +99,19 @@ describe('message', function testSuite() {
     });
   });
 
-  it('should return error if message is not simple and user is not admin', done => {
+  it('should return error if sticky message and user is not admin', done => {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
       client.emit('chat.rooms.join', { id: this.room.id.toString() }, error => {
         expect(error).to.be.equals(null);
-        client.emit(action, { id: this.room.id.toString(), message: { type: 'color', text: 'foo', color: 'red' } }, error => {
+
+        const message = { type: 'sticky', text: 'foo' };
+
+        client.emit(action, { id: this.room.id.toString(), message }, error => {
           expect(error.name).to.be.equals('NotPermittedError');
-          expect(error.message).to.be.equals('An attempt was made to perform an operation that is not permitted: Access denied');
+          expect(error.message).to.be.equals('An attempt was made to perform an operation' +
+            ' that is not permitted: Access denied for message type "sticky"');
           client.disconnect();
           done();
         });
@@ -175,7 +128,7 @@ describe('message', function testSuite() {
         client.emit(action, { id: this.room.id.toString(), message: { text: 'foo' } }, (error, response) => {
           expect(error).to.be.equals(null);
           expect(response).to.have.property('user').that.is.an('object');
-          expect(response.message).to.be.deep.equals({ text: 'foo', type: 'simple' });
+          expect(response.message).to.be.deep.equals({ text: 'foo' });
           client.disconnect();
           done();
         });
@@ -190,7 +143,7 @@ describe('message', function testSuite() {
 
     client1.on(`rooms.message.${roomId}`, response => {
       expect(response).to.have.property('user').that.is.an('object');
-      expect(response.message).to.be.deep.equals({ text: 'foo', type: 'simple' });
+      expect(response.message).to.be.deep.equals({ text: 'foo' });
       client1.disconnect();
       client2.disconnect();
       done();

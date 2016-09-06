@@ -1,5 +1,6 @@
 const Errors = require('common-errors');
-const fetchRoom = require('./../fetchers/room');
+const fetchRoom = require('../fetchers/room');
+const isElevated = require('../services/roles/isElevated');
 const Promise = require('bluebird');
 
 /**
@@ -30,15 +31,17 @@ function RoomsMessageAction(request) {
   return Promise.resolve(response);
 }
 
-const allowed = request => {
+function allowed(request) {
   const { params, room, socket } = request;
 
   if (!socket.rooms[room.id.toString()]) {
     return Promise.reject(new Errors.NotPermittedError('Not in the room'));
   }
 
-  if (params.message.type !== 'simple' && socket.user.isAdmin !== true) {
-    return Promise.reject(new Errors.NotPermittedError('Access denied'));
+  if (params.message.type && isElevated(socket.user, room) !== true) {
+    return Promise.reject(
+      new Errors.NotPermittedError(`Access denied for message type "${params.message.type}"`)
+    );
   }
 
   return Promise.resolve(request);

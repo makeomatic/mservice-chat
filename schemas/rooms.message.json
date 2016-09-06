@@ -10,69 +10,42 @@
       "type": "string"
     },
     "message": {
-      "type": "object",
-      "description": "Message object",
-      "properties": {
-        "type": {
-          "default": "simple",
-          "description": "Message type",
-          "type": "string"
-        },
-        "text": {
-          "type": "string",
-          "description": "Message text"
-        }
-      },
-      "switch": [
+      "oneOf": [
         {
-          "if": {
-            "properties": {
-              "type": {
-                "constant": "simple"
-              }
-            }
-          },
-          "then": {
-            "additionalProperties": false,
-            "required": ["type", "text"],
-            "properties": {
-              "text": {
-                "type": "string"
-              },
-              "type": {
-                "type": "string"
-              }
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Simple message",
+          "required": ["text"],
+          "properties": {
+            "text": {
+              "$ref": "#/definitions/messageText"
             }
           }
         },
         {
-          "if": {
-            "properties": {
-              "type": {
-                "constant": "color"
-              }
-            }
-          },
-          "then": {
-            "additionalProperties": false,
-            "required": ["type", "color", "text"],
-            "properties": {
-              "color": {
-                "type": "string"
-              },
-              "text": {
-                "type": "string"
-              },
-              "type": {
-                "type": "string"
-              }
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Sticky message",
+          "required": ["text", "type"],
+          "properties": {
+            "type": {
+              "constant": "sticky",
+              "description": "Message type",
+              "type": "string"
+            },
+            "text": {
+              "$ref": "#/definitions/messageText"
             }
           }
-        },
-        {
-          "then": false
         }
       ]
+    }
+  },
+  "definitions": {
+    "messageText": {
+      "type": "string",
+      "description": "Message text",
+      "maxLength": 1024
     }
   }
 }

@@ -24,8 +24,8 @@ class LightUserModel
   /**
    * @returns {boolean}
    */
-  get isAdmin() {
-    return this.roles.indexOf('admin') !== -1;
+  get isRoot() {
+    return this.roles.includes('root');
   }
 }
 
