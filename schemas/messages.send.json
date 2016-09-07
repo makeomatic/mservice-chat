@@ -1,10 +1,10 @@
 {
-  "id": "message.send",
+  "id": "messages.send",
   "additionalProperties": false,
   "type": "object",
-  "required": ["id", "message"],
+  "required": ["roomId", "message"],
   "properties": {
-    "id": {
+    "roomId": {
       "format": "uuid",
       "description": "Room id",
       "type": "string"

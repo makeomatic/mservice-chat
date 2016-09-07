@@ -1,0 +1,17 @@
+{
+  "id": "messages.delete",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["id", "token"],
+  "properties": {
+    "id": {
+      "description": "Message id",
+      "type": "string",
+      "format": "uuid"
+    },
+    "token": {
+      "description": "Auth token",
+      "type": "string"
+    }
+  }
+}

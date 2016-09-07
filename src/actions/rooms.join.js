@@ -1,5 +1,5 @@
 const Errors = require('common-errors');
-const fetchRoom = require('./../fetchers/room');
+const fetchRoom = require('./../fetchers/room')();
 const Promise = require('bluebird');
 
 /**

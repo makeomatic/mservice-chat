@@ -40,4 +40,5 @@ module.exports = {
   },
   key: [['roomId'], 'createdAt'],
   clustering_order: { createdAt: 'desc' },
+  indexes: ['id'],
 };

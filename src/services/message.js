@@ -37,6 +37,21 @@ class MessageService
       .return(message);
   }
 
+  getById(id) {
+    if (is.string(id) === false) {
+      throw new Errors.Argument('id');
+    }
+
+    return this.model.findOneAsync({ id: this.cassandraClient.datatypes.Uuid.fromString(id) })
+      .then(message => {
+        if (!message) {
+          return Promise.reject(new Errors.NotFoundError(`Message #${id} not found`));
+        }
+
+        return Promise.resolve(message);
+      });
+  }
+
   find(cond = {}, sort = {}, limit = 20) {
     const query = Object.assign({}, cond);
 

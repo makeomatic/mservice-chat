@@ -1,0 +1,13 @@
+{
+  "id": "messages.delete.broadcast",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["id"],
+  "properties": {
+    "id": {
+      "description": "Message id",
+      "type": "string",
+      "format": "uuid"
+    }
+  }
+}

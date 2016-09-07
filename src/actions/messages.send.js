@@ -1,32 +1,30 @@
 const Errors = require('common-errors');
-const fetchRoom = require('../fetchers/room');
+const fetchRoom = require('../fetchers/room')('roomId');
 const isElevated = require('../services/roles/isElevated');
 const Promise = require('bluebird');
 
 /**
- * @api {socket.io} <prefix>.message.send Send message to a room
+ * @api {socket.io} <prefix>.messages.send Send message to a room
  * @apiVersion 1.0.0
- * @apiName message.send
- * @apiGroup Rooms
- * @apiSchema {jsonschema=../../schemas/message.send.json} apiParam
+ * @apiName messages.send
+ * @apiGroup Messages
+ * @apiParam (Payload) {String} roomId - Room identificator
+ * @apiParam (Payload) {Object} message - Message object
+ * @apiParam (Payload) {String} message.text - Text
+ * @apiParam (Payload) {String} [message.type] - `sticky` if sticky message
  */
  /**
-  * @api {socket.io} message.send.<roomId> Send message to a room
+  * @api {socket.io} messages.send.<roomId> Send message to a room
   * @apiDescription Fired when somebody sends message to a room
   * @apiVersion 1.0.0
-  * @apiName message.send.broadcast
+  * @apiName messages.send.broadcast
   * @apiGroup SocketIO Events
-  * @apiSchema {jsonschema=../../schemas/message.send.broadcast.json} apiSuccess
+  * @apiSchema {jsonschema=../../schemas/messages.send.broadcast.json} apiSuccess
   */
-function RoomsMessageSendAction(request) {
+function messageSendAction(request) {
   const { params, room, socket } = request;
-  const { user } = socket;
   const { message: messageService } = this.services;
   const roomId = room.id.toString();
-  const response = {
-    user,
-    message: params.message,
-  };
   const message = {
     roomId: room.id,
     text: params.message.text,
@@ -34,11 +32,9 @@ function RoomsMessageSendAction(request) {
     user: socket.user,
   };
 
-  socket.nsp.in(roomId).emit(`message.send.${roomId}`, response);
-
   return messageService
     .create(message)
-    .return(response);
+    .tap(createdMessage => socket.nsp.in(roomId).emit(`messages.send.${roomId}`, createdMessage));
 }
 
 function allowed(request) {
@@ -62,9 +58,9 @@ function allowed(request) {
   return Promise.resolve(request);
 }
 
-RoomsMessageSendAction.allowed = allowed;
-RoomsMessageSendAction.fetch = fetchRoom;
-RoomsMessageSendAction.schema = 'message.send';
-RoomsMessageSendAction.transports = ['socketIO'];
+messageSendAction.allowed = allowed;
+messageSendAction.fetch = fetchRoom;
+messageSendAction.schema = 'messages.send';
+messageSendAction.transports = ['socketIO'];
 
-module.exports = RoomsMessageSendAction;
+module.exports = messageSendAction;
