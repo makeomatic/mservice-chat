@@ -1,6 +1,7 @@
 const assert = require('assert');
 const { expect } = require('chai');
 const Chance = require('chance');
+const is = require('is');
 
 describe('message', function testSuite() {
   const SocketIOClient = require('socket.io-client');
@@ -195,7 +196,7 @@ describe('message', function testSuite() {
           client.emit(action, { roomId, message: { text: 'bar' } }, () => {
             client.emit(action, { roomId, message: { text: 'baz' } }, () => {
               this.chat.services.message
-                .find({ roomId }, { $desc: 'createdAt' }, 2)
+                .find({ roomId }, { $desc: 'id' }, 2)
                 .then(messages => {
                   const [first, second] = messages;
 

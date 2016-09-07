@@ -5,7 +5,7 @@ const Promise = require('bluebird');
 
 class MessageService
 {
-  constructor(cassandraClient) {
+  constructor(cassandraClient, flakeless) {
     if (is.object(cassandraClient.modelInstance) === false) {
       throw new Errors.Argument('cassandraClient');
     }
@@ -15,6 +15,7 @@ class MessageService
     }
 
     this.cassandraClient = cassandraClient;
+    this.flakeless = flakeless;
     this.model = Promise.promisifyAll(cassandraClient.modelInstance.message);
   }
 
@@ -25,7 +26,7 @@ class MessageService
   create(properties) {
     const MessageModel = this.model;
     const messageParams = Object.assign({}, properties, {
-      id: this.cassandraClient.uuid(),
+      id: this.flakeless.next(),
       createdAt: now(),
       properties: {},
       attachments: {},
@@ -37,12 +38,14 @@ class MessageService
       .return(message);
   }
 
-  getById(id) {
-    if (is.string(id) === false) {
-      throw new Errors.Argument('id');
-    }
+  getById(id, roomId) {
+    const query = {
+      id,
+      roomId: this.cassandraClient.datatypes.Uuid.fromString(roomId),
+    };
 
-    return this.model.findOneAsync({ id: this.cassandraClient.datatypes.Uuid.fromString(id) })
+    return this.model
+      .findOneAsync(query)
       .then(message => {
         if (!message) {
           return Promise.reject(new Errors.NotFoundError(`Message #${id} not found`));
@@ -53,13 +56,17 @@ class MessageService
   }
 
   find(cond = {}, sort = {}, limit = 20) {
+    const query = this.makeCond(cond, sort, limit);
+
+    return this.model.findAsync(query);
+  }
+
+  makeCond(cond = {}, sort = {}, limit) {
     const query = Object.assign({}, cond);
 
-    ['id', 'roomId'].forEach(field => {
-      if (query[field]) {
-        query[field] = this.cassandraClient.datatypes.Uuid.fromString(query[field]);
-      }
-    });
+    if (query.roomId) {
+      query.roomId = this.cassandraClient.datatypes.Uuid.fromString(query.roomId);
+    }
 
     if (sort) {
       query.$orderby = sort;
@@ -69,7 +76,7 @@ class MessageService
       query.$limit = limit;
     }
 
-    return this.model.findAsync(query);
+    return query;
   }
 }
 

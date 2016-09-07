@@ -3,7 +3,7 @@ const required = require('./utils/validators/required');
 module.exports = {
   fields: {
     id: {
-      type: 'uuid',
+      type: 'varchar',
       rule: required,
     },
     text: {
@@ -38,7 +38,6 @@ module.exports = {
       rule: required,
     },
   },
-  key: [['roomId'], 'createdAt'],
-  clustering_order: { createdAt: 'desc' },
-  indexes: ['id'],
+  key: [['roomId'], 'id'],
+  clustering_order: { id: 'desc' },
 };

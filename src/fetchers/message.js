@@ -1,12 +1,14 @@
 const Promise = require('bluebird');
 
 function fetchMessage(request, application) {
+  const { id, roomId } = request.params;
+
   return application.services.message
-    .getById(request.params.id)
+    .getById(id, roomId)
     .tap(message => {
       request.message = message;
     })
-    .then(message => application.services.room.getById(message.roomId.toString()))
+    .then(() => application.services.room.getById(roomId))
     .tap(room => {
       request.room = room;
     })

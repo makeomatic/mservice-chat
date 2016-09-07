@@ -63,22 +63,21 @@ describe('rooms.delete', function testSuite() {
   });
 
   it('should returns error if invalid `id`', () => {
-    return request(uri, { token: adminToken, id: 'invalid-id' })
+    return request(uri, { token: adminToken, id: 0, roomId: room.id.toString() })
       .then(({ statusCode, body }) => {
         assert.equal(statusCode, 400);
         assert.equal(body.name, 'ValidationError');
         assert.equal(body.message, 'messages.delete validation failed:' +
-          ' data.id should match format "uuid"');
+          ' data.id should be string');
       });
   });
 
   it('should returns error if room not found', () => {
-    return request(uri, { token: adminToken, id: '00000000-0000-0000-0000-000000000000' })
+    return request(uri, { token: adminToken, id: '0', roomId: room.id.toString() })
       .then(({ statusCode, body }) => {
         assert.equal(statusCode, 404);
         assert.equal(body.name, 'NotFoundError');
-        assert.equal(body.message, 'Not Found: "Message #00000000-0000-0000-0000-000000000000' +
-          ' not found"');
+        assert.equal(body.message, 'Not Found: "Message #0 not found"');
       });
   });
 
@@ -92,7 +91,7 @@ describe('rooms.delete', function testSuite() {
 
     return chat.services.message
       .create(params)
-      .then(message => request(uri, { token: userToken, id: message.id }))
+      .then(message => request(uri, { token: userToken, id: message.id, roomId: room.id.toString() }))
       .then(({ statusCode, body }) => {
         assert.equal(statusCode, 403);
         assert.equal(body.name, 'NotPermittedError');
@@ -116,7 +115,7 @@ describe('rooms.delete', function testSuite() {
         const messageParams = { roomId: room.id.toString(), message: { text: 'foo' } };
 
         client.emit('chat.messages.send', messageParams, (error, message) => {
-          request(uri, { token: userToken, id: message.id })
+          request(uri, { token: userToken, id: message.id, roomId: room.id.toString() })
             .then(({ statusCode, body }) => {
               assert.equal(statusCode, 200);
               assert.equal(body.id, message.id);
@@ -142,7 +141,7 @@ describe('rooms.delete', function testSuite() {
         const messageParams = { roomId: room.id.toString(), message: { text: 'foo' } };
 
         client.emit('chat.messages.send', messageParams, (error, message) => {
-          request(uri, { token: adminToken, id: message.id })
+          request(uri, { token: adminToken, id: message.id, roomId: room.id.toString() })
             .then(({ statusCode, body }) => {
               assert.equal(statusCode, 200);
               assert.equal(body.id, message.id);
@@ -172,7 +171,7 @@ describe('rooms.delete', function testSuite() {
             assert.equal(result.id, message.id);
             done();
           });
-          request(uri, { token: userToken, id: message.id });
+          request(uri, { token: userToken, id: message.id, roomId: room.id.toString() });
         });
       });
     });

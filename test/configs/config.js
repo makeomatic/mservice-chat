@@ -14,7 +14,6 @@ global.SERVICES = {
         contactPoints: ['cassandra'],
       },
       ormOptions: {
-        createKeyspace: true,
         migration: 'drop',
       },
     },

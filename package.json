@@ -24,6 +24,7 @@
     "is": "^3.1.0",
     "lodash": "^4.15.0",
     "ms-conf": "^2.1.0",
+    "ms-flakeless": "^4.0.1",
     "ms-socket.io-adapter-amqp": "^2.0.0",
     "ms-validation": "^3.0.0",
     "mservice": "^4.0.1",

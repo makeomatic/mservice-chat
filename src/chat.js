@@ -1,4 +1,5 @@
-const _ = require('lodash');
+const merge = require('lodash/merge');
+const Flakeless = require('ms-flakeless');
 const getAuthMiddleware = require('./middlewares/socketIO/auth');
 const { globFiles } = require('ms-conf/lib/load-config');
 const MessageService = require('./services/message');
@@ -13,11 +14,17 @@ class Chat extends MService {
    * @param config
    */
   constructor(config = {}) {
-    super(_.merge({}, defaultConfig, config));
+    super(merge({}, defaultConfig, config));
 
     this.on('plugin:connect:cassandra', cassandra => {
+      const flakeless = new Flakeless({
+        epochStart: Date.now(),
+        outputType: 'base10',
+      });
+
       this.services = {
-        message: new MessageService(cassandra),
+        flakeless,
+        message: new MessageService(cassandra, flakeless),
         room: new RoomService(cassandra),
       };
     });
