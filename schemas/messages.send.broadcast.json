@@ -1,0 +1,26 @@
+{
+  "id": "messages.send.broadcast",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["message", "user"],
+  "properties": {
+    "message": {
+      "type": "object",
+      "description": "Message object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "integer"
+        },
+        "user": {
+          "$ref": "common.json#/definitions/user"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "messages.delete",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["id", "roomId", "token"],
+  "properties": {
+    "id": {
+      "description": "Message id",
+      "type": "string"
+    },
+    "roomId": {
+      "description": "Room id",
+      "type": "string",
+      "format": "uuid"
+    },
+    "token": {
+      "description": "Auth token",
+      "type": "string"
+    }
+  }
+}

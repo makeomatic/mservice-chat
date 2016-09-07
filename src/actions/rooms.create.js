@@ -10,15 +10,15 @@ const Promise = require('bluebird');
  */
 function RoomsCreateAction(request) {
   const { auth, params } = request;
-  const properties = Object.assign({ createdBy: auth.credentials.id }, params);
+  const properties = Object.assign({ createdBy: auth.credentials.user.id }, params);
   return this.services.room.create(properties);
 }
 
 const allowed = request => {
   const { auth } = request;
 
-  if (auth.credentials.isAdmin !== true) {
-    return Promise.reject(new Errors.NotPermittedError('Not an admin'));
+  if (auth.credentials.user.isRoot !== true) {
+    return Promise.reject(new Errors.NotPermittedError('Not an root'));
   }
 
   return Promise.resolve(request);

@@ -13,6 +13,9 @@ global.SERVICES = {
       clientOptions: {
         contactPoints: ['cassandra'],
       },
+      ormOptions: {
+        migration: 'drop',
+      },
     },
   },
   socketIO: {

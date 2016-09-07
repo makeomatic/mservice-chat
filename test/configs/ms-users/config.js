@@ -28,8 +28,14 @@ module.exports = {
     {
       username: 'test@test.ru',
       password: 'megalongsuperpasswordfortest',
+      metadata: {
+        firstName: 'Root',
+        lastName: 'Admin',
+        roles: ['admin','root'],
+      },
       firstName: 'Admin',
       lastName: 'Admin',
+      roles: ['admin','root'],
     },
     {
       username: 'foo@bar.ru',

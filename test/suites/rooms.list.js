@@ -10,13 +10,13 @@ describe('rooms.list', function testSuite() {
     return chat.connect();
   });
 
-  before('create first room', () => this.chat.services.room.create({ name: 'first room' })
+  before('create first room', () => this.chat.services.room.create({ name: 'first room', createdBy: 'test@test.ru' })
     .then(room => {
       this.firstRoom = room;
     })
   );
 
-  before('create second room', () => this.chat.services.room.create({ name: 'second room' })
+  before('create second room', () => this.chat.services.room.create({ name: 'second room', createdBy: 'test@test.ru' })
     .then(room => {
       this.secondRoom = room;
     })

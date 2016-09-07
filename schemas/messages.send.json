@@ -1,0 +1,51 @@
+{
+  "id": "messages.send",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["roomId", "message"],
+  "properties": {
+    "roomId": {
+      "format": "uuid",
+      "description": "Room id",
+      "type": "string"
+    },
+    "message": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Simple message",
+          "required": ["text"],
+          "properties": {
+            "text": {
+              "$ref": "#/definitions/messageText"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Sticky message",
+          "required": ["text", "type"],
+          "properties": {
+            "type": {
+              "constant": "sticky",
+              "description": "Message type",
+              "type": "string"
+            },
+            "text": {
+              "$ref": "#/definitions/messageText"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "messageText": {
+      "type": "string",
+      "description": "Message text",
+      "maxLength": 1024
+    }
+  }
+}

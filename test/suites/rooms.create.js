@@ -29,7 +29,8 @@ describe('rooms.create', function testSuite() {
       .then(response => {
         expect(response.statusCode).to.be.equals(400);
         expect(response.body.name).to.be.equals('ValidationError');
-        expect(response.body.message).to.be.equals('rooms.create validation failed: data should have required property \'name\'');
+        expect(response.body.message).to.be.equals('rooms.create validation failed:' +
+          ' data should have required property \'name\'');
         done();
       });
   });
@@ -48,11 +49,12 @@ describe('rooms.create', function testSuite() {
       .then(response => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
-        expect(response.body.message).to.be.equals('An attempt was made to perform an operation that is not permitted: Not an admin');
+        expect(response.body.message).to.be.equals('An attempt was made to perform an operation' +
+          ' that is not permitted: Not an root');
       });
   });
 
-  it('should create room if user is admin', done => {
+  it('should create a room if user is admin', done => {
     const token = this.adminToken;
 
     request(uri, { token, name: 'test room'})

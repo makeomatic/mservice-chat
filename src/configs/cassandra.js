@@ -22,8 +22,15 @@ module.exports = {
           class: 'SimpleStrategy',
           replication_factor: 1,
         },
-        dropTableOnSchemaChange: false,
+        migration: 'safe',
         createKeyspace: true,
+        udts: {
+          User: {
+            id: 'text',
+            name: 'text',
+            roles: 'set<text>',
+          },
+        },
       },
     },
   },

@@ -24,10 +24,13 @@
     "is": "^3.1.0",
     "lodash": "^4.15.0",
     "ms-conf": "^2.1.0",
+    "ms-flakeless": "^4.0.1",
     "ms-socket.io-adapter-amqp": "^2.0.0",
     "ms-validation": "^3.0.0",
-    "mservice": "^3.7.1",
+    "mservice": "^4.0.1",
+    "node-uuid": "^1.4.7",
     "socket.io": "^1.4.8",
+    "socketio-wildcard": "^0.3.0",
     "uid2": "0.0.3"
   },
   "devDependencies": {
@@ -45,7 +48,7 @@
     "codecov": "^1.0.1",
     "cz-conventional-changelog": "^1.2.0",
     "eslint": "^3.4.0",
-    "eslint-config-airbnb-base": "^5.0.3",
+    "eslint-config-airbnb-base": "^6.0.0",
     "eslint-plugin-import": "^1.14.0",
     "eslint-plugin-mocha": "^4.5.1",
     "isparta": "^4.0.0",

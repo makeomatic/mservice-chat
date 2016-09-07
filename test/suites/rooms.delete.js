@@ -64,18 +64,18 @@ describe('rooms.delete', function testSuite() {
       .then(response => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
-        expect(response.body.message).to.be.equals('An attempt was made to perform an operation that is not permitted: Not an admin');
+        expect(response.body.message).to.be.equals('An attempt was made to perform an operation that is not permitted: Has not access');
       });
   });
 
   it('should return error if user is not room creator', done => {
     const id = this.room.id.toString();
     const token = this.secondAdminToken;
-    request(uri, {id, token})
+    request(uri, { id, token })
       .then(response => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
-        expect(response.body.message).to.be.equals('An attempt was made to perform an operation that is not permitted: Not an creator');
+        expect(response.body.message).to.be.equals('An attempt was made to perform an operation that is not permitted: Has not access');
         done();
       });
   });

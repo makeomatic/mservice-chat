@@ -14,9 +14,8 @@ describe('users.me', function testSuite() {
     const client = SocketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('action', {action}, (error, user) => {
+      client.emit(action, {}, (error, user) => {
         expect(error).to.be.equals(null);
-        expect(user.id).to.be.equal(null);
         expect(user.name.startsWith('Guest')).to.be.equal(true);
         expect(user.roles).to.be.deep.equal([]);
         client.disconnect();
@@ -44,11 +43,11 @@ describe('users.me', function testSuite() {
       const client = SocketIOClient('http://0.0.0.0:3000', { query: `token=${reply.jwt}` });
       client.on('error', done);
       client.on('connect', () => {
-        client.emit('action', { action }, (error, user) => {
+        client.emit(action, {}, (error, user) => {
           expect(error).to.be.equals(null);
           expect(user.id).to.be.equal('test@test.ru');
-          expect(user.name).to.be.equal('Admin Admin');
-          expect(user.roles).to.be.deep.equal(['admin']);
+          expect(user.name).to.be.equal('Root Admin');
+          expect(user.roles).to.be.deep.equal(['admin', 'root']);
           client.disconnect();
           done();
         });
