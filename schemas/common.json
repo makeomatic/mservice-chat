@@ -22,6 +22,33 @@
           "description": "Array of user roles"
         }
       }
+    },
+    "messageId": {
+      "description": "`message` identificator",
+      "type": "string",
+      "pattern": "^\\d+$"
+    },
+    "roomId": {
+      "description": "`room` identificator",
+      "type": "string",
+      "format": "uuid"
+    },
+    "message": {
+      "description": "`message` object",
+      "type": "object",
+      "required": ["id", "text", "user"],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/messageId"
+        },
+        "text": {
+          "type": "string",
+          "description": "Message text"
+        },
+        "user": {
+          "$ref": "#/definitions/user"
+        }
+      }
     }
   }
 }

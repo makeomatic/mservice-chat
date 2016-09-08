@@ -1,25 +1,22 @@
 const Chance = require('chance');
+const Chat = require('../../src');
 const { expect } = require('chai');
 const request = require('./../helpers/request');
 
 const chance = new Chance();
+const chat = new Chat(global.SERVICES);
+const uri = 'http://0.0.0.0:3000/api/chat/rooms/create';
 
 describe('rooms.create', function testSuite() {
-  const Chat = require('../../src');
-  const uri = 'http://0.0.0.0:3000/api/chat/rooms/create';
+  before('start up chat', () => chat.connect());
 
-  before('start up chat', () => {
-    const chat = this.chat = new Chat(global.SERVICES);
-    return chat.connect();
-  });
-
-  before('login admin', () => this.chat.amqp.publishAndWait('users.login', {
-      username: 'test@test.ru',
-      password: 'megalongsuperpasswordfortest',
-      audience: '*.localhost'
-    }).tap(reply => {
-      this.adminToken = reply.jwt;
-    })
+  before('login admin', () => chat.amqp.publishAndWait('users.login', {
+    username: 'test@test.ru',
+    password: 'megalongsuperpasswordfortest',
+    audience: '*.localhost',
+  }).tap(reply => {
+    this.adminToken = reply.jwt;
+  })
   );
 
   it('should return error if request is not valid', done => {
@@ -44,7 +41,7 @@ describe('rooms.create', function testSuite() {
       username,
     };
 
-    return this.chat.amqp.publishAndWait('users.register', userParams)
+    return chat.amqp.publishAndWait('users.register', userParams)
       .then(response => request(uri, { name: 'test room', token: response.jwt }))
       .then(response => {
         expect(response.statusCode).to.be.equals(403);
@@ -57,14 +54,14 @@ describe('rooms.create', function testSuite() {
   it('should create a room if user is admin', done => {
     const token = this.adminToken;
 
-    request(uri, { token, name: 'test room'})
+    request(uri, { token, name: 'test room' })
       .then(response => {
         expect(response.statusCode).to.be.equals(200);
         expect(response.body.name).to.be.equals('test room');
         expect(response.body.createdBy).to.be.equals('test@test.ru');
         return response;
       })
-      .then(response => this.chat.services.room.getById(response.body.id))
+      .then(response => chat.services.room.getById(response.body.id))
       .then(room => {
         expect(room.name).to.be.equals('test room');
         return room.deleteAsync();
@@ -72,5 +69,5 @@ describe('rooms.create', function testSuite() {
       .asCallback(done);
   });
 
-  after('shutdown chat', () => this.chat.close());
+  after('shutdown chat', () => chat.close());
 });

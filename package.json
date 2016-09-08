@@ -7,11 +7,12 @@
     "doc": "cd schemas && apidoc -i ./../src/actions -v -o ./../docs",
     "doc-open": "npm run doc && opn ./docs/index.html",
     "docker-release": "./docker-release.sh",
-    "lint": "eslint ./src",
+    "lint": "eslint .",
     "prepublish": "npm run lint && npm run compile",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "node ./bin/mservice.js | bunyan -o short",
-    "test": "npm run lint && ./test/docker.sh"
+    "test": "npm run lint && ./test/docker.sh",
+    "test-dev": "SKIP_REBUILD=1 SKIP_SLEEP=1 ./test/docker.sh"
   },
   "dependencies": {
     "bluebird": "^3.4.6",
@@ -48,7 +49,7 @@
     "codecov": "^1.0.1",
     "cz-conventional-changelog": "^1.2.0",
     "eslint": "^3.4.0",
-    "eslint-config-airbnb-base": "^6.0.0",
+    "eslint-config-airbnb-base": "^7.0.0",
     "eslint-plugin-import": "^1.14.0",
     "eslint-plugin-mocha": "^4.5.1",
     "isparta": "^4.0.0",

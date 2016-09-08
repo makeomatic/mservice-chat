@@ -1,7 +1,7 @@
 const assert = require('assert');
+const Chat = require('../../src');
 
 describe('The `internal.rooms.create` action', function suite() {
-  const Chat = require('../../src');
   const chat = new Chat(global.SERVICES);
 
   before('start up chat', () => chat.connect());

@@ -3,6 +3,7 @@
 const fs = require('fs');
 const glob = require('glob');
 const istanbul = require('istanbul');
+
 const reporter = new istanbul.Reporter();
 const collector = new istanbul.Collector();
 

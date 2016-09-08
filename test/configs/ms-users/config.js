@@ -22,7 +22,7 @@ module.exports = {
         host: 'redis-3',
         port: 6379,
       },
-    ]
+    ],
   },
   admins: [
     {
@@ -31,11 +31,11 @@ module.exports = {
       metadata: {
         firstName: 'Root',
         lastName: 'Admin',
-        roles: ['admin','root'],
+        roles: ['admin', 'root'],
       },
       firstName: 'Admin',
       lastName: 'Admin',
-      roles: ['admin','root'],
+      roles: ['admin', 'root'],
     },
     {
       username: 'foo@bar.ru',
@@ -43,5 +43,5 @@ module.exports = {
       firstName: 'Foo',
       lastName: 'Bar',
     },
-  ]
+  ],
 };

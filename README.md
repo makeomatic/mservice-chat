@@ -29,5 +29,5 @@ curl -H "Content-Type: application/json" -X POST -d '{"token":"user-token"}' htt
 
 * `socket.io`
 ```js
-const client = SocketIOClient('http://0.0.0.0:3000', { query: 'token=user-token' });
+const client = socketIOClient('http://0.0.0.0:3000', { query: 'token=user-token' });
 ```

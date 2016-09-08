@@ -1,0 +1,33 @@
+{
+  "id": "messages.history.response",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["meta", "data"],
+  "properties": {
+    "meta": {
+      "description": "Response metadata",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count"],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "description": "Count of results"
+        },
+        "before": {
+          "$ref": "common.json#/definitions/messageId"
+        },
+        "last": {
+          "$ref": "common.json#/definitions/messageId"
+        }
+      }
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "common.json#/definitions/message"
+      },
+      "description": "Collection of messages"
+    }
+  }
+}

@@ -13,9 +13,9 @@ const Promise = require('bluebird');
  * @api {socket.io} rooms.join.<roomId> Join a room
  * @apiDescription Fired when somebody joins a room
  * @apiVersion 1.0.0
- * @apiName rooms.join.event
+ * @apiName rooms.join.broadcast
  * @apiGroup SocketIO Events
- * @apiSchema {jsonschema=../../schemas/rooms.join.event.json} apiSuccess
+ * @apiSchema {jsonschema=../../schemas/rooms.join.broadcast.json} apiSuccess
  */
 function RoomsJoinAction(request) {
   const { room, socket } = request;

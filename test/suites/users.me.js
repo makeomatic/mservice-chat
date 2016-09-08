@@ -1,17 +1,15 @@
-const {expect} = require('chai');
+const Chat = require('../../src');
+const { expect } = require('chai');
+const socketIOClient = require('socket.io-client');
+
+const action = 'chat.users.me';
+const chat = new Chat(global.SERVICES);
 
 describe('users.me', function testSuite() {
-  const SocketIOClient = require('socket.io-client');
-  const Chat = require('../../src');
-  const action = 'chat.users.me';
-
-  before('start up chat', () => {
-    const chat = this.chat = new Chat(global.SERVICES);
-    return chat.connect();
-  });
+  before('start up chat', () => chat.connect());
 
   it('should auth as a guest', done => {
-    const client = SocketIOClient('http://0.0.0.0:3000');
+    const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, {}, (error, user) => {
@@ -25,22 +23,23 @@ describe('users.me', function testSuite() {
   });
 
   it('should return invalid token error', done => {
-    const client = SocketIOClient('http://0.0.0.0:3000', {query: 'token=invalidToken'});
+    const client = socketIOClient('http://0.0.0.0:3000', { query: 'token=invalidToken' });
     client.on('error', error => {
-      expect(error).to.be.equals('An attempt was made to perform an operation without authentication: Auth failed');
+      expect(error).to.be.equals('An attempt was made to perform an operation' +
+        ' without authentication: Auth failed');
       client.disconnect();
       done();
     });
   });
 
   it('should auth as an admin', done => {
-    this.chat.amqp.publishAndWait('users.login', {
-        username: 'test@test.ru',
-        password: 'megalongsuperpasswordfortest',
-        audience: '*.localhost'
-      }
+    chat.amqp.publishAndWait('users.login', {
+      username: 'test@test.ru',
+      password: 'megalongsuperpasswordfortest',
+      audience: '*.localhost',
+    }
     ).then(reply => {
-      const client = SocketIOClient('http://0.0.0.0:3000', { query: `token=${reply.jwt}` });
+      const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${reply.jwt}` });
       client.on('error', done);
       client.on('connect', () => {
         client.emit(action, {}, (error, user) => {
@@ -55,5 +54,5 @@ describe('users.me', function testSuite() {
     });
   });
 
-  after('shutdown chat', () => this.chat.close());
+  after('shutdown chat', () => chat.close());
 });
