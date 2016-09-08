@@ -1,21 +1,4 @@
-function makeResponse(messages, { before }) {
-  const response = {
-    meta: {
-      count: messages.length,
-    },
-    data: messages,
-  };
-
-  if (messages.length) {
-    response.meta.last = messages[0].id;
-  }
-
-  if (before) {
-    response.meta.before = before;
-  }
-
-  return response;
-}
+const collectionResponse = require('../services/response/collection');
 
 /**
  * @api {http} <prefix>.messages.history Get messages history
@@ -25,11 +8,11 @@ function makeResponse(messages, { before }) {
  * @apiSchema {jsonschema=../../schemas/messages.history.json} apiParam
  * @apiSchema {jsonschema=../../schemas/messages.history.response.json} apiSuccess
  */
-function messageHistoryAction({ params }) {
-  const { roomId, before, limit } = params;
+function messageHistoryAction(request) {
+  const { roomId, before, limit } = request.params;
   return this.services.message
     .history(roomId, before, limit)
-    .then(messages => makeResponse(messages, params));
+    .then(messages => collectionResponse(messages, request));
 }
 
 messageHistoryAction.schema = 'messages.history';

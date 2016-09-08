@@ -1,4 +1,6 @@
+const assert = require('assert');
 const Chat = require('../../src');
+const { create } = require('../helpers/messages');
 const { expect } = require('chai');
 const socketIOClient = require('socket.io-client');
 
@@ -16,8 +18,15 @@ describe('rooms.join', function testSuite() {
       .then(room => (this.room = room));
   });
 
+  before('create messages', () => {
+    const messages = ['foo', 'bar'];
+
+    return create(chat.services.message, messages, { roomId: this.room.id });
+  });
+
   it('should return validation error if invalid room id', done => {
     const client = socketIOClient('http://0.0.0.0:3000');
+
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, { id: '1' }, error => {
@@ -65,8 +74,13 @@ describe('rooms.join', function testSuite() {
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, { id: this.room.id.toString() }, (error, response) => {
-        expect(error).to.be.equals(null);
-        expect(response).to.have.property('user').that.is.an('object');
+        const { meta, data } = response;
+
+        assert.equal(error, null);
+        assert.equal(meta.count, 2);
+        assert.equal(data[0].text, 'bar');
+        assert.equal(data[1].text, 'foo');
+
         client.disconnect();
         done();
       });

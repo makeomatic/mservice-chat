@@ -27,8 +27,6 @@ function makeCond(cond = {}, sort = {}, limit) {
     query.$limit = limit;
   }
 
-  console.log(query)
-
   return query;
 }
 
