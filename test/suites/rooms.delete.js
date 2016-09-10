@@ -1,42 +1,39 @@
 const Chance = require('chance');
-const {expect} = require('chai');
+const Chat = require('../../src');
+const { expect } = require('chai');
 const request = require('./../helpers/request');
 
 const chance = new Chance();
+const chat = new Chat(global.SERVICES);
+const uri = 'http://0.0.0.0:3000/api/chat/rooms/delete';
 
 describe('rooms.delete', function testSuite() {
-  const Chat = require('../../src');
-  const uri = 'http://0.0.0.0:3000/api/chat/rooms/delete';
+  before('start up chat', () => chat.connect());
 
-  before('start up chat', () => {
-    const chat = this.chat = new Chat(global.SERVICES);
-    return chat.connect();
+  before('create room', () => {
+    const params = { name: 'test', createdBy: 'test@test.ru' };
+
+    return chat.services.room
+      .create(params)
+      .then(room => (this.room = room));
   });
 
-  before('create room', () => this.chat.services.room.create({
-      name: 'test room',
-      createdBy: 'test@test.ru'
-    }).then(room => {
-      this.room = room;
-    })
+  before('login first admin', () => chat.amqp.publishAndWait('users.login', {
+    username: 'test@test.ru',
+    password: 'megalongsuperpasswordfortest',
+    audience: '*.localhost',
+  }).tap(reply => {
+    this.firstAdminToken = reply.jwt;
+  })
   );
 
-  before('login first admin', () => this.chat.amqp.publishAndWait('users.login', {
-      username: 'test@test.ru',
-      password: 'megalongsuperpasswordfortest',
-      audience: '*.localhost'
-    }).tap(reply => {
-      this.firstAdminToken = reply.jwt;
-    })
-  );
-
-  before('login second admin', () => this.chat.amqp.publishAndWait('users.login', {
-      username: 'foo@bar.ru',
-      password: 'bazbazbazbazbazbaz',
-      audience: '*.localhost'
-    }).tap(reply => {
-      this.secondAdminToken = reply.jwt;
-    })
+  before('login second admin', () => chat.amqp.publishAndWait('users.login', {
+    username: 'foo@bar.ru',
+    password: 'bazbazbazbazbazbaz',
+    audience: '*.localhost',
+  }).tap(reply => {
+    this.secondAdminToken = reply.jwt;
+  })
   );
 
   it('should return error if request is not valid', done => {
@@ -45,7 +42,8 @@ describe('rooms.delete', function testSuite() {
       .then(response => {
         expect(response.statusCode).to.be.equals(400);
         expect(response.body.name).to.be.equals('ValidationError');
-        expect(response.body.message).to.be.equals('rooms.delete validation failed: data.id should match format "uuid"');
+        expect(response.body.message).to.be.equals('rooms.delete validation failed:' +
+          ' data.id should match format "uuid"');
         done();
       });
   });
@@ -59,12 +57,13 @@ describe('rooms.delete', function testSuite() {
       username: chance.email(),
     };
 
-    return this.chat.amqp.publishAndWait('users.register', userParams)
+    return chat.amqp.publishAndWait('users.register', userParams)
       .then(response => request(uri, { id, token: response.jwt }))
       .then(response => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
-        expect(response.body.message).to.be.equals('An attempt was made to perform an operation that is not permitted: Has not access');
+        expect(response.body.message).to.be.equals('An attempt was made to perform' +
+          ' an operation that is not permitted: Has not access');
       });
   });
 
@@ -75,7 +74,8 @@ describe('rooms.delete', function testSuite() {
       .then(response => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
-        expect(response.body.message).to.be.equals('An attempt was made to perform an operation that is not permitted: Has not access');
+        expect(response.body.message).to.be.equals('An attempt was made to perform' +
+          ' an operation that is not permitted: Has not access');
         done();
       });
   });
@@ -84,14 +84,14 @@ describe('rooms.delete', function testSuite() {
     const id = this.room.id.toString();
     const token = this.firstAdminToken;
 
-    this.chat.services.room.find()
+    chat.services.room.find()
       .then(roomsBefore => expect(roomsBefore.length).to.be.equals(1))
-      .then(() => request(uri, {id, token}))
+      .then(() => request(uri, { id, token }))
       .then(response => {
         expect(response.statusCode).to.be.equals(200);
         expect(response.body).to.be.equals(true);
       })
-      .then(() => this.chat.services.room.find())
+      .then(() => chat.services.room.find())
       .then(roomsAfter => {
         expect(roomsAfter.length).to.be.equals(0);
         done();
@@ -99,5 +99,5 @@ describe('rooms.delete', function testSuite() {
   });
 
   after('delete first room', () => this.room.deleteAsync());
-  after('shutdown chat', () => this.chat.close());
+  after('shutdown chat', () => chat.close());
 });

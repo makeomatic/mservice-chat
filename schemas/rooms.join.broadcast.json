@@ -1,5 +1,5 @@
 {
-  "id": "rooms.join.event",
+  "id": "rooms.join.broadcast",
   "additionalProperties": false,
   "type": "object",
   "required": ["user"],

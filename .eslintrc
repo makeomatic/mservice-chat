@@ -1,12 +1,6 @@
 {
   "extends": "airbnb-base",
   "parser": "babel-eslint",
-  "plugins": [
-    "mocha"
-  ],
-  "env": {
-    "mocha": true
-  },
   "rules": {
     "no-param-reassign": [2, {"props": false}],
     "prefer-arrow-callback": 0,

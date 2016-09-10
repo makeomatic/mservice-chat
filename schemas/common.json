@@ -22,6 +22,65 @@
           "description": "Array of user roles"
         }
       }
+    },
+    "messageId": {
+      "description": "`message` identificator",
+      "type": "string",
+      "pattern": "^\\d+$"
+    },
+    "roomId": {
+      "description": "`room` identificator",
+      "type": "string",
+      "format": "uuid"
+    },
+    "message": {
+      "description": "`message` object",
+      "type": "object",
+      "required": ["id", "text", "user"],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/messageId"
+        },
+        "text": {
+          "type": "string",
+          "description": "Message text"
+        },
+        "user": {
+          "$ref": "#/definitions/user"
+        }
+      }
+    },
+    "messagesCollection": {
+      "additionalProperties": false,
+      "type": "object",
+      "required": ["meta", "data"],
+      "properties": {
+        "meta": {
+          "description": "Response metadata",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count"],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "description": "Count of results"
+            },
+            "before": {
+              "$ref": "common.json#/definitions/messageId"
+            },
+            "last": {
+              "$ref": "common.json#/definitions/messageId"
+            }
+          }
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/message"
+          },
+          "description": "Collection of messages"
+        }
+      }
     }
   }
 }

@@ -5,13 +5,10 @@
   "required": ["id", "roomId", "token"],
   "properties": {
     "id": {
-      "description": "Message id",
-      "type": "string"
+      "$ref": "common.json#/definitions/messageId"
     },
     "roomId": {
-      "description": "Room id",
-      "type": "string",
-      "format": "uuid"
+      "$ref": "common.json#/definitions/roomId"
     },
     "token": {
       "description": "Auth token",

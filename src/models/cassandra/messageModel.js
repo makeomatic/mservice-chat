@@ -3,7 +3,7 @@ const required = require('./utils/validators/required');
 module.exports = {
   fields: {
     id: {
-      type: 'varchar',
+      type: 'bigint',
       rule: required,
     },
     text: {

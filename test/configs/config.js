@@ -1,5 +1,3 @@
-const cassandra = require('express-cassandra');
-
 global.SERVICES = {
   amqp: {
     transport: {
@@ -24,7 +22,7 @@ global.SERVICES = {
         options: {
           connection: {
             host: 'rabbitmq',
-          }
+          },
         },
       },
     },

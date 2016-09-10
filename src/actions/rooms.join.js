@@ -1,3 +1,4 @@
+const collectionResponse = require('../services/response/collection');
 const Errors = require('common-errors');
 const fetchRoom = require('./../fetchers/room')();
 const Promise = require('bluebird');
@@ -8,30 +9,26 @@ const Promise = require('bluebird');
  * @apiName rooms.join
  * @apiGroup Rooms
  * @apiSchema {jsonschema=../../schemas/rooms.join.json} apiParam
+ * @apiSchema {jsonschema=../../schemas/rooms.join.response.json} apiSuccess
  */
 /**
  * @api {socket.io} rooms.join.<roomId> Join a room
  * @apiDescription Fired when somebody joins a room
  * @apiVersion 1.0.0
- * @apiName rooms.join.event
+ * @apiName rooms.join.broadcast
  * @apiGroup SocketIO Events
- * @apiSchema {jsonschema=../../schemas/rooms.join.event.json} apiSuccess
+ * @apiSchema {jsonschema=../../schemas/rooms.join.broadcast.json} apiSuccess
  */
 function RoomsJoinAction(request) {
   const { room, socket } = request;
+  const { user } = socket;
   const roomId = room.id.toString();
 
   return Promise
     .fromCallback(callback => socket.join(roomId, callback))
-    .then(() => {
-      const response = {
-        user: socket.user,
-      };
-
-      socket.nsp.in(roomId).emit(`rooms.join.${roomId}`, response);
-
-      return Promise.resolve(response);
-    });
+    .tap(() => socket.nsp.in(roomId).emit(`rooms.join.${roomId}`, { user }))
+    .then(() => this.services.message.history(roomId))
+    .then(messages => collectionResponse(messages, request));
 }
 
 const allowed = request => {

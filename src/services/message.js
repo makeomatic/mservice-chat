@@ -1,7 +1,34 @@
-const now = require('lodash/now');
 const Errors = require('common-errors');
 const is = require('is');
+const now = require('lodash/now');
+const merge = require('lodash/merge');
+const mapValues = require('lodash/mapValues');
 const Promise = require('bluebird');
+const { uuidFromString, datatypes } = require('express-cassandra');
+
+function makeCond(cond = {}, sort = {}, limit) {
+  const query = merge({}, cond);
+
+  if (is.string(query.roomId) === true) {
+    query.roomId = uuidFromString(query.roomId);
+  }
+
+  if (is.string(query.id) === true) {
+    query.id = datatypes.Long.fromString(query.id);
+  } else if (is.object(query.id) === true) {
+    query.id = mapValues(query.id, value => datatypes.Long.fromString(value));
+  }
+
+  if (Object.keys(sort).length) {
+    query.$orderby = sort;
+  }
+
+  if (limit) {
+    query.$limit = limit;
+  }
+
+  return query;
+}
 
 class MessageService
 {
@@ -26,7 +53,7 @@ class MessageService
   create(properties) {
     const MessageModel = this.model;
     const messageParams = Object.assign({}, properties, {
-      id: this.flakeless.next(),
+      id: datatypes.Long.fromString(this.flakeless.next()),
       createdAt: now(),
       properties: {},
       attachments: {},
@@ -39,44 +66,31 @@ class MessageService
   }
 
   getById(id, roomId) {
-    const query = {
-      id,
-      roomId: this.cassandraClient.datatypes.Uuid.fromString(roomId),
-    };
+    const query = makeCond({ id, roomId });
 
     return this.model
       .findOneAsync(query)
-      .then(message => {
+      .tap(message => {
         if (!message) {
-          return Promise.reject(new Errors.NotFoundError(`Message #${id} not found`));
+          throw new Errors.NotFoundError(`Message #${id} not found`);
         }
-
-        return Promise.resolve(message);
       });
   }
 
   find(cond = {}, sort = {}, limit = 20) {
-    const query = this.makeCond(cond, sort, limit);
+    const query = makeCond(cond, sort, limit);
 
     return this.model.findAsync(query);
   }
 
-  makeCond(cond = {}, sort = {}, limit) {
-    const query = Object.assign({}, cond);
+  history(roomId, before, limit = 20) {
+    const query = { roomId };
 
-    if (query.roomId) {
-      query.roomId = this.cassandraClient.datatypes.Uuid.fromString(query.roomId);
+    if (before) {
+      query.id = { $lt: before };
     }
 
-    if (sort) {
-      query.$orderby = sort;
-    }
-
-    if (limit) {
-      query.$limit = limit;
-    }
-
-    return query;
+    return this.find(query, { $desc: 'id' }, limit);
   }
 }
 

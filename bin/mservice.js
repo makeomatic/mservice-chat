@@ -2,7 +2,9 @@
 
 let dir;
 try {
+  // eslint-disable-next-line import/no-extraneous-dependencies, global-require
   require('babel-register');
+
   dir = '../src';
 } catch (e) {
   dir = '../lib';
@@ -11,7 +13,9 @@ try {
 // accepts conf through .env file
 // suitable for configuring this in the docker env
 const configuration = require('ms-conf');
+
 const Chat = require(dir);
+
 const chat = new Chat(configuration.get('/'));
 
 chat.connect()

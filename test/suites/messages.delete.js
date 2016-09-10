@@ -1,12 +1,12 @@
 const assert = require('assert');
 const Chance = require('chance');
 const request = require('./../helpers/request');
-const SocketIOClient = require('socket.io-client');
+const socketIOClient = require('socket.io-client');
 
 const chance = new Chance();
 const Chat = require('../../src');
 
-describe('rooms.delete', function testSuite() {
+describe('messages.delete', function testSuite() {
   const chat = new Chat(global.SERVICES);
   const uri = 'http://0.0.0.0:3000/api/chat/messages/delete';
   let adminToken;
@@ -32,7 +32,7 @@ describe('rooms.delete', function testSuite() {
     const params = {
       username: 'test@test.ru',
       password: 'megalongsuperpasswordfortest',
-      audience: '*.localhost'
+      audience: '*.localhost',
     };
 
     return chat.amqp
@@ -63,7 +63,9 @@ describe('rooms.delete', function testSuite() {
   });
 
   it('should returns error if invalid `id`', () => {
-    return request(uri, { token: adminToken, id: 0, roomId: room.id.toString() })
+    const params = { token: adminToken, id: 0, roomId: room.id.toString() };
+
+    return request(uri, params)
       .then(({ statusCode, body }) => {
         assert.equal(statusCode, 400);
         assert.equal(body.name, 'ValidationError');
@@ -72,8 +74,10 @@ describe('rooms.delete', function testSuite() {
       });
   });
 
-  it('should returns error if room not found', () => {
-    return request(uri, { token: adminToken, id: '0', roomId: room.id.toString() })
+  it('should returns error if message not found', () => {
+    const params = { token: adminToken, id: '0', roomId: room.id.toString() };
+
+    return request(uri, params)
       .then(({ statusCode, body }) => {
         assert.equal(statusCode, 404);
         assert.equal(body.name, 'NotFoundError');
@@ -91,7 +95,11 @@ describe('rooms.delete', function testSuite() {
 
     return chat.services.message
       .create(params)
-      .then(message => request(uri, { token: userToken, id: message.id, roomId: room.id.toString() }))
+      .then(message => {
+        const requestParams = { token: userToken, id: message.id, roomId: room.id.toString() };
+
+        return request(uri, requestParams);
+      })
       .then(({ statusCode, body }) => {
         assert.equal(statusCode, 403);
         assert.equal(body.name, 'NotPermittedError');
@@ -101,13 +109,7 @@ describe('rooms.delete', function testSuite() {
   });
 
   it('should delete message by user', done => {
-    const params = {
-      userId,
-      roomId: room.id,
-      text: 'foo',
-      user: { id: userId, name: 'Simple User', roles: ['user'] },
-    };
-    const client = SocketIOClient('http://0.0.0.0:3000', { query: `token=${userToken}` });
+    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${userToken}` });
 
     client.on('error', done);
     client.on('connect', () => {
@@ -127,13 +129,7 @@ describe('rooms.delete', function testSuite() {
   });
 
   it('should delete message by admin', done => {
-    const params = {
-      userId,
-      roomId: room.id,
-      text: 'foo',
-      user: { id: userId, name: 'Simple User', roles: ['user'] },
-    };
-    const client = SocketIOClient('http://0.0.0.0:3000', { query: `token=${userToken}` });
+    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${userToken}` });
 
     client.on('error', done);
     client.on('connect', () => {
@@ -153,13 +149,7 @@ describe('rooms.delete', function testSuite() {
   });
 
   it('should emits event when delete a message', done => {
-    const params = {
-      userId,
-      roomId: room.id,
-      text: 'foo',
-      user: { id: userId, name: 'Simple User', roles: ['user'] },
-    };
-    const client = SocketIOClient('http://0.0.0.0:3000', { query: `token=${userToken}` });
+    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${userToken}` });
 
     client.on('error', done);
     client.on('connect', () => {
