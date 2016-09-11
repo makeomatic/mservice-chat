@@ -16,7 +16,7 @@ function auth(token, application) {
   const timeout = config.users.timeouts.verify;
 
   return amqp.publishAndWait(route, { token, audience }, { timeout })
-    .then(reply => {
+    .then((reply) => {
       const user = reply.metadata[audience];
       const name = `${user.firstName} ${user.lastName}`;
       const model = new LightUserModel(user.username, name, user.roles);

@@ -24,9 +24,9 @@ describe('rooms.list', function testSuite() {
       .then(room => (this.secondRoom = room));
   });
 
-  it('should return list of rooms', done => {
+  it('should return list of rooms', (done) => {
     request(uri)
-      .then(response => {
+      .then((response) => {
         expect(response.statusCode).to.be.equals(200);
         expect(response.body.length).to.be.equals(2);
         done();

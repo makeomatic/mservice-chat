@@ -5,11 +5,11 @@ function fetchMessage(request, application) {
 
   return application.services.message
     .getById(id, roomId)
-    .tap(message => {
+    .tap((message) => {
       request.message = message;
     })
     .then(() => application.services.room.getById(roomId))
-    .tap(room => {
+    .tap((room) => {
       request.room = room;
     })
     .then(() => Promise.resolve(request));

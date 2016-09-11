@@ -16,7 +16,7 @@ describe('messages.history', function suite() {
     const params = { roomId };
 
     return create(chat.services.message, messages, params)
-      .then(createdMessages => {
+      .then((createdMessages) => {
         function reducer(previous, current) {
           previous[current.text] = current;
 
@@ -31,7 +31,7 @@ describe('messages.history', function suite() {
     const params = { roomId: roomId.toString() };
 
     return request(uri, params)
-      .then(response => {
+      .then((response) => {
         const { meta, data } = response.body;
         const [fourth, third, second, first] = data;
 
@@ -57,7 +57,7 @@ describe('messages.history', function suite() {
     };
 
     return request(uri, params)
-      .then(response => {
+      .then((response) => {
         const { meta, data } = response.body;
         const [second, first] = data;
 
@@ -80,7 +80,7 @@ describe('messages.history', function suite() {
     };
 
     return request(uri, params)
-      .then(response => {
+      .then((response) => {
         const { meta, data } = response.body;
         const [first] = data;
 
@@ -97,7 +97,7 @@ describe('messages.history', function suite() {
     const params = { roomId: fakeRoomId };
 
     return request(uri, params)
-      .then(response => {
+      .then((response) => {
         const { meta, data } = response.body;
 
         assert.equal(data.length, 0);

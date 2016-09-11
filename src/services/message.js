@@ -70,7 +70,7 @@ class MessageService
 
     return this.model
       .findOneAsync(query)
-      .tap(message => {
+      .tap((message) => {
         if (!message) {
           throw new Errors.NotFoundError(`Message #${id} not found`);
         }

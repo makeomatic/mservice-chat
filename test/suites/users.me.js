@@ -8,7 +8,7 @@ const chat = new Chat(global.SERVICES);
 describe('users.me', function testSuite() {
   before('start up chat', () => chat.connect());
 
-  it('should auth as a guest', done => {
+  it('should auth as a guest', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
@@ -22,9 +22,9 @@ describe('users.me', function testSuite() {
     });
   });
 
-  it('should return invalid token error', done => {
+  it('should return invalid token error', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000', { query: 'token=invalidToken' });
-    client.on('error', error => {
+    client.on('error', (error) => {
       expect(error).to.be.equals('An attempt was made to perform an operation' +
         ' without authentication: Auth failed');
       client.disconnect();
@@ -32,13 +32,13 @@ describe('users.me', function testSuite() {
     });
   });
 
-  it('should auth as an admin', done => {
+  it('should auth as an admin', (done) => {
     chat.amqp.publishAndWait('users.login', {
       username: 'test@test.ru',
       password: 'megalongsuperpasswordfortest',
       audience: '*.localhost',
     }
-    ).then(reply => {
+    ).then((reply) => {
       const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${reply.jwt}` });
       client.on('error', done);
       client.on('connect', () => {

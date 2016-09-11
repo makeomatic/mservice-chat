@@ -16,11 +16,11 @@ describe('rooms.leave', function testSuite() {
       .then(room => (this.room = room));
   });
 
-  it('should return validation error if invalid room id', done => {
+  it('should return validation error if invalid room id', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, { id: '1' }, error => {
+      client.emit(action, { id: '1' }, (error) => {
         expect(error.name).to.be.equals('ValidationError');
         expect(error.message).to.be
           .equals('rooms.leave validation failed: data.id should match format "uuid"');
@@ -30,11 +30,11 @@ describe('rooms.leave', function testSuite() {
     });
   });
 
-  it('should return not found error if room is not exists', done => {
+  it('should return not found error if room is not exists', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, { id: '00000000-0000-0000-0000-000000000000' }, error => {
+      client.emit(action, { id: '00000000-0000-0000-0000-000000000000' }, (error) => {
         expect(error.name).to.be.equals('NotFoundError');
         expect(error.message).to.be.equals('Not Found:' +
           ' "Room #00000000-0000-0000-0000-000000000000 not found"');
@@ -44,11 +44,11 @@ describe('rooms.leave', function testSuite() {
     });
   });
 
-  it('should return not permitted error if not in the room', done => {
+  it('should return not permitted error if not in the room', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, { id: this.room.id.toString() }, error => {
+      client.emit(action, { id: this.room.id.toString() }, (error) => {
         expect(error.name).to.be.equals('NotPermittedError');
         expect(error.message).to.be.equals('An attempt was made to perform an operation that is '
           + 'not permitted: Not in the room');
@@ -58,7 +58,7 @@ describe('rooms.leave', function testSuite() {
     });
   });
 
-  it('should leave room', done => {
+  it('should leave room', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
@@ -74,12 +74,12 @@ describe('rooms.leave', function testSuite() {
     });
   });
 
-  it('should emit when leave room', done => {
+  it('should emit when leave room', (done) => {
     const client1 = socketIOClient('http://0.0.0.0:3000');
     const client2 = socketIOClient('http://0.0.0.0:3000');
     const roomId = this.room.id.toString();
 
-    client1.on(`rooms.leave.${roomId}`, response => {
+    client1.on(`rooms.leave.${roomId}`, (response) => {
       expect(response).to.have.property('user').that.is.an('object');
       client1.disconnect();
       client2.disconnect();

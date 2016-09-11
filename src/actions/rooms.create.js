@@ -14,7 +14,7 @@ function RoomsCreateAction(request) {
   return this.services.room.create(properties);
 }
 
-const allowed = request => {
+const allowed = (request) => {
   const { auth } = request;
 
   if (auth.credentials.user.isRoot !== true) {

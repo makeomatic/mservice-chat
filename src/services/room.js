@@ -35,7 +35,7 @@ class RoomService
     }
 
     return this.model.findOneAsync({ id: this.cassandraClient.datatypes.Uuid.fromString(id) })
-      .then(room => {
+      .then((room) => {
         if (!room) {
           return Promise.reject(new Errors.NotFoundError(`Room #${id} not found`));
         }

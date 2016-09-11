@@ -23,7 +23,7 @@ chat.connect()
     const address = chat.http.info;
     chat.log.info(`connected on ${address.address}:${address.port}`);
   })
-  .catch(err => {
+  .catch((err) => {
     chat.log.fatal('Failed to start service', err);
     setImmediate(() => {
       throw err;

@@ -28,7 +28,7 @@ describe('messages.send', function testSuite() {
       password: 'megalongsuperpasswordfortest',
       audience: '*.localhost',
     })
-    .tap(reply => {
+    .tap((reply) => {
       this.adminToken = reply.jwt;
     })
   );
@@ -53,11 +53,11 @@ describe('messages.send', function testSuite() {
       });
   });
 
-  it('should return validation error if invalid params', done => {
+  it('should return validation error if invalid params', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, { roomId: fakeRoomId, message: { foo: 'bar' } }, error => {
+      client.emit(action, { roomId: fakeRoomId, message: { foo: 'bar' } }, (error) => {
         expect(error.name).to.be.equals('ValidationError');
         client.disconnect();
         done();
@@ -65,11 +65,11 @@ describe('messages.send', function testSuite() {
     });
   });
 
-  it('should return validation error if invalid message', done => {
+  it('should return validation error if invalid message', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, { roomId: fakeRoomId, message: { text: 'bar', foo: 'baz' } }, error => {
+      client.emit(action, { roomId: fakeRoomId, message: { text: 'bar', foo: 'baz' } }, (error) => {
         expect(error.name).to.be.equals('ValidationError');
         client.disconnect();
         done();
@@ -77,14 +77,14 @@ describe('messages.send', function testSuite() {
     });
   });
 
-  it('should return validation error if invalid sticky message', done => {
+  it('should return validation error if invalid sticky message', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, {
         roomId: '00000000-0000-0000-0000-000000000000',
         message: { type: 'sticky', foo: 'bar' },
-      }, error => {
+      }, (error) => {
         expect(error.name).to.be.equals('ValidationError');
         client.disconnect();
         done();
@@ -92,11 +92,11 @@ describe('messages.send', function testSuite() {
     });
   });
 
-  it('should return validation error if invalid room id', done => {
+  it('should return validation error if invalid room id', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, { roomId: '1', message: { text: 'foo' } }, error => {
+      client.emit(action, { roomId: '1', message: { text: 'foo' } }, (error) => {
         expect(error.name).to.be.equals('ValidationError');
         expect(error.message).to.be.equals('messages.send validation failed:' +
           ' data.roomId should match format "uuid"');
@@ -106,11 +106,11 @@ describe('messages.send', function testSuite() {
     });
   });
 
-  it('should return not found error if room not found', done => {
+  it('should return not found error if room not found', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, { roomId: fakeRoomId, message: { text: 'foo' } }, error => {
+      client.emit(action, { roomId: fakeRoomId, message: { text: 'foo' } }, (error) => {
         expect(error.name).to.be.equals('NotFoundError');
         expect(error.message).to.be.equals('Not Found:' +
           ' "Room #00000000-0000-0000-0000-000000000000 not found"');
@@ -120,11 +120,11 @@ describe('messages.send', function testSuite() {
     });
   });
 
-  it('should return not permitted error if not in the room', done => {
+  it('should return not permitted error if not in the room', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, { roomId: this.room.id.toString(), message: { text: 'foo' } }, error => {
+      client.emit(action, { roomId: this.room.id.toString(), message: { text: 'foo' } }, (error) => {
         expect(error.name).to.be.equals('NotPermittedError');
         expect(error.message).to.be.equals('An attempt was made to perform an operation that' +
           ' is not permitted: Not in the room');
@@ -134,7 +134,7 @@ describe('messages.send', function testSuite() {
     });
   });
 
-  it('should return error if sticky message and user is not admin', done => {
+  it('should return error if sticky message and user is not admin', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
 
     client.on('error', done);
@@ -142,7 +142,7 @@ describe('messages.send', function testSuite() {
       client.emit('chat.rooms.join', { id: this.room.id.toString() }, () => {
         const message = { type: 'sticky', text: 'foo' };
 
-        client.emit(action, { roomId: this.room.id.toString(), message }, error => {
+        client.emit(action, { roomId: this.room.id.toString(), message }, (error) => {
           expect(error.name).to.be.equals('NotPermittedError');
           expect(error.message).to.be.equals('An attempt was made to perform an operation' +
             ' that is not permitted: Access denied for message type "sticky"');
@@ -153,7 +153,7 @@ describe('messages.send', function testSuite() {
     });
   });
 
-  it('should send message', done => {
+  it('should send message', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.adminToken}` });
     const roomId = this.room.id.toString();
 
@@ -181,7 +181,7 @@ describe('messages.send', function testSuite() {
     });
   });
 
-  it('should save message', done => {
+  it('should save message', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.adminToken}` });
     const roomId = this.room.id.toString();
 
@@ -193,7 +193,7 @@ describe('messages.send', function testSuite() {
             client.emit(action, { roomId, message: { text: 'baz' } }, () => {
               this.chat.services.message
                 .find({ roomId }, { $desc: 'id' }, 2)
-                .then(messages => {
+                .then((messages) => {
                   const [first, second] = messages;
 
                   assert.ok(first.id);
@@ -228,12 +228,12 @@ describe('messages.send', function testSuite() {
     });
   });
 
-  it('should emit when send message', done => {
+  it('should emit when send message', (done) => {
     const client1 = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.adminToken}` });
     const client2 = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
     const roomId = this.room.id.toString();
 
-    client1.on(`messages.send.${roomId}`, response => {
+    client1.on(`messages.send.${roomId}`, (response) => {
       assert.ok(response.id);
       assert.equal(response.text, 'foo');
       assert.equal(response.roomId, roomId);
@@ -253,7 +253,7 @@ describe('messages.send', function testSuite() {
     client1.on('connect', () => {
       client1.emit('chat.rooms.join', { id: roomId }, () => {
         client2.emit('chat.rooms.join', { id: roomId }, () => {
-          client2.emit(action, { roomId, message: { text: 'foo' } }, error => {
+          client2.emit(action, { roomId, message: { text: 'foo' } }, (error) => {
             expect(error).to.be.equals(null);
           });
         });

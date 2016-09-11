@@ -14,7 +14,7 @@ function RoomsDeleteAction(request) {
   return request.room.deleteAsync().return(true);
 }
 
-const allowed = request => {
+const allowed = (request) => {
   const { auth, room } = request;
 
   if (isElevated(auth.credentials.user, room) !== true) {

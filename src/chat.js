@@ -16,7 +16,7 @@ class Chat extends MService {
   constructor(config = {}) {
     super(merge({}, defaultConfig, config));
 
-    this.on('plugin:connect:cassandra', cassandra => {
+    this.on('plugin:connect:cassandra', (cassandra) => {
       const flakeless = new Flakeless({
         epochStart: Date.now(),
         outputType: 'base10',

@@ -12,7 +12,7 @@ describe('The `internal.rooms.create` action', function suite() {
 
     return amqp.publishAndWait('chat.internal.rooms.create', {})
       .reflect()
-      .then(inspection => {
+      .then((inspection) => {
         assert.equal(inspection.isFulfilled(), false);
 
         const response = inspection.error();
@@ -36,7 +36,7 @@ describe('The `internal.rooms.create` action', function suite() {
 
     return amqp.publishAndWait('chat.internal.rooms.create', roomParams)
       .reflect()
-      .then(inspection => {
+      .then((inspection) => {
         assert.equal(inspection.isFulfilled(), true);
 
         const response = inspection.value();
@@ -49,7 +49,7 @@ describe('The `internal.rooms.create` action', function suite() {
         return response.id;
       })
       .then(id => chat.services.room.getById(id))
-      .then(room => {
+      .then((room) => {
         assert.equal(room.createdBy, 'test@gmail.com');
         assert.equal(room.name, 'Test Room');
         assert.ok(room.id);
