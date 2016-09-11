@@ -26,7 +26,7 @@ const allowed = request => {
 
 RoomsDeleteAction.allowed = allowed;
 RoomsDeleteAction.auth = 'token';
-RoomsDeleteAction.fetch = fetchRoom;
+RoomsDeleteAction.fetcher = fetchRoom;
 RoomsDeleteAction.schema = 'rooms.delete';
 RoomsDeleteAction.transports = ['http'];
 

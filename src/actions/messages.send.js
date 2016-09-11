@@ -49,6 +49,11 @@ function allowed(request) {
     return Promise.reject(new Errors.NotPermittedError('Access denied for guests'));
   }
 
+  // @todo try to move it to model method
+  if (room.banned !== null && room.banned.includes(user.id) === true) {
+    throw new Errors.NotPermittedError(`User #${user.id} is banned`);
+  }
+
   if (params.message.type && isElevated(user, room) !== true) {
     return Promise.reject(
       new Errors.NotPermittedError(`Access denied for message type "${params.message.type}"`)
@@ -59,7 +64,7 @@ function allowed(request) {
 }
 
 messageSendAction.allowed = allowed;
-messageSendAction.fetch = fetchRoom;
+messageSendAction.fetcher = fetchRoom;
 messageSendAction.schema = 'messages.send';
 messageSendAction.transports = ['socketIO'];
 

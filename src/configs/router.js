@@ -1,7 +1,7 @@
 const { ActionTransport, routerExtension } = require('mservice');
-const auth = require('./../auth/token');
+const auth = require('../auth/token');
+const fetcher = require('../fetchers/extension');
 const path = require('path');
-const Promise = require('bluebird');
 
 const { amqp, http, socketIO } = ActionTransport;
 
@@ -16,18 +16,7 @@ module.exports = {
       enabled: ['preAllowed', 'postRequest', 'preRequest', 'preResponse'],
       register: [
         routerExtension('audit/log'),
-        [
-          {
-            point: 'preAllowed',
-            handler: function preAllowed(request) {
-              if (request.action.fetch) {
-                return request.action.fetch(request, this);
-              }
-
-              return Promise.resolve(request);
-            },
-          },
-        ],
+        fetcher,
       ],
     },
     auth: {

@@ -1,18 +1,13 @@
-const Promise = require('bluebird');
+function getFetcher(messageKey = 'id', roomKey = 'roomId') {
+  function fetchMessage(request, application) {
+    const { params } = request;
 
-function fetchMessage(request, application) {
-  const { id, roomId } = request.params;
+    return application.services.message
+      .getById(params[messageKey], params[roomKey])
+      .tap(message => (request.message = message));
+  }
 
-  return application.services.message
-    .getById(id, roomId)
-    .tap(message => {
-      request.message = message;
-    })
-    .then(() => application.services.room.getById(roomId))
-    .tap(room => {
-      request.room = room;
-    })
-    .then(() => Promise.resolve(request));
+  return fetchMessage;
 }
 
-module.exports = fetchMessage;
+module.exports = getFetcher;

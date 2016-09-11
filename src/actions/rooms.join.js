@@ -42,7 +42,7 @@ const allowed = request => {
 };
 
 RoomsJoinAction.allowed = allowed;
-RoomsJoinAction.fetch = fetchRoom;
+RoomsJoinAction.fetcher = fetchRoom;
 RoomsJoinAction.schema = 'rooms.join';
 RoomsJoinAction.transports = ['socketIO'];
 

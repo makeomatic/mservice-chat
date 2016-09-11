@@ -45,7 +45,7 @@ const allowed = request => {
 };
 
 RoomsLeaveAction.allowed = allowed;
-RoomsLeaveAction.fetch = fetchRoom;
+RoomsLeaveAction.fetcher = fetchRoom;
 RoomsLeaveAction.schema = 'rooms.leave';
 RoomsLeaveAction.transports = ['socketIO'];
 

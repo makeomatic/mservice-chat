@@ -10,8 +10,7 @@
       "format": "uuid"
     },
     "token": {
-      "description": "Auth token",
-      "type": "string"
+      "$ref": "common.json#/definitions/token"
     }
   }
 }

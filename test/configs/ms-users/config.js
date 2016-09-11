@@ -26,22 +26,49 @@ module.exports = {
   },
   admins: [
     {
-      username: 'test@test.ru',
-      password: 'megalongsuperpasswordfortest',
+      username: 'root@foo.com',
+      password: 'rootpassword000000',
       metadata: {
         firstName: 'Root',
         lastName: 'Admin',
         roles: ['admin', 'root'],
       },
-      firstName: 'Admin',
-      lastName: 'Admin',
-      roles: ['admin', 'root'],
     },
     {
-      username: 'foo@bar.ru',
-      password: 'bazbazbazbazbazbaz',
-      firstName: 'Foo',
-      lastName: 'Bar',
+      username: 'admin@foo.com',
+      password: 'adminpassword00000',
+      metadata: {
+        firstName: 'Admin',
+        lastName: 'Admin',
+        roles: ['admin'],
+      },
+    },
+    {
+      username: 'second.admin@foo.com',
+      password: 'secondadminpassword',
+      metadata: {
+        firstName: 'SecondAdmin',
+        lastName: 'Admin',
+        roles: ['admin'],
+      },
+    },
+    {
+      username: 'user@foo.com',
+      password: 'userpassword000000',
+      metadata: {
+        firstName: 'User',
+        lastName: 'User',
+        roles: ['user'],
+      },
+    },
+    {
+      username: 'second.user@foo.com',
+      password: 'seconduserpassword',
+      metadata: {
+        firstName: 'SecondUser',
+        lastName: 'User',
+        roles: ['user'],
+      },
     },
   ],
 };

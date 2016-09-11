@@ -1,3 +1,4 @@
+const assert = require('assert');
 const Chance = require('chance');
 const Chat = require('../../src');
 const { expect } = require('chai');
@@ -11,8 +12,8 @@ describe('rooms.create', function testSuite() {
   before('start up chat', () => chat.connect());
 
   before('login admin', () => chat.amqp.publishAndWait('users.login', {
-    username: 'test@test.ru',
-    password: 'megalongsuperpasswordfortest',
+    username: 'root@foo.com',
+    password: 'rootpassword000000',
     audience: '*.localhost',
   }).tap(reply => {
     this.adminToken = reply.jwt;
@@ -51,14 +52,15 @@ describe('rooms.create', function testSuite() {
       });
   });
 
-  it('should create a room if user is admin', done => {
+  it('should be able create a room if the user is an admin', done => {
     const token = this.adminToken;
 
     request(uri, { token, name: 'test room' })
       .then(response => {
         expect(response.statusCode).to.be.equals(200);
         expect(response.body.name).to.be.equals('test room');
-        expect(response.body.createdBy).to.be.equals('test@test.ru');
+        assert.equal(response.body.createdBy, 'root@foo.com');
+
         return response;
       })
       .then(response => chat.services.room.getById(response.body.id))

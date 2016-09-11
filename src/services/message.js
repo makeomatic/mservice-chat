@@ -1,6 +1,5 @@
 const Errors = require('common-errors');
 const is = require('is');
-const now = require('lodash/now');
 const merge = require('lodash/merge');
 const mapValues = require('lodash/mapValues');
 const Promise = require('bluebird');
@@ -54,7 +53,7 @@ class MessageService
     const MessageModel = this.model;
     const messageParams = Object.assign({}, properties, {
       id: datatypes.Long.fromString(this.flakeless.next()),
-      createdAt: now(),
+      createdAt: Date.now(),
       properties: {},
       attachments: {},
     });

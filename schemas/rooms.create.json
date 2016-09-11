@@ -8,8 +8,7 @@
       "type": "string"
     },
     "token": {
-      "description": "Auth token",
-      "type": "string"
+      "$ref": "common.json#/definitions/token"
     }
   }
 }

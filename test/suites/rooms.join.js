@@ -11,7 +11,7 @@ describe('rooms.join', function testSuite() {
   before('start up chat', () => chat.connect());
 
   before('create room', () => {
-    const params = { name: 'test', createdBy: 'test@test.ru' };
+    const params = { name: 'test', createdBy: 'admin@foo.com' };
 
     return chat.services.room
       .create(params)

@@ -9,7 +9,7 @@ describe('rooms.list', function testSuite() {
   before('start up a chat', () => chat.connect());
 
   before('create first room', () => {
-    const params = { name: 'first room', createdBy: 'test@test.ru' };
+    const params = { name: 'first room', createdBy: 'admin@foo.com' };
 
     return chat.services.room
       .create(params)
@@ -17,7 +17,7 @@ describe('rooms.list', function testSuite() {
   });
 
   before('create second room', () => {
-    const params = { name: 'second room', createdBy: 'test@test.ru' };
+    const params = { name: 'second room', createdBy: 'admin@foo.com' };
 
     return chat.services.room
       .create(params)

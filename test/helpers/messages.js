@@ -4,11 +4,11 @@ const { uuid } = require('express-cassandra');
 function create(messageService, messages = ['foo'], params) {
   const defaults = {
     roomId: uuid(),
-    userId: 'foo@bar.ru',
+    userId: 'user@foo.com',
     user: {
-      id: 'test@test.ru',
-      name: 'Root Admin',
-      roles: ['root'],
+      id: 'user@foo.com',
+      name: 'User User',
+      roles: ['user'],
     },
   };
 

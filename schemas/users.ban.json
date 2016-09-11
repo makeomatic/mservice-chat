@@ -1,14 +1,14 @@
 {
-  "id": "messages.delete",
+  "id": "users.ban",
   "additionalProperties": false,
   "type": "object",
-  "required": ["id", "roomId", "token"],
+  "required": ["roomId", "userId"],
   "properties": {
-    "id": {
-      "$ref": "common.json#/definitions/messageId"
-    },
     "roomId": {
       "$ref": "common.json#/definitions/roomId"
+    },
+    "userId": {
+      "$ref": "common.json#/definitions/userId"
     },
     "token": {
       "$ref": "common.json#/definitions/token"
