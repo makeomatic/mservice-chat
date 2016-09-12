@@ -23,7 +23,7 @@ describe('messages.delete', function testSuite() {
 
     return roomService
       .create(params)
-      .tap(createdRoom => {
+      .tap((createdRoom) => {
         room = createdRoom;
       });
   });
@@ -95,7 +95,7 @@ describe('messages.delete', function testSuite() {
 
     return chat.services.message
       .create(params)
-      .then(message => {
+      .then((message) => {
         const requestParams = { token: userToken, id: message.id, roomId: room.id.toString() };
 
         return request(uri, requestParams);
@@ -108,7 +108,7 @@ describe('messages.delete', function testSuite() {
       });
   });
 
-  it('should delete message by user', done => {
+  it('should delete message by user', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${userToken}` });
 
     client.on('error', done);
@@ -128,7 +128,7 @@ describe('messages.delete', function testSuite() {
     });
   });
 
-  it('should delete message by admin', done => {
+  it('should delete message by admin', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${userToken}` });
 
     client.on('error', done);
@@ -148,7 +148,7 @@ describe('messages.delete', function testSuite() {
     });
   });
 
-  it('should emits event when delete a message', done => {
+  it('should emits event when delete a message', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${userToken}` });
 
     client.on('error', done);
@@ -157,7 +157,7 @@ describe('messages.delete', function testSuite() {
         const messageParams = { roomId: room.id.toString(), message: { text: 'foo' } };
 
         client.emit('chat.messages.send', messageParams, (error, message) => {
-          client.on(`messages.delete.${room.id}`, result => {
+          client.on(`messages.delete.${room.id}`, (result) => {
             assert.equal(result.id, message.id);
             done();
           });

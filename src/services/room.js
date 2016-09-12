@@ -37,7 +37,7 @@ class RoomService
 
     return this.model
       .findOneAsync(query)
-      .tap(room => {
+      .tap((room) => {
         if (!room) {
           throw new Errors.NotFoundError(`Room #${id} not found`);
         }

@@ -22,7 +22,7 @@ describe('rooms.delete', function testSuite() {
     username: 'admin@foo.com',
     password: 'adminpassword00000',
     audience: '*.localhost',
-  }).tap(reply => {
+  }).tap((reply) => {
     this.firstAdminToken = reply.jwt;
   })
   );
@@ -31,15 +31,15 @@ describe('rooms.delete', function testSuite() {
     username: 'second.admin@foo.com',
     password: 'secondadminpassword',
     audience: '*.localhost',
-  }).tap(reply => {
+  }).tap((reply) => {
     this.secondAdminToken = reply.jwt;
   })
   );
 
-  it('should return error if request is not valid', done => {
+  it('should return error if request is not valid', (done) => {
     const token = this.firstAdminToken;
     request(uri, { token, id: 'invalid-id' })
-      .then(response => {
+      .then((response) => {
         expect(response.statusCode).to.be.equals(400);
         expect(response.body.name).to.be.equals('ValidationError');
         expect(response.body.message).to.be.equals('rooms.delete validation failed:' +
@@ -59,7 +59,7 @@ describe('rooms.delete', function testSuite() {
 
     return chat.amqp.publishAndWait('users.register', userParams)
       .then(response => request(uri, { id, token: response.jwt }))
-      .then(response => {
+      .then((response) => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
         expect(response.body.message).to.be.equals('An attempt was made to perform' +
@@ -67,11 +67,11 @@ describe('rooms.delete', function testSuite() {
       });
   });
 
-  it('should return error if user is not room creator', done => {
+  it('should return error if user is not room creator', (done) => {
     const id = this.room.id.toString();
     const token = this.secondAdminToken;
     request(uri, { id, token })
-      .then(response => {
+      .then((response) => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
         expect(response.body.message).to.be.equals('An attempt was made to perform' +
@@ -80,19 +80,19 @@ describe('rooms.delete', function testSuite() {
       });
   });
 
-  it('should delete room if user is admin and room creator', done => {
+  it('should delete room if user is admin and room creator', (done) => {
     const id = this.room.id.toString();
     const token = this.firstAdminToken;
 
     chat.services.room.find()
       .then(roomsBefore => expect(roomsBefore.length).to.be.equals(1))
       .then(() => request(uri, { id, token }))
-      .then(response => {
+      .then((response) => {
         expect(response.statusCode).to.be.equals(200);
         expect(response.body).to.be.equals(true);
       })
       .then(() => chat.services.room.find())
-      .then(roomsAfter => {
+      .then((roomsAfter) => {
         expect(roomsAfter.length).to.be.equals(0);
         done();
       });

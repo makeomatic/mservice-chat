@@ -4,14 +4,14 @@ const { login } = require('../helpers/users');
 const request = require('../helpers/request');
 
 const chat = new Chat(global.SERVICES);
-const uri = 'http://0.0.0.0:3000/api/chat/users/ban';
+const uri = 'http://0.0.0.0:3000/api/chat/users/unban';
 
-describe('users.ban', function suite() {
+describe('users.unban', function suite() {
   before('start up chat', () => chat.connect());
 
   before('login root admin', () =>
     login(chat.amqp, 'root@foo.com', 'rootpassword000000')
-      .tap(({ jwt }) => (this.rootToken = jwt))
+      .tap(({ jwt }) => (this.adminToken = jwt))
   );
 
   before('login admin', () =>
@@ -25,7 +25,13 @@ describe('users.ban', function suite() {
   );
 
   before('create room', () => {
-    const params = { name: 'test room', createdBy: 'admin@foo.com' };
+    const params = {
+      name: 'test room',
+      createdBy: 'admin@foo.com',
+      banned: [
+        'user@foo.com',
+      ],
+    };
 
     return chat.services.room
       .create(params)
@@ -35,7 +41,24 @@ describe('users.ban', function suite() {
       });
   });
 
-  it('should not be able to ban if not authorized', () => {
+  before('create second room', () => {
+    const params = {
+      name: 'second test room',
+      createdBy: 'admin@foo.com',
+      banned: [
+        'admin@foo.com',
+      ],
+    };
+
+    return chat.services.room
+      .create(params)
+      .tap((createdRoom) => {
+        this.secondRoom = createdRoom;
+        this.secondRoomId = createdRoom.id.toString();
+      });
+  });
+
+  it('should not be able to unban if not authorized', () => {
     const params = { userId: 'user@foo.com', roomId: this.roomId };
 
     return request(uri, params)
@@ -45,14 +68,14 @@ describe('users.ban', function suite() {
         assert.equal(statusCode, 400);
         assert.equal(body.statusCode, 400);
         assert.equal(body.error, 'Bad Request');
-        assert.equal(body.message, 'users.ban validation failed:' +
+        assert.equal(body.message, 'users.unban validation failed:' +
           ' data should have required property \'token\'');
         assert.equal(body.name, 'ValidationError');
       });
   });
 
-  it('should not be able to ban if not admin', () => {
-    const params = { userId: 'second.user@foo.com', roomId: this.roomId, token: this.userToken };
+  it('should not be able to unban if not admin', () => {
+    const params = { userId: 'user@foo.com', roomId: this.roomId, token: this.userToken };
 
     return request(uri, params)
       .then((response) => {
@@ -67,7 +90,7 @@ describe('users.ban', function suite() {
       });
   });
 
-  it('should not be able to ban in non existent room', () => {
+  it('should not be able to unban in non existent room', () => {
     const params = {
       userId: 'user@foo.com',
       roomId: '123e4567-e89b-12d3-a456-426655440000',
@@ -87,10 +110,10 @@ describe('users.ban', function suite() {
       });
   });
 
-  it('should not be able to ban non existent user', () => {
+  it('should not be able to unban self', () => {
     const params = {
-      userId: 'non.existent.user@foo.com',
-      roomId: this.roomId,
+      userId: 'admin@foo.com',
+      roomId: this.secondRoomId,
       token: this.adminToken,
     };
 
@@ -98,48 +121,16 @@ describe('users.ban', function suite() {
       .then((response) => {
         const { body, statusCode } = response;
 
-        assert.equal(statusCode, 404);
-        assert.equal(body.statusCode, 404);
-        assert.equal(body.error, 'Not Found');
-        assert.equal(body.message, 'Not Found:' +
-          ' "User #non.existent.user@foo.com not found"');
-        assert.equal(body.name, 'NotFoundError');
-      });
-  });
-
-  it('should not be able to ban self', () => {
-    const params = { userId: 'admin@foo.com', roomId: this.roomId, token: this.adminToken };
-
-    return request(uri, params)
-      .then((response) => {
-        const { body, statusCode } = response;
-
         assert.equal(statusCode, 403);
         assert.equal(body.statusCode, 403);
         assert.equal(body.error, 'Forbidden');
         assert.equal(body.message, 'An attempt was made to perform an operation that'
-          + ' is not permitted: Can\'t ban yourself');
+          + ' is not permitted: Can\'t unban yourself');
         assert.equal(body.name, 'NotPermittedError');
       });
   });
 
-  it('should not be able to ban root admin', () => {
-    const params = { userId: 'root@foo.com', roomId: this.roomId, token: this.adminToken };
-
-    return request(uri, params)
-      .then((response) => {
-        const { body, statusCode } = response;
-
-        assert.equal(statusCode, 403);
-        assert.equal(body.statusCode, 403);
-        assert.equal(body.error, 'Forbidden');
-        assert.equal(body.message, 'An attempt was made to perform an operation that'
-          + ' is not permitted: Can\'t ban root admin');
-        assert.equal(body.name, 'NotPermittedError');
-      });
-  });
-
-  it('should be able to ban user', () => {
+  it('should be able to unban user', () => {
     const params = { userId: 'user@foo.com', roomId: this.roomId, token: this.adminToken };
 
     return request(uri, params)
@@ -151,11 +142,11 @@ describe('users.ban', function suite() {
       })
       .then(() => chat.services.room.getById(this.roomId))
       .then((room) => {
-        assert.deepEqual(room.banned, ['user@foo.com']);
+        assert.deepEqual(room.banned, null);
       });
   });
 
-  it('should not be able to ban user if already banned', () => {
+  it('should not be able to ban user if not banned', () => {
     const params = { userId: 'user@foo.com', roomId: this.roomId, token: this.adminToken };
 
     return request(uri, params)
@@ -166,24 +157,8 @@ describe('users.ban', function suite() {
         assert.equal(body.statusCode, 403);
         assert.equal(body.error, 'Forbidden');
         assert.equal(body.message, 'An attempt was made to perform an operation that'
-          + ' is not permitted: User #user@foo.com is already banned');
+          + ' is not permitted: User #user@foo.com isn\'t banned');
         assert.equal(body.name, 'NotPermittedError');
-      });
-  });
-
-  it('should be able to ban admin if root', () => {
-    const params = { userId: 'admin@foo.com', roomId: this.roomId, token: this.rootToken };
-
-    return request(uri, params)
-      .then((response) => {
-        const { body, statusCode } = response;
-
-        assert.equal(statusCode, 200);
-        assert.equal(body.meta.status, 'success');
-      })
-      .then(() => chat.services.room.getById(this.roomId))
-      .then((room) => {
-        assert.deepEqual(room.banned, ['admin@foo.com', 'user@foo.com']);
       });
   });
 

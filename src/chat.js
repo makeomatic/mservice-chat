@@ -22,12 +22,12 @@ class Chat extends MService {
     super(merge({}, defaultConfig, config));
     this.services = {};
 
-    this.on('plugin:connect:cassandra', cassandra => {
+    this.on('plugin:connect:cassandra', (cassandra) => {
       this.services.message = new MessageService(cassandra, flakeless);
       this.services.room = new RoomService(cassandra);
     });
 
-    this.on('plugin:connect:amqp', amqp => {
+    this.on('plugin:connect:amqp', (amqp) => {
       this.services.user = new UserService(this.config.users, amqp);
     });
 

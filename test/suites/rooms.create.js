@@ -15,16 +15,16 @@ describe('rooms.create', function testSuite() {
     username: 'root@foo.com',
     password: 'rootpassword000000',
     audience: '*.localhost',
-  }).tap(reply => {
+  }).tap((reply) => {
     this.adminToken = reply.jwt;
   })
   );
 
-  it('should return error if request is not valid', done => {
+  it('should return error if request is not valid', (done) => {
     const token = this.adminToken;
 
     request(uri, { token })
-      .then(response => {
+      .then((response) => {
         expect(response.statusCode).to.be.equals(400);
         expect(response.body.name).to.be.equals('ValidationError');
         expect(response.body.message).to.be.equals('rooms.create validation failed:' +
@@ -44,7 +44,7 @@ describe('rooms.create', function testSuite() {
 
     return chat.amqp.publishAndWait('users.register', userParams)
       .then(response => request(uri, { name: 'test room', token: response.jwt }))
-      .then(response => {
+      .then((response) => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
         expect(response.body.message).to.be.equals('An attempt was made to perform an operation' +
@@ -52,11 +52,11 @@ describe('rooms.create', function testSuite() {
       });
   });
 
-  it('should be able create a room if the user is an admin', done => {
+  it('should be able create a room if the user is an admin', (done) => {
     const token = this.adminToken;
 
     request(uri, { token, name: 'test room' })
-      .then(response => {
+      .then((response) => {
         expect(response.statusCode).to.be.equals(200);
         expect(response.body.name).to.be.equals('test room');
         assert.equal(response.body.createdBy, 'root@foo.com');
@@ -64,7 +64,7 @@ describe('rooms.create', function testSuite() {
         return response;
       })
       .then(response => chat.services.room.getById(response.body.id))
-      .then(room => {
+      .then((room) => {
         expect(room.name).to.be.equals('test room');
         return room.deleteAsync();
       })

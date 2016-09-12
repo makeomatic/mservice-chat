@@ -31,7 +31,7 @@ function RoomsJoinAction(request) {
     .then(messages => collectionResponse(messages, request));
 }
 
-const allowed = request => {
+const allowed = (request) => {
   const { room, socket } = request;
 
   if (socket.rooms[room.id.toString()]) {
