@@ -82,14 +82,6 @@ class RoomService
 
     return this.model.updateAsync(query, update);
   }
-
-  ban(roomId, userId) {
-    return this.update({ id: roomId }, { banned: { $add: [userId] } });
-  }
-
-  unban(roomId, userId) {
-    return this.update({ id: roomId }, { banned: { $remove: [userId] } });
-  }
 }
 
 module.exports = RoomService;

@@ -2,20 +2,10 @@
   "id": "users.ban.response",
   "additionalProperties": false,
   "type": "object",
-  "required": ["meta"],
+  "required": ["data"],
   "properties": {
-    "meta": {
-      "additionalProperties": false,
-      "type": "object",
-      "required": ["status"],
-      "description": "Response metadata",
-      "properties": {
-        "status": {
-          "type": "string",
-          "enum": ["success"],
-          "description": "Request status"
-        }
-      }
+    "data": {
+      "$ref": "common.json#/definitions/ban"
     }
   }
 }

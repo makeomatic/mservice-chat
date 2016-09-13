@@ -5,6 +5,7 @@ const { globFiles } = require('ms-conf/lib/load-config');
 const MessageService = require('./services/message');
 const MService = require('mservice');
 const path = require('path');
+const BanService = require('./services/ban');
 const PinService = require('./services/pin');
 const RoomService = require('./services/room');
 const UserService = require('./services/user');
@@ -24,6 +25,7 @@ class Chat extends MService {
     this.services = {};
 
     this.on('plugin:connect:cassandra', (cassandra) => {
+      this.services.ban = new BanService(cassandra);
       this.services.message = new MessageService(cassandra, flakeless);
       this.services.pin = new PinService(cassandra);
       this.services.room = new RoomService(cassandra);

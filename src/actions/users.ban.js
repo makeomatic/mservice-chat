@@ -1,7 +1,9 @@
 const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
-const fetchRoom = require('../fetchers/room')('roomId');
-const fetchUser = require('../fetchers/user')('userId');
+const fetchBan = require('../fetchers/ban');
+const fetchRoom = require('../fetchers/room');
+const fetchUser = require('../fetchers/user');
+const makeModelResponse = require('../services/response/model');
 
 /**
  * @api {http} <prefix>.users.ban Ban an user
@@ -11,20 +13,28 @@ const fetchUser = require('../fetchers/user')('userId');
  * @apiSchema {jsonschema=../../schemas/users.ban.json} apiParam
  * @apiSchema {jsonschema=../../schemas/users.ban.response.json} apiSuccess
  */
+ /**
+  * @api {socket.io} users.ban.<roomId> Ban an user
+  * @apiDescription Fired when somebody ban an user
+  * @apiVersion 1.0.0
+  * @apiName users.ban.broadcast
+  * @apiGroup UsersBroadcast
+  * @apiSchema {jsonschema=../../schemas/users.ban.broadcast.json} apiSuccess
+  */
 function usersBanAction(request) {
-  const { roomId, userId } = request.params;
+  const { socketIO } = this;
+  const { auth, params, room, user: bannedUser } = request;
+  const { reason, roomId } = params;
+  const admin = auth.credentials.user;
 
-  return this.services.room
-    .ban(roomId, userId)
-    .return({
-      meta: {
-        status: 'success',
-      },
-    });
+  return this.services.ban
+    .add(room.id, bannedUser, admin, reason)
+    .then(makeModelResponse)
+    .tap(response => socketIO.in(roomId).emit(`users.ban.${roomId}`, response));
 }
 
 function allowed(request) {
-  const { auth, room, user: bannedUser, params } = request;
+  const { auth, ban, room, user: bannedUser, params } = request;
   const admin = auth.credentials.user;
 
   if (isElevated(admin, room) !== true) {
@@ -39,8 +49,7 @@ function allowed(request) {
     throw new Errors.NotPermittedError('Can\'t ban root admin');
   }
 
-  // @todo try to move it to model method
-  if (room.banned !== null && room.banned.includes(bannedUser.id) === true) {
+  if (ban) {
     throw new Errors.NotPermittedError(`User #${bannedUser.id} is already banned`);
   }
 
@@ -49,7 +58,7 @@ function allowed(request) {
 
 usersBanAction.allowed = allowed;
 usersBanAction.auth = 'token';
-usersBanAction.fetchers = [fetchRoom, fetchUser];
+usersBanAction.fetchers = [fetchRoom('roomId'), fetchUser(), fetchBan('id')];
 usersBanAction.schema = 'users.ban';
 usersBanAction.transports = ['http'];
 

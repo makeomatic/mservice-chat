@@ -120,6 +120,32 @@
           "$ref": "#/definitions/user"
         }
       }
+    },
+    "ban": {
+      "description": "`ban` object",
+      "type": "object",
+      "required": ["roomId", "userId", "user", "bannedAt", "bannedBy", "reason"],
+      "properties": {
+        "roomId": {
+          "$ref": "#/definitions/roomId"
+        },
+        "userId": {
+          "$ref": "#/definitions/userId"
+        },
+        "user": {
+          "$ref": "#/definitions/user"
+        },
+        "bannedAt": {
+          "$ref": "#/definitions/timestamp"
+        },
+        "bannedBy": {
+          "$ref": "#/definitions/user"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Ban reason"
+        }
+      }
     }
   }
 }

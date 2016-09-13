@@ -27,11 +27,7 @@ describe('messages.send', function testSuite() {
   );
 
   before('create room', () => {
-    const params = {
-      name: 'test room',
-      createdBy: 'admin@foo.com',
-      banned: ['second.user@foo.com'],
-    };
+    const params = { name: 'test room', createdBy: 'admin@foo.com' };
 
     return chat.services.room
       .create(params)
@@ -39,6 +35,13 @@ describe('messages.send', function testSuite() {
         this.room = createdRoom;
         this.roomId = createdRoom.id.toString();
       });
+  });
+
+  before('create ban', () => {
+    const bannedUser = { id: 'second.user@foo.com', name: 'SecondUser User', roles: ['user'] };
+    const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
+
+    return chat.services.ban.add(this.room.id, bannedUser, admin, 'foo');
   });
 
   it('should return validation error if invalid params', (done) => {

@@ -1,5 +1,6 @@
 const Errors = require('common-errors');
-const fetchRoom = require('../fetchers/room')('roomId');
+const fetchRoom = require('../fetchers/room');
+const fetchBan = require('../fetchers/ban');
 const isElevated = require('../services/roles/isElevated');
 const Promise = require('bluebird');
 
@@ -44,7 +45,7 @@ function messageSendAction(request) {
 }
 
 function allowed(request) {
-  const { params, room, socket } = request;
+  const { ban, params, room, socket } = request;
   const { user } = socket;
 
   if (!socket.rooms[room.id.toString()]) {
@@ -55,8 +56,7 @@ function allowed(request) {
     return Promise.reject(new Errors.NotPermittedError('Access denied for guests'));
   }
 
-  // @todo try to move it to model method
-  if (room.banned !== null && room.banned.includes(user.id) === true) {
+  if (ban !== undefined) {
     throw new Errors.NotPermittedError(`User #${user.id} is banned`);
   }
 
@@ -70,7 +70,7 @@ function allowed(request) {
 }
 
 messageSendAction.allowed = allowed;
-messageSendAction.fetcher = fetchRoom;
+messageSendAction.fetchers = [fetchRoom('roomId'), fetchBan(null)];
 messageSendAction.schema = 'messages.send';
 messageSendAction.transports = ['socketIO'];
 

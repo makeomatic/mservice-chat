@@ -1,6 +1,8 @@
 const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
-const fetchRoom = require('../fetchers/room')('roomId');
+const fetchBan = require('../fetchers/ban');
+const fetchRoom = require('../fetchers/room');
+const makeModelResponse = require('../services/response/model');
 
 /**
  * @api {http} <prefix>.users.unban Unban an user
@@ -10,33 +12,37 @@ const fetchRoom = require('../fetchers/room')('roomId');
  * @apiSchema {jsonschema=../../schemas/users.unban.json} apiParam
  * @apiSchema {jsonschema=../../schemas/users.unban.response.json} apiSuccess
  */
+ /**
+  * @api {socket.io} users.unban.<roomId> Unban an user
+  * @apiDescription Fired when somebody unban an user
+  * @apiVersion 1.0.0
+  * @apiName users.unban.broadcast
+  * @apiGroup UsersBroadcast
+  * @apiSchema {jsonschema=../../schemas/users.unban.broadcast.json} apiSuccess
+  */
 function usersUnbanAction(request) {
-  const { roomId, userId } = request.params;
+  const { socketIO } = this;
+  const { ban, params } = request;
 
-  return this.services.room
-    .unban(roomId, userId)
-    .return({
-      meta: {
-        status: 'success',
-      },
-    });
+  return ban.deleteAsync()
+    .then(() => makeModelResponse(ban))
+    .tap(response => socketIO.in(params.roomId).emit(`users.unban.${params.roomId}`, response));
 }
 
 function allowed(request) {
-  const { auth, room, params } = request;
+  const { auth, ban, room, params } = request;
   const admin = auth.credentials.user;
 
   if (isElevated(admin, room) !== true) {
     throw new Errors.NotPermittedError(`Access to room #${params.roomId} is denied`);
   }
 
-  if (admin.id === params.userId) {
+  if (admin.id === params.id) {
     throw new Errors.NotPermittedError('Can\'t unban yourself');
   }
 
-  // @todo try to move it to model method
-  if (room.banned === null || room.banned.includes(params.userId) === false) {
-    throw new Errors.NotPermittedError(`User #${params.userId} isn\'t banned`);
+  if (ban === undefined) {
+    throw new Errors.NotPermittedError(`User #${params.id} isn\'t banned`);
   }
 
   return Promise.resolve(request);
@@ -44,7 +50,7 @@ function allowed(request) {
 
 usersUnbanAction.allowed = allowed;
 usersUnbanAction.auth = 'token';
-usersUnbanAction.fetchers = [fetchRoom];
+usersUnbanAction.fetchers = [fetchRoom('roomId'), fetchBan('id')];
 usersUnbanAction.schema = 'users.unban';
 usersUnbanAction.transports = ['http'];
 

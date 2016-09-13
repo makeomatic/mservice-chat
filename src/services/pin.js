@@ -1,34 +1,18 @@
 const CassandraMixin = require('./mixins/model/cassandra');
-const Errors = require('common-errors');
-const is = require('is');
 const { mix } = require('mixwith');
-const Promise = require('bluebird');
 
 class PinService
 {
-  castOptions = {
+  static castOptions = {
     roomId: 'Uuid',
     messageId: 'Long',
   };
 
-  constructor(cassandraClient) {
-    if (is.object(cassandraClient.modelInstance) === false) {
-      throw new Errors.Argument('cassandraClient');
-    }
+  static defaultData = {
+    pinnedAt: () => Date.now(),
+  };
 
-    if (is.fn(cassandraClient.modelInstance.pin) === false) {
-      throw new Errors.Argument('cassandraClient', 'Model \'pin\' not found');
-    }
-
-    this.cassandraClient = cassandraClient;
-    this.model = Promise.promisifyAll(cassandraClient.modelInstance.pin);
-  }
-
-  defaultData() { // eslint-disable-line class-methods-use-this
-    return {
-      pinnedAt: Date.now(),
-    };
-  }
+  static modelName = 'pin';
 
   pin(roomId, message, user) {
     const params = {

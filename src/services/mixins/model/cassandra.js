@@ -1,12 +1,37 @@
+const { datatypes } = require('express-cassandra');
+const Errors = require('common-errors');
 const is = require('is');
 const mapValues = require('lodash/mapValues');
 const Promise = require('bluebird');
-const { datatypes } = require('express-cassandra');
 
-module.exports = superclass => class extends superclass {
+module.exports = superclass => class Mixin extends superclass {
+  constructor(cassandraClient) {
+    super();
+
+    if (is.object(cassandraClient.modelInstance) === false) {
+      throw new Errors.Argument('cassandraClient');
+    }
+
+    if (is.fn(cassandraClient.modelInstance.pin) === false) {
+      throw new Errors.Argument('cassandraClient', 'Model \'pin\' not found');
+    }
+
+    if (superclass.modelName === undefined) {
+      throw new Errors.Argument('this.model');
+    }
+
+    const model = cassandraClient.modelInstance[superclass.modelName];
+
+    if (model === undefined) {
+      throw new Errors.Argument('cassandraClient', `Model "${superclass.modelName}" not found`);
+    }
+
+    this.model = Promise.promisifyAll(model);
+  }
+
   create(properties) {
     const Model = this.model;
-    const defaultData = this.getDefaultData();
+    const defaultData = Mixin.getDefaultData();
 
     return Promise
       .resolve(defaultData)
@@ -15,15 +40,11 @@ module.exports = superclass => class extends superclass {
       .tap(model => model.saveAsync());
   }
 
-  getDefaultData() {
-    const defaultData = this.defaultData;
-
-    if (is.function(defaultData) === true) {
-      return defaultData();
-    }
+  static getDefaultData() {
+    const defaultData = superclass.defaultData;
 
     if (is.object(defaultData) === true) {
-      return defaultData;
+      return mapValues(defaultData, value => (is.fn(value) === true ? value() : value));
     }
 
     return Promise.resolve({});
@@ -35,10 +56,16 @@ module.exports = superclass => class extends superclass {
     return this.model.findAsync(query);
   }
 
-  findOne(cond = {}, sort = {}, limit = 20) {
-    const query = this.makeCond(cond, sort, limit);
+  findOne(cond = {}, sort = {}) {
+    const query = this.makeCond(cond, sort);
 
     return this.model.findOneAsync(query);
+  }
+
+  delete(cond = {}) {
+    const query = this.makeCond(cond);
+
+    return this.model.deleteAsync(query);
   }
 
   cast(value, type) {
@@ -57,7 +84,7 @@ module.exports = superclass => class extends superclass {
   }
 
   castData(data) {
-    const castOptions = this.castOptions || {};
+    const castOptions = superclass.castOptions || {};
 
     return mapValues(data, (value, key) => {
       const type = castOptions[key];

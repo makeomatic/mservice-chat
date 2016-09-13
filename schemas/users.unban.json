@@ -2,13 +2,13 @@
   "id": "users.unban",
   "additionalProperties": false,
   "type": "object",
-  "required": ["roomId", "userId", "token"],
+  "required": ["id", "roomId", "token"],
   "properties": {
+    "id": {
+      "$ref": "common.json#/definitions/userId"
+    },
     "roomId": {
       "$ref": "common.json#/definitions/roomId"
-    },
-    "userId": {
-      "$ref": "common.json#/definitions/userId"
     },
     "token": {
       "$ref": "common.json#/definitions/token"

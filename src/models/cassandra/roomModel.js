@@ -18,11 +18,6 @@ module.exports = {
       type: 'varchar',
       rule: required,
     },
-    banned: {
-      type: 'set',
-      typeDef: '<varchar>',
-      rule: required,
-    },
   },
   key: [['id']],
 };
