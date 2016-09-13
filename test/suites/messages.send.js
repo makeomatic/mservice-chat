@@ -270,6 +270,28 @@ describe('messages.send', function testSuite() {
     });
   });
 
+  it('should be able to pin sticky message', (done) => {
+    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.adminToken}` });
+
+    client.on('error', done);
+    client.on('connect', () => {
+      client.emit('chat.rooms.join', { id: this.roomId }, () => {
+        const message = { type: 'sticky', text: 'pin me plz' };
+
+        client.emit(action, { roomId: this.roomId, message }, () => {
+          chat.services.pin
+            .last(this.roomId)
+            .then((pin) => {
+              assert.equal(pin.message.text, 'pin me plz');
+
+              client.disconnect();
+              done();
+            });
+        });
+      });
+    });
+  });
+
   after('delete room', () => this.room.deleteAsync());
 
   after('shutdown chat', () => chat.close());

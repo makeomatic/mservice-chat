@@ -187,7 +187,7 @@ describe('users.ban', function suite() {
       });
   });
 
-  after('shutdown chat', () => chat.close());
-
   after('delete room', () => this.room.deleteAsync());
+
+  after('shutdown chat', () => chat.close());
 });

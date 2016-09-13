@@ -23,18 +23,24 @@ const Promise = require('bluebird');
   */
 function messageSendAction(request) {
   const { params, room, socket } = request;
-  const { message: messageService } = this.services;
+  const { message: messageService, pin: pinService } = this.services;
   const roomId = room.id.toString();
+  const { user } = socket;
   const message = {
+    user,
     roomId: room.id,
     text: params.message.text,
     userId: socket.user.id,
-    user: socket.user,
   };
 
   return messageService
     .create(message)
-    .tap(createdMessage => socket.nsp.in(roomId).emit(`messages.send.${roomId}`, createdMessage));
+    .tap(createdMessage => socket.nsp.in(roomId).emit(`messages.send.${roomId}`, createdMessage))
+    .tap((createdMessage) => { // eslint-disable-line consistent-return
+      if (params.message.type === 'sticky') {
+        return pinService.pin(room.id, createdMessage, user);
+      }
+    });
 }
 
 function allowed(request) {

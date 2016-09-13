@@ -1,0 +1,17 @@
+{
+  "id": "messages.pin",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["roomId", "id", "token"],
+  "properties": {
+    "id": {
+      "$ref": "common.json#/definitions/messageId"
+    },
+    "roomId": {
+      "$ref": "common.json#/definitions/roomId"
+    },
+    "token": {
+      "$ref": "common.json#/definitions/token"
+    }
+  }
+}

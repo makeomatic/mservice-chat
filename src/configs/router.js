@@ -13,7 +13,7 @@ module.exports = {
       transports: [amqp, http, socketIO],
     },
     extensions: {
-      enabled: ['preAllowed', 'postRequest', 'preRequest', 'preResponse'],
+      enabled: ['postValidate', 'postRequest', 'preRequest', 'preResponse'],
       register: [
         routerExtension('audit/log'),
         fetcher,

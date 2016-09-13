@@ -88,6 +88,38 @@
     "token": {
       "type": "string",
       "description": "Auth token"
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "Timestamp"
+    },
+    "pin": {
+      "description": "`pin` object",
+      "type": "object",
+      "required": ["roomId", "messageId", "message", "pinnedAt", "unpinnedAt"],
+      "properties": {
+        "roomId": {
+          "$ref": "#/definitions/roomId"
+        },
+        "messageId": {
+          "$ref": "#/definitions/messageId"
+        },
+        "message": {
+          "$ref": "#/definitions/message"
+        },
+        "pinnedAt": {
+          "$ref": "#/definitions/timestamp"
+        },
+        "unpinnedAt": {
+          "$ref": "#/definitions/timestamp"
+        },
+        "pinnedBy": {
+          "$ref": "#/definitions/user"
+        },
+        "unpinnedBy": {
+          "$ref": "#/definitions/user"
+        }
+      }
     }
   }
 }
