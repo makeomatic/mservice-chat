@@ -3,6 +3,7 @@ const Chat = require('../../src');
 const { login } = require('../helpers/users');
 const { create } = require('../helpers/messages');
 const request = require('../helpers/request');
+const socketIOClient = require('socket.io-client');
 
 const chat = new Chat(global.SERVICES);
 const uri = 'http://0.0.0.0:3000/api/chat/messages/unpin';
@@ -111,7 +112,14 @@ describe('messages.unpin', function suite() {
         const { body, statusCode } = response;
 
         assert.equal(statusCode, 200);
-        assert.deepEqual(body.meta, { status: 'success' });
+        assert.deepEqual(body.meta, {
+          status: 'success',
+          user: {
+            id: 'admin@foo.com',
+            name: 'Admin Admin',
+            roles: ['admin'],
+          },
+        });
       })
       .then(() => chat.services.pin.find({ roomId: this.roomId }))
       .then((pins) => {
@@ -163,6 +171,32 @@ describe('messages.unpin', function suite() {
           roles: ['admin'],
         });
       });
+  });
+
+  it('should be able to broadcast when pin a message', done => {
+    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
+    const params = { roomId: this.roomId, token: this.adminToken };
+
+    client.on('error', done);
+    client.on('connect', () => {
+      client.emit('chat.rooms.join', { id: this.roomId }, () => {
+        client.on(`messages.unpin.${this.roomId}`, (response) => {
+          assert.deepEqual(response.meta, {
+            status: 'success',
+            user: {
+              id: 'admin@foo.com',
+              name: 'Admin Admin',
+              roles: ['admin'],
+            },
+          });
+
+          client.disconnect();
+          done();
+        });
+
+        request(uri, params);
+      });
+    });
   });
 
   after('delete room', () => this.room.deleteAsync());

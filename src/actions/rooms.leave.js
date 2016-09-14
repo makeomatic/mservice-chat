@@ -3,18 +3,18 @@ const fetchRoom = require('./../fetchers/room')();
 const Promise = require('bluebird');
 
 /**
- * @api {socket.io} <prefix>.rooms.join Leave from a room
+ * @api {socket.io} <prefix>.rooms.join Leave a room
  * @apiVersion 1.0.0
  * @apiName rooms.leave
  * @apiGroup Rooms
  * @apiSchema {jsonschema=../../schemas/rooms.leave.json} apiParam
  */
  /**
-  * @api {socket.io} rooms.leave.<roomId> Leave from a room
+  * @api {socket.io} rooms.leave.<roomId> Leave a room
   * @apiDescription Fired when somebody leaves a room
   * @apiVersion 1.0.0
   * @apiName rooms.leave.event
-  * @apiGroup SocketIO Events
+  * @apiGroup RoomsBroadcast
   * @apiSchema {jsonschema=../../schemas/rooms.leave.event.json} apiSuccess
   */
 function RoomsLeaveAction(request) {

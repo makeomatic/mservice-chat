@@ -16,7 +16,7 @@ const Promise = require('bluebird');
   * @apiDescription Fired when somebody delete a message
   * @apiVersion 1.0.0
   * @apiName messages.delete.broadcast
-  * @apiGroup SocketIO Events
+  * @apiGroup MessagesBroadcast
   * @apiSchema {jsonschema=../../schemas/messages.delete.broadcast.json} apiSuccess
   */
 function messageDeleteAction(request) {

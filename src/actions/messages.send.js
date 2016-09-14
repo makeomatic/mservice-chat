@@ -19,7 +19,7 @@ const Promise = require('bluebird');
   * @apiDescription Fired when somebody sends message to a room
   * @apiVersion 1.0.0
   * @apiName messages.send.broadcast
-  * @apiGroup SocketIO Events
+  * @apiGroup MessagesBroadcast
   * @apiSchema {jsonschema=../../schemas/messages.send.broadcast.json} apiSuccess
   */
 function messageSendAction(request) {

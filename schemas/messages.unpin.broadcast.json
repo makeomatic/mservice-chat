@@ -1,5 +1,5 @@
 {
-  "id": "messages.unpin.response",
+  "id": "messages.unpin.broadcast",
   "additionalProperties": false,
   "type": "object",
   "required": ["meta"],
