@@ -173,7 +173,7 @@ describe('messages.unpin', function suite() {
       });
   });
 
-  it('should be able to broadcast when pin a message', done => {
+  it('should be able to broadcast when pin a message', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
     const params = { roomId: this.roomId, token: this.adminToken };
 
