@@ -18,7 +18,7 @@ describe('messages.delete', function testSuite() {
   before('start up chat', () => chat.connect());
 
   before('create room', () => {
-    const params = { name: 'test room', createdBy: 'test@test.ru' };
+    const params = { name: 'test room', createdBy: 'admin@foo.com' };
     roomService = chat.services.room;
 
     return roomService
@@ -30,8 +30,8 @@ describe('messages.delete', function testSuite() {
 
   before('login admin', () => {
     const params = {
-      username: 'test@test.ru',
-      password: 'megalongsuperpasswordfortest',
+      username: 'admin@foo.com',
+      password: 'adminpassword00000',
       audience: '*.localhost',
     };
 
@@ -87,10 +87,10 @@ describe('messages.delete', function testSuite() {
 
   it('should returns error user is not message owner', () => {
     const params = {
-      userId: 'test@test.ru',
+      userId: 'admin@foo.com',
       roomId: room.id,
       text: 'foo',
-      user: { id: 'test@test.ru', name: 'Root Admin', roles: ['root'] },
+      user: { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] },
     };
 
     return chat.services.message

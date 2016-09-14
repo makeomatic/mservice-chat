@@ -5,7 +5,6 @@
   "scripts": {
     "compile": "rm -rf ./lib; babel -d ./lib ./src",
     "doc": "cd schemas && apidoc -i ./../src/actions -v -o ./../docs",
-    "doc-open": "npm run doc && opn ./docs/index.html",
     "docker-release": "./docker-release.sh",
     "lint": "eslint .",
     "prepublish": "npm run lint && npm run compile",
@@ -24,6 +23,7 @@
     "hapi": "^15.0.3",
     "is": "^3.1.0",
     "lodash": "^4.15.0",
+    "mixwith": "^0.1.1",
     "ms-conf": "^2.1.0",
     "ms-flakeless": "^4.0.1",
     "ms-socket.io-adapter-amqp": "^2.0.0",
@@ -39,6 +39,7 @@
     "apidoc-plugin-schema": "0.0.6",
     "babel-cli": "^6.14.0",
     "babel-eslint": "^6.1.2",
+    "babel-plugin-transform-class-properties": "^6.11.5",
     "babel-plugin-transform-es2015-destructuring": "^6.9.0",
     "babel-plugin-transform-es2015-spread": "^6.8.0",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",

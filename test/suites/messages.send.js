@@ -1,56 +1,47 @@
 const assert = require('assert');
-const Chance = require('chance');
 const Chat = require('../../src');
 const { expect } = require('chai');
+const { login } = require('../helpers/users');
 const socketIOClient = require('socket.io-client');
 
 const action = 'chat.messages.send';
-const chance = new Chance();
+const chat = new Chat(global.SERVICES);
 const fakeRoomId = '00000000-0000-0000-0000-000000000000';
 
 describe('messages.send', function testSuite() {
-  before('start up chat', () => {
-    const chat = this.chat = new Chat(global.SERVICES);
-    return chat.connect();
-  });
+  before('start up chat', () => chat.connect());
 
-  before('create room', () => {
-    const params = { name: 'test', createdBy: 'test@test.ru' };
-
-    return this.chat.services.room
-      .create(params)
-      .tap(room => (this.room = room));
-  });
-
-  before('login admin', () => this.chat.amqp
-    .publishAndWait('users.login', {
-      username: 'test@test.ru',
-      password: 'megalongsuperpasswordfortest',
-      audience: '*.localhost',
-    })
-    .tap((reply) => {
-      this.adminToken = reply.jwt;
-    })
+  before('login admin', () =>
+    login(chat.amqp, 'admin@foo.com', 'adminpassword00000')
+        .tap(({ jwt }) => (this.adminToken = jwt))
   );
 
-  before('create user', () => {
-    const userParams = {
-      username: chance.email(),
-      password: 'megalongsuperpasswordfortest',
-      audience: '*.localhost',
-      metadata: {
-        firstName: 'Simple',
-        lastName: 'User',
-        roles: ['user'],
-      },
-    };
+  before('login user', () =>
+    login(chat.amqp, 'user@foo.com', 'userpassword000000')
+      .tap(({ jwt }) => (this.userToken = jwt))
+  );
 
-    return this.chat.amqp
-      .publishAndWait('users.register', userParams)
-      .tap(({ jwt }) => {
-        this.username = userParams.username;
-        this.userToken = jwt;
+  before('login second user', () =>
+    login(chat.amqp, 'second.user@foo.com', 'seconduserpassword')
+      .tap(({ jwt }) => (this.secondUserToken = jwt))
+  );
+
+  before('create room', () => {
+    const params = { name: 'test room', createdBy: 'admin@foo.com' };
+
+    return chat.services.room
+      .create(params)
+      .tap((createdRoom) => {
+        this.room = createdRoom;
+        this.roomId = createdRoom.id.toString();
       });
+  });
+
+  before('create ban', () => {
+    const bannedUser = { id: 'second.user@foo.com', name: 'SecondUser User', roles: ['user'] };
+    const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
+
+    return chat.services.ban.add(this.room.id, bannedUser, admin, 'foo');
   });
 
   it('should return validation error if invalid params', (done) => {
@@ -154,7 +145,7 @@ describe('messages.send', function testSuite() {
   });
 
   it('should send message', (done) => {
-    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.adminToken}` });
+    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
     const roomId = this.room.id.toString();
 
     client.on('error', done);
@@ -167,12 +158,33 @@ describe('messages.send', function testSuite() {
           assert.equal(response.text, 'foo');
           assert.equal(response.roomId, roomId);
           assert.ok(response.createdAt);
-          assert.equal(response.userId, 'test@test.ru');
-          assert.equal(response.user.id, 'test@test.ru');
-          assert.equal(response.user.name, 'Root Admin');
-          assert.deepEqual(response.user.roles, ['admin', 'root']);
+          assert.equal(response.userId, 'user@foo.com');
+          assert.equal(response.user.id, 'user@foo.com');
+          assert.equal(response.user.name, 'User User');
+          assert.deepEqual(response.user.roles, ['user']);
           assert.deepEqual(response.properties, {});
           assert.deepEqual(response.attachments, {});
+
+          client.disconnect();
+          done();
+        });
+      });
+    });
+  });
+
+  it('should not be able to send message if banned', (done) => {
+    const client = socketIOClient('http://0.0.0.0:3000', {
+      query: `token=${this.secondUserToken}`,
+    });
+    const roomId = this.roomId;
+
+    client.on('error', done);
+    client.on('connect', () => {
+      client.emit('chat.rooms.join', { id: roomId }, () => {
+        client.emit(action, { roomId, message: { text: 'foo' } }, (error) => {
+          assert.equal(error.message, 'An attempt was made to perform an operation that' +
+            ' is not permitted: User #second.user@foo.com is banned');
+          assert.equal(error.name, 'NotPermittedError');
 
           client.disconnect();
           done();
@@ -191,7 +203,7 @@ describe('messages.send', function testSuite() {
         client.emit(action, { roomId, message: { text: 'foo' } }, () => {
           client.emit(action, { roomId, message: { text: 'bar' } }, () => {
             client.emit(action, { roomId, message: { text: 'baz' } }, () => {
-              this.chat.services.message
+              chat.services.message
                 .find({ roomId }, { $desc: 'id' }, 2)
                 .then((messages) => {
                   const [first, second] = messages;
@@ -200,10 +212,10 @@ describe('messages.send', function testSuite() {
                   assert.equal(first.text, 'baz');
                   assert.equal(first.roomId, roomId);
                   assert.ok(first.createdAt);
-                  assert.equal(first.userId, 'test@test.ru');
-                  assert.equal(first.user.id, 'test@test.ru');
-                  assert.equal(first.user.name, 'Root Admin');
-                  assert.deepEqual(first.user.roles, ['admin', 'root']);
+                  assert.equal(first.userId, 'admin@foo.com');
+                  assert.equal(first.user.id, 'admin@foo.com');
+                  assert.equal(first.user.name, 'Admin Admin');
+                  assert.deepEqual(first.user.roles, ['admin']);
                   assert.equal(first.properties, null);
                   assert.equal(first.attachments, null);
 
@@ -211,10 +223,10 @@ describe('messages.send', function testSuite() {
                   assert.equal(second.text, 'bar');
                   assert.equal(second.roomId, roomId);
                   assert.ok(second.createdAt);
-                  assert.equal(second.userId, 'test@test.ru');
-                  assert.equal(second.user.id, 'test@test.ru');
-                  assert.equal(second.user.name, 'Root Admin');
-                  assert.deepEqual(second.user.roles, ['admin', 'root']);
+                  assert.equal(second.userId, 'admin@foo.com');
+                  assert.equal(second.user.id, 'admin@foo.com');
+                  assert.equal(second.user.name, 'Admin Admin');
+                  assert.deepEqual(second.user.roles, ['admin']);
                   assert.equal(second.properties, null);
                   assert.equal(second.attachments, null);
 
@@ -238,9 +250,9 @@ describe('messages.send', function testSuite() {
       assert.equal(response.text, 'foo');
       assert.equal(response.roomId, roomId);
       assert.ok(response.createdAt);
-      assert.equal(response.userId, this.username);
-      assert.equal(response.user.id, this.username);
-      assert.equal(response.user.name, 'Simple User');
+      assert.equal(response.userId, 'user@foo.com');
+      assert.equal(response.user.id, 'user@foo.com');
+      assert.equal(response.user.name, 'User User');
       assert.deepEqual(response.user.roles, ['user']);
       assert.deepEqual(response.properties, {});
       assert.deepEqual(response.attachments, {});
@@ -261,6 +273,29 @@ describe('messages.send', function testSuite() {
     });
   });
 
+  it('should be able to pin sticky message', (done) => {
+    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.adminToken}` });
+
+    client.on('error', done);
+    client.on('connect', () => {
+      client.emit('chat.rooms.join', { id: this.roomId }, () => {
+        const message = { type: 'sticky', text: 'pin me plz' };
+
+        client.emit(action, { roomId: this.roomId, message }, () => {
+          chat.services.pin
+            .last(this.roomId)
+            .then((pin) => {
+              assert.equal(pin.message.text, 'pin me plz');
+
+              client.disconnect();
+              done();
+            });
+        });
+      });
+    });
+  });
+
   after('delete room', () => this.room.deleteAsync());
-  after('shutdown chat', () => this.chat.close());
+
+  after('shutdown chat', () => chat.close());
 });

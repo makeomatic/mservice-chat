@@ -1,0 +1,20 @@
+{
+  "id": "users.ban",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["id", "roomId", "reason", "token"],
+  "properties": {
+    "id": {
+      "$ref": "common.json#/definitions/userId"
+    },
+    "roomId": {
+      "$ref": "common.json#/definitions/roomId"
+    },
+    "reason": {
+      "$ref": "common.json#/definitions/ban/properties/reason"
+    },
+    "token": {
+      "$ref": "common.json#/definitions/token"
+    }
+  }
+}

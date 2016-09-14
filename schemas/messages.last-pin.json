@@ -1,0 +1,11 @@
+{
+  "id": "messages.last-pin",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["roomId"],
+  "properties": {
+    "roomId": {
+      "$ref": "common.json#/definitions/roomId"
+    }
+  }
+}

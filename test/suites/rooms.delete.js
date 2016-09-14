@@ -11,7 +11,7 @@ describe('rooms.delete', function testSuite() {
   before('start up chat', () => chat.connect());
 
   before('create room', () => {
-    const params = { name: 'test', createdBy: 'test@test.ru' };
+    const params = { name: 'test', createdBy: 'admin@foo.com' };
 
     return chat.services.room
       .create(params)
@@ -19,8 +19,8 @@ describe('rooms.delete', function testSuite() {
   });
 
   before('login first admin', () => chat.amqp.publishAndWait('users.login', {
-    username: 'test@test.ru',
-    password: 'megalongsuperpasswordfortest',
+    username: 'admin@foo.com',
+    password: 'adminpassword00000',
     audience: '*.localhost',
   }).tap((reply) => {
     this.firstAdminToken = reply.jwt;
@@ -28,8 +28,8 @@ describe('rooms.delete', function testSuite() {
   );
 
   before('login second admin', () => chat.amqp.publishAndWait('users.login', {
-    username: 'foo@bar.ru',
-    password: 'bazbazbazbazbazbaz',
+    username: 'second.admin@foo.com',
+    password: 'secondadminpassword',
     audience: '*.localhost',
   }).tap((reply) => {
     this.secondAdminToken = reply.jwt;

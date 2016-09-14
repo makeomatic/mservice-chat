@@ -1,0 +1,11 @@
+{
+  "id": "messages.pin.broadcast",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["data"],
+  "properties": {
+    "data": {
+      "$ref": "common.json#/definitions/pin"
+    }
+  }
+}

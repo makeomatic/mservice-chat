@@ -1,5 +1,6 @@
 const Errors = require('common-errors');
-const fetchMessage = require('../fetchers/message');
+const fetchMessage = require('../fetchers/message')();
+const fetchRoom = require('../fetchers/room')('roomId');
 const isElevated = require('../services/roles/isElevated');
 const Promise = require('bluebird');
 
@@ -15,7 +16,7 @@ const Promise = require('bluebird');
   * @apiDescription Fired when somebody delete a message
   * @apiVersion 1.0.0
   * @apiName messages.delete.broadcast
-  * @apiGroup SocketIO Events
+  * @apiGroup MessagesBroadcast
   * @apiSchema {jsonschema=../../schemas/messages.delete.broadcast.json} apiSuccess
   */
 function messageDeleteAction(request) {
@@ -50,7 +51,7 @@ function allowed(request) {
 
 messageDeleteAction.allowed = allowed;
 messageDeleteAction.auth = 'token';
-messageDeleteAction.fetch = fetchMessage;
+messageDeleteAction.fetchers = [fetchMessage, fetchRoom];
 messageDeleteAction.schema = 'messages.delete';
 messageDeleteAction.transports = ['http'];
 

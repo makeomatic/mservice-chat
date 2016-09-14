@@ -1,5 +1,6 @@
 const Errors = require('common-errors');
-const fetchRoom = require('../fetchers/room')('roomId');
+const fetchRoom = require('../fetchers/room');
+const fetchBan = require('../fetchers/ban');
 const isElevated = require('../services/roles/isElevated');
 const Promise = require('bluebird');
 
@@ -18,27 +19,33 @@ const Promise = require('bluebird');
   * @apiDescription Fired when somebody sends message to a room
   * @apiVersion 1.0.0
   * @apiName messages.send.broadcast
-  * @apiGroup SocketIO Events
+  * @apiGroup MessagesBroadcast
   * @apiSchema {jsonschema=../../schemas/messages.send.broadcast.json} apiSuccess
   */
 function messageSendAction(request) {
   const { params, room, socket } = request;
-  const { message: messageService } = this.services;
+  const { message: messageService, pin: pinService } = this.services;
   const roomId = room.id.toString();
+  const { user } = socket;
   const message = {
+    user,
     roomId: room.id,
     text: params.message.text,
     userId: socket.user.id,
-    user: socket.user,
   };
 
   return messageService
     .create(message)
-    .tap(createdMessage => socket.nsp.in(roomId).emit(`messages.send.${roomId}`, createdMessage));
+    .tap(createdMessage => socket.nsp.in(roomId).emit(`messages.send.${roomId}`, createdMessage))
+    .tap((createdMessage) => { // eslint-disable-line consistent-return
+      if (params.message.type === 'sticky') {
+        return pinService.pin(room.id, createdMessage, user);
+      }
+    });
 }
 
 function allowed(request) {
-  const { params, room, socket } = request;
+  const { ban, params, room, socket } = request;
   const { user } = socket;
 
   if (!socket.rooms[room.id.toString()]) {
@@ -47,6 +54,10 @@ function allowed(request) {
 
   if (user.isGuest === true) {
     return Promise.reject(new Errors.NotPermittedError('Access denied for guests'));
+  }
+
+  if (ban !== undefined) {
+    throw new Errors.NotPermittedError(`User #${user.id} is banned`);
   }
 
   if (params.message.type && isElevated(user, room) !== true) {
@@ -59,7 +70,7 @@ function allowed(request) {
 }
 
 messageSendAction.allowed = allowed;
-messageSendAction.fetch = fetchRoom;
+messageSendAction.fetchers = [fetchRoom('roomId'), fetchBan(null)];
 messageSendAction.schema = 'messages.send';
 messageSendAction.transports = ['socketIO'];
 

@@ -11,8 +11,7 @@
       "$ref": "common.json#/definitions/roomId"
     },
     "token": {
-      "description": "Auth token",
-      "type": "string"
+      "$ref": "common.json#/definitions/token"
     }
   }
 }

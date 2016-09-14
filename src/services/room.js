@@ -1,17 +1,21 @@
-const _ = require('lodash');
 const Errors = require('common-errors');
 const is = require('is');
+const merge = require('lodash/merge');
 const Promise = require('bluebird');
+const { uuid, uuidFromString } = require('express-cassandra');
 
-/**
- * @property {CassandraClient} cassandraClient
- * @property {BaseModel} model
- */
+function makeCond(cond = {}) {
+  const query = merge({}, cond);
+
+  if (is.string(query.id) === true) {
+    query.id = uuidFromString(query.id);
+  }
+
+  return query;
+}
+
 class RoomService
 {
-  /**
-   * @param {CassandraClient} cassandraClient
-   */
   constructor(cassandraClient) {
     if (is.object(cassandraClient.modelInstance) === false) {
       throw new Errors.Argument('cassandraClient');
@@ -21,7 +25,6 @@ class RoomService
       throw new Errors.Argument('cassandraClient', 'Model \'room\' not found');
     }
 
-    this.cassandraClient = cassandraClient;
     this.model = Promise.promisifyAll(cassandraClient.modelInstance.room);
   }
 
@@ -30,17 +33,14 @@ class RoomService
    * @returns {Promise}
    */
   getById(id) {
-    if (is.string(id) === false) {
-      throw new Errors.Argument('id');
-    }
+    const query = makeCond({ id });
 
-    return this.model.findOneAsync({ id: this.cassandraClient.datatypes.Uuid.fromString(id) })
-      .then((room) => {
+    return this.model
+      .findOneAsync(query)
+      .tap((room) => {
         if (!room) {
-          return Promise.reject(new Errors.NotFoundError(`Room #${id} not found`));
+          throw new Errors.NotFoundError(`Room #${id} not found`);
         }
-
-        return Promise.resolve(room);
       });
   }
 
@@ -49,16 +49,15 @@ class RoomService
    * @param {object} options
    * @returns {Promise.<Object[]>}
    */
-  find(query = {}, options = {}) {
-    if (is.object(query) === false) {
+  find(cond = {}) {
+    if (is.object(cond) === false) {
       throw new Errors.Argument('query');
     }
 
-    if (is.object(options) === false) {
-      throw new Errors.Argument('options');
-    }
+    const query = makeCond(cond);
 
-    return this.model.findAsync(query, options);
+    return this.model
+      .findAsync(query);
   }
 
   /**
@@ -67,14 +66,21 @@ class RoomService
    */
   create(properties) {
     const RoomModel = this.model;
-    const roomParams = Object.assign({}, properties, {
-      id: this.cassandraClient.uuid(),
-      createdAt: _.now(),
+    const roomParams = Object.assign({ banned: [] }, properties, {
+      id: uuid(),
+      createdAt: Date.now(),
     });
     const room = new RoomModel(roomParams);
 
-    return room.saveAsync()
+    return room
+      .saveAsync()
       .return(room);
+  }
+
+  update(cond = {}, update = {}) {
+    const query = makeCond(cond);
+
+    return this.model.updateAsync(query, update);
   }
 }
 

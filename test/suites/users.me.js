@@ -34,17 +34,17 @@ describe('users.me', function testSuite() {
 
   it('should auth as an admin', (done) => {
     chat.amqp.publishAndWait('users.login', {
-      username: 'test@test.ru',
-      password: 'megalongsuperpasswordfortest',
+      username: 'root@foo.com',
+      password: 'rootpassword000000',
       audience: '*.localhost',
-    }
-    ).then((reply) => {
+    })
+    .then((reply) => {
       const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${reply.jwt}` });
       client.on('error', done);
       client.on('connect', () => {
         client.emit(action, {}, (error, user) => {
           expect(error).to.be.equals(null);
-          expect(user.id).to.be.equal('test@test.ru');
+          expect(user.id).to.be.equal('root@foo.com');
           expect(user.name).to.be.equal('Root Admin');
           expect(user.roles).to.be.deep.equal(['admin', 'root']);
           client.disconnect();

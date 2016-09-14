@@ -1,0 +1,14 @@
+{
+  "id": "messages.unpin",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["roomId", "token"],
+  "properties": {
+    "roomId": {
+      "$ref": "common.json#/definitions/roomId"
+    },
+    "token": {
+      "$ref": "common.json#/definitions/token"
+    }
+  }
+}

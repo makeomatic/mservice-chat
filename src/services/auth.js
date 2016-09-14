@@ -9,19 +9,9 @@ function auth(token, application) {
     return Promise.resolve(new LightUserModel(uuid.v4(), `Guest#${uid2(6)}`));
   }
 
-  const { amqp, config } = application;
+  const { user } = application.services;
 
-  const route = `${config.users.prefix}.${config.users.postfix.verify}`;
-  const audience = config.users.audience;
-  const timeout = config.users.timeouts.verify;
-
-  return amqp.publishAndWait(route, { token, audience }, { timeout })
-    .then((reply) => {
-      const user = reply.metadata[audience];
-      const name = `${user.firstName} ${user.lastName}`;
-      const model = new LightUserModel(user.username, name, user.roles);
-      return Promise.resolve(model);
-    });
+  return user.login(token);
 }
 
 module.exports = auth;

@@ -1,14 +1,17 @@
 {
   "id": "common.json",
   "definitions": {
+    "userId": {
+      "type": "string",
+      "description": "User identificator"
+    },
     "user": {
       "description": "User object",
       "type": "object",
       "required": ["id", "name", "roles"],
       "properties": {
         "id": {
-          "type": "string",
-          "description": "User identificator"
+          "$ref": "#/definitions/userId"
         },
         "name": {
           "type": "string",
@@ -79,6 +82,68 @@
             "$ref": "#/definitions/message"
           },
           "description": "Collection of messages"
+        }
+      }
+    },
+    "token": {
+      "type": "string",
+      "description": "Auth token"
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "Timestamp"
+    },
+    "pin": {
+      "description": "`pin` object",
+      "type": "object",
+      "required": ["roomId", "messageId", "message", "pinnedAt", "unpinnedAt"],
+      "properties": {
+        "roomId": {
+          "$ref": "#/definitions/roomId"
+        },
+        "messageId": {
+          "$ref": "#/definitions/messageId"
+        },
+        "message": {
+          "$ref": "#/definitions/message"
+        },
+        "pinnedAt": {
+          "$ref": "#/definitions/timestamp"
+        },
+        "unpinnedAt": {
+          "$ref": "#/definitions/timestamp"
+        },
+        "pinnedBy": {
+          "$ref": "#/definitions/user"
+        },
+        "unpinnedBy": {
+          "$ref": "#/definitions/user"
+        }
+      }
+    },
+    "ban": {
+      "description": "`ban` object",
+      "type": "object",
+      "required": ["roomId", "userId", "user", "bannedAt", "bannedBy", "reason"],
+      "properties": {
+        "roomId": {
+          "$ref": "#/definitions/roomId"
+        },
+        "userId": {
+          "$ref": "#/definitions/userId"
+        },
+        "user": {
+          "$ref": "#/definitions/user"
+        },
+        "bannedAt": {
+          "$ref": "#/definitions/timestamp"
+        },
+        "bannedBy": {
+          "$ref": "#/definitions/user"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Ban reason"
         }
       }
     }
