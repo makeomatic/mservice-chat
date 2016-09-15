@@ -11,8 +11,10 @@ const { successResponse } = require('../utils/response');
  * @apiSchema {jsonschema=../../schemas/rooms.delete.json} apiParam
  */
 function RoomsDeleteAction(request) {
-  return request.room
-    .deleteAsync()
+  const { id } = request.params;
+
+  return this.services.room
+    .delete({ id })
     .then(successResponse);
 }
 

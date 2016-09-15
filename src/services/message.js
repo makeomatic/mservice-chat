@@ -2,12 +2,7 @@ const CassandraMixin = require('./mixins/model/cassandra');
 const Errors = require('common-errors');
 const Flakeless = require('ms-flakeless');
 const { mix } = require('mixwith');
-
-const is = require('is');
-const merge = require('lodash/merge');
-const mapValues = require('lodash/mapValues');
-const Promise = require('bluebird');
-const { uuidFromString, datatypes } = require('express-cassandra');
+const { datatypes } = require('express-cassandra');
 
 const flakeless = new Flakeless({
   epochStart: Date.now(),
@@ -53,11 +48,16 @@ class MessageService
   }
 
   afterDelete(cond) {
-    const { pin } = this.services;
-    const { id, roomId } = cond
+    const { pin: pinService } = this.services;
+    const { id, roomId } = cond;
+    const query = { roomId };
 
-    return pin
-      .find({ messageId: id, roomId: roomId })
+    if (cond.id) {
+      query.messageId = id;
+    }
+
+    return pinService
+      .find(query)
       .each(pin => pin.deleteAsync());
   }
 }

@@ -63,7 +63,7 @@ describe('rooms.create', function testSuite() {
 
         return response;
       })
-      .then(response => chat.services.room.getById(response.body.id))
+      .then(response => chat.services.room.getById(response.body.data.id))
       .then((room) => {
         expect(room.name).to.be.equals('test room');
         return room.deleteAsync();

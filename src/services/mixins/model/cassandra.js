@@ -58,7 +58,7 @@ module.exports = superclass => class Mixin extends superclass {
 
   update(cond = {}, update = {}, options = {}) {
     const query = this.makeCond(cond);
-    
+
     return this.model.updateAsync(query, update, options);
   }
 

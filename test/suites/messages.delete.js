@@ -1,6 +1,5 @@
 const assert = require('assert');
 const Chance = require('chance');
-const { login } = require('../helpers/users');
 const { create } = require('../helpers/messages');
 const request = require('./../helpers/request');
 const socketIOClient = require('socket.io-client');
@@ -14,7 +13,6 @@ describe('messages.delete', function testSuite() {
   const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
   let adminToken;
   let room;
-  let roomService;
   let userId;
   let userToken;
 
@@ -183,14 +181,13 @@ describe('messages.delete', function testSuite() {
     });
   });
 
-  it('should be able to remove last pinned message', () => {
-    console.log('start')
-    return request(uri, { token: adminToken, id: this.messageId, roomId: room.id.toString() })
+  it('should be able to remove last pinned message', () =>
+    request(uri, { token: adminToken, id: this.messageId, roomId: room.id.toString() })
       .then(() => chat.services.pin.last(room.id.toString()))
-      .then(pin => {
+      .then((pin) => {
         assert.equal(pin, null);
-      });
-  });
+      })
+  );
 
   after('delete first room', () => room.deleteAsync());
   after('shutdown chat', () => chat.close());
