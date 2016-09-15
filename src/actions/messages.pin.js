@@ -20,8 +20,7 @@ const fetchMessage = require('../fetchers/message')();
   * @apiSchema {jsonschema=../../schemas/messages.pin.broadcast.json} apiSuccess
   */
 function messagesPinAction(request) {
-  const { socketIO } = this;
-  const { auth, room, message, params } = request;
+  const { auth, room, message } = request;
   const admin = auth.credentials.user;
   const pinService = this.services.pin;
 

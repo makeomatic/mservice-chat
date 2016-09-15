@@ -317,7 +317,7 @@ describe('messages.send', function testSuite() {
           client.disconnect();
           done();
         });
-        
+
         client.emit(action, { roomId: this.roomId, message });
       });
     });
