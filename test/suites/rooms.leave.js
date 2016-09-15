@@ -13,7 +13,7 @@ describe('rooms.leave', function testSuite() {
 
     return chat.services.room
       .create(params)
-      .then(room => {
+      .then((room) => {
         this.room = room;
         this.roomId = room.id.toString();
       });
@@ -75,7 +75,7 @@ describe('rooms.leave', function testSuite() {
           const { status } = response.meta;
 
           assert.equal(status, 'success');
-          
+
           client.disconnect();
           done();
         });

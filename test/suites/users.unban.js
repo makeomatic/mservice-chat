@@ -195,7 +195,7 @@ describe('users.unban', function suite() {
     client.on('connect', () => {
       client.emit('chat.rooms.join', { id: this.roomId }, () => {
         client.on(`users.unban.${this.roomId}`, (response) => {
-          const { type, attributes } = response.data;
+          const { attributes } = response.data;
 
           assert.equal(attributes.roomId, this.roomId);
           assert.equal(attributes.userId, 'second.user@foo.com');
