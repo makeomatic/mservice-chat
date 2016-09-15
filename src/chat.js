@@ -27,7 +27,7 @@ class Chat extends MService {
     this.on('plugin:connect:cassandra', (cassandra) => {
       this.services.ban = new BanService(cassandra);
       this.services.message = new MessageService(cassandra, flakeless);
-      this.services.pin = new PinService(cassandra);
+      this.services.pin = new PinService(cassandra, this.socketIO);
       this.services.room = new RoomService(cassandra);
     });
 

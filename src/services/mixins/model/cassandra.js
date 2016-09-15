@@ -5,16 +5,8 @@ const mapValues = require('lodash/mapValues');
 const Promise = require('bluebird');
 
 module.exports = superclass => class Mixin extends superclass {
-  constructor(cassandraClient) {
+  constructor(cassandraClient, socketIO) {
     super();
-
-    if (is.object(cassandraClient.modelInstance) === false) {
-      throw new Errors.Argument('cassandraClient');
-    }
-
-    if (is.fn(cassandraClient.modelInstance.pin) === false) {
-      throw new Errors.Argument('cassandraClient', 'Model \'pin\' not found');
-    }
 
     if (superclass.modelName === undefined) {
       throw new Errors.Argument('this.model');
@@ -27,6 +19,7 @@ module.exports = superclass => class Mixin extends superclass {
     }
 
     this.model = Promise.promisifyAll(model);
+    this.socketIO = socketIO;
   }
 
   create(properties) {

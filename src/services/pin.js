@@ -1,5 +1,6 @@
 const CassandraMixin = require('./mixins/model/cassandra');
 const { mix } = require('mixwith');
+const { modelResponse, TYPE_PIN } = require('../utils/response');
 
 class PinService
 {
@@ -25,6 +26,15 @@ class PinService
     return this
       .unpin(roomId, user)
       .then(() => this.create(params));
+  }
+
+  pinAndBroadcast(roomId, message, user) {
+    const id = roomId.toString();
+
+    return this
+      .pin(roomId, message, user)
+      .then(pin => modelResponse(pin, TYPE_PIN))
+      .tap(response => this.socketIO.in(id).emit(`messages.pin.${id}`, response));
   }
 
   unpin(roomId, user) {

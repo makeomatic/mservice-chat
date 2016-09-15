@@ -40,7 +40,7 @@ function messageSendAction(request) {
     .create(message)
     .tap((createdMessage) => { // eslint-disable-line consistent-return
       if (params.message.type === 'sticky') {
-        return pinService.pin(room.id, createdMessage, user);
+        return pinService.pinAndBroadcast(room.id, createdMessage, user);
       }
     })
     .then(createdMessage => modelResponse(createdMessage, TYPE_MESSAGE))
