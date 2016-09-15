@@ -1,4 +1,5 @@
 const Promise = require('bluebird');
+const { modelResponse, TYPE_USER } = require('../utils/response');
 
 /**
  * @api {socket.io} <prefix>.users.me Get current user
@@ -8,7 +9,9 @@ const Promise = require('bluebird');
  * @apiDescription Get an information about current user
  */
 function UsersMeAction(request) {
-  return Promise.resolve(request.socket.user);
+  return Promise
+    .resolve(request.socket.user)
+    .then(user => modelResponse(user, TYPE_USER));
 }
 
 UsersMeAction.transports = ['socketIO'];

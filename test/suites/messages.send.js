@@ -154,16 +154,18 @@ describe('messages.send', function testSuite() {
         client.emit(action, { roomId, message: { text: 'foo' } }, (error, response) => {
           assert.equal(error, null);
 
-          assert.ok(response.id);
-          assert.equal(response.text, 'foo');
-          assert.equal(response.roomId, roomId);
-          assert.ok(response.createdAt);
-          assert.equal(response.userId, 'user@foo.com');
-          assert.equal(response.user.id, 'user@foo.com');
-          assert.equal(response.user.name, 'User User');
-          assert.deepEqual(response.user.roles, ['user']);
-          assert.deepEqual(response.properties, {});
-          assert.deepEqual(response.attachments, {});
+          const { data } = response;
+
+          assert.ok(data.id);
+          assert.equal(data.attributes.text, 'foo');
+          assert.equal(data.attributes.roomId, roomId);
+          assert.ok(data.attributes.createdAt);
+          assert.equal(data.attributes.userId, 'user@foo.com');
+          assert.equal(data.attributes.user.id, 'user@foo.com');
+          assert.equal(data.attributes.user.name, 'User User');
+          assert.deepEqual(data.attributes.user.roles, ['user']);
+          assert.deepEqual(data.attributes.properties, {});
+          assert.deepEqual(data.attributes.attachments, {});
 
           client.disconnect();
           done();
@@ -246,16 +248,19 @@ describe('messages.send', function testSuite() {
     const roomId = this.room.id.toString();
 
     client1.on(`messages.send.${roomId}`, (response) => {
-      assert.ok(response.id);
-      assert.equal(response.text, 'foo');
-      assert.equal(response.roomId, roomId);
-      assert.ok(response.createdAt);
-      assert.equal(response.userId, 'user@foo.com');
-      assert.equal(response.user.id, 'user@foo.com');
-      assert.equal(response.user.name, 'User User');
-      assert.deepEqual(response.user.roles, ['user']);
-      assert.deepEqual(response.properties, {});
-      assert.deepEqual(response.attachments, {});
+      const { attributes, id, type } = response.data;
+
+      assert.ok(id);
+      assert.equal(type, 'message');
+      assert.equal(attributes.text, 'foo');
+      assert.equal(attributes.roomId, roomId);
+      assert.ok(attributes.createdAt);
+      assert.equal(attributes.userId, 'user@foo.com');
+      assert.equal(attributes.user.id, 'user@foo.com');
+      assert.equal(attributes.user.name, 'User User');
+      assert.deepEqual(attributes.user.roles, ['user']);
+      assert.deepEqual(attributes.properties, {});
+      assert.deepEqual(attributes.attachments, {});
 
       client1.disconnect();
       client2.disconnect();

@@ -1,11 +1,4 @@
 {
   "id": "messages.pin.response",
-  "additionalProperties": false,
-  "type": "object",
-  "required": ["data"],
-  "properties": {
-    "data": {
-      "$ref": "common.json#/definitions/pin"
-    }
-  }
+  "$ref": "common.json#/definitions/pinResponse"
 }

@@ -1,10 +1,10 @@
 const { ActionTransport } = require('mservice');
 
 /**
- * @api {http} <prefix>.internal.rooms.create Create a room, for internal use only
+ * @api {amqp} <prefix>.internal.rooms.create Create a room, for internal use only
  * @apiVersion 1.0.0
  * @apiName internal.rooms.create
- * @apiGroup Internals
+ * @apiGroup RoomInternal
  * @apiSchema {jsonschema=../../schemas/internal.rooms.create.json} apiParam
  */
 function internalRoomsCreate(request) {

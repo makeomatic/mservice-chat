@@ -117,10 +117,10 @@ describe('messages.delete', function testSuite() {
         const messageParams = { roomId: room.id.toString(), message: { text: 'foo' } };
 
         client.emit('chat.messages.send', messageParams, (error, message) => {
-          request(uri, { token: userToken, id: message.id, roomId: room.id.toString() })
+          request(uri, { token: userToken, id: message.data.id, roomId: room.id.toString() })
             .then(({ statusCode, body }) => {
               assert.equal(statusCode, 200);
-              assert.equal(body.id, message.id);
+              assert.equal(body.meta.status, 'success');
               done();
             });
         });
@@ -137,10 +137,10 @@ describe('messages.delete', function testSuite() {
         const messageParams = { roomId: room.id.toString(), message: { text: 'foo' } };
 
         client.emit('chat.messages.send', messageParams, (error, message) => {
-          request(uri, { token: adminToken, id: message.id, roomId: room.id.toString() })
+          request(uri, { token: adminToken, id: message.data.id, roomId: room.id.toString() })
             .then(({ statusCode, body }) => {
               assert.equal(statusCode, 200);
-              assert.equal(body.id, message.id);
+              assert.equal(body.meta.status, 'success');
               done();
             });
         });
@@ -157,11 +157,11 @@ describe('messages.delete', function testSuite() {
         const messageParams = { roomId: room.id.toString(), message: { text: 'foo' } };
 
         client.emit('chat.messages.send', messageParams, (error, message) => {
-          client.on(`messages.delete.${room.id}`, (result) => {
-            assert.equal(result.id, message.id);
+          client.on(`messages.delete.${room.id.toString()}`, (result) => {
+            assert.equal(result.data.type, 'message');
             done();
           });
-          request(uri, { token: userToken, id: message.id, roomId: room.id.toString() });
+          request(uri, { token: userToken, id: message.data.id, roomId: room.id.toString() });
         });
       });
     });

@@ -1,4 +1,4 @@
-const collectionResponse = require('../services/response/collection');
+const { collectionResponse, TYPE_MESSAGE } = require('../utils/response');
 
 /**
  * @api {http} <prefix>.messages.history Get messages history
@@ -12,7 +12,7 @@ function messageHistoryAction(request) {
   const { roomId, before, limit } = request.params;
   return this.services.message
     .history(roomId, before, limit)
-    .then(messages => collectionResponse(messages, request));
+    .then(messages => collectionResponse(messages, TYPE_MESSAGE, before));
 }
 
 messageHistoryAction.schema = 'messages.history';

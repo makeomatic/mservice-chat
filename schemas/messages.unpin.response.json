@@ -1,24 +1,4 @@
 {
   "id": "messages.unpin.response",
-  "additionalProperties": false,
-  "type": "object",
-  "required": ["meta"],
-  "properties": {
-    "meta": {
-      "additionalProperties": false,
-      "type": "object",
-      "required": ["status"],
-      "description": "Response metadata",
-      "properties": {
-        "status": {
-          "type": "string",
-          "enum": ["success"],
-          "description": "Request status"
-        },
-        "user": {
-          "$ref": "common.json#/definitions/user"
-        }
-      }
-    }
-  }
+  "$ref": "common.json#/definitions/statusSuccess"
 }

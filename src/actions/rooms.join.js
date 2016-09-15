@@ -1,10 +1,19 @@
-const collectionResponse = require('../services/response/collection');
+const {
+  collectionResponse,
+  modelResponse,
+  transform,
+  TYPE_USER,
+  TYPE_PIN,
+  TYPE_MESSAGE,
+} = require('../utils/response');
 const Errors = require('common-errors');
 const fetchRoom = require('./../fetchers/room')();
 const Promise = require('bluebird');
 
 /**
  * @api {socket.io} <prefix>.rooms.join Join a room
+ * @apiDescription Returns collection of `message` objects. If the room has pinned message
+ * it will be first item in collection and will not affect meta.
  * @apiVersion 1.0.0
  * @apiName rooms.join
  * @apiGroup Rooms
@@ -20,15 +29,34 @@ const Promise = require('bluebird');
  * @apiSchema {jsonschema=../../schemas/rooms.join.broadcast.json} apiSuccess
  */
 function RoomsJoinAction(request) {
-  const { room, socket } = request;
+  const { socket, params } = request;
+  const { id, before } = params;
   const { user } = socket;
-  const roomId = room.id.toString();
 
   return Promise
-    .fromCallback(callback => socket.join(roomId, callback))
-    .tap(() => socket.nsp.in(roomId).emit(`rooms.join.${roomId}`, { user }))
-    .then(() => this.services.message.history(roomId))
-    .then(messages => collectionResponse(messages, request));
+    .fromCallback(callback => socket.join(id, callback))
+    .tap(() =>
+      socket.broadcast
+        .to(id)
+        .emit(`rooms.join.${id}`, modelResponse(user, TYPE_USER))
+    )
+    .then(() => {
+      const promises = [
+        this.services.message.history(id),
+        this.services.pin.last(id),
+      ];
+
+      return Promise.all(promises);
+    })
+    .spread((messages, pin) => {
+      const response = collectionResponse(messages, TYPE_MESSAGE, before);
+
+      if (pin) {
+        response.data.unshift(transform(pin, TYPE_PIN));
+      }
+
+      return response;
+    });
 }
 
 const allowed = (request) => {

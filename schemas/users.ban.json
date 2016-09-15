@@ -11,7 +11,7 @@
       "$ref": "common.json#/definitions/roomId"
     },
     "reason": {
-      "$ref": "common.json#/definitions/ban/properties/reason"
+      "$ref": "common.json#/definitions/ban/properties/attributes/properties/reason"
     },
     "token": {
       "$ref": "common.json#/definitions/token"

@@ -28,7 +28,7 @@ describe('rooms.list', function testSuite() {
     request(uri)
       .then((response) => {
         expect(response.statusCode).to.be.equals(200);
-        expect(response.body.length).to.be.equals(2);
+        expect(response.body.data.length).to.be.equals(2);
         done();
       });
   });

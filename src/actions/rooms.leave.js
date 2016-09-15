@@ -1,6 +1,7 @@
 const Errors = require('common-errors');
 const fetchRoom = require('./../fetchers/room')();
 const Promise = require('bluebird');
+const { successResponse, modelResponse, TYPE_USER } = require('../utils/response');
 
 /**
  * @api {socket.io} <prefix>.rooms.join Leave a room
@@ -8,6 +9,7 @@ const Promise = require('bluebird');
  * @apiName rooms.leave
  * @apiGroup Rooms
  * @apiSchema {jsonschema=../../schemas/rooms.leave.json} apiParam
+ * @apiSchema {jsonschema=../../schemas/rooms.leave.response.json} apiSuccess
  */
  /**
   * @api {socket.io} rooms.leave.<roomId> Leave a room
@@ -15,7 +17,7 @@ const Promise = require('bluebird');
   * @apiVersion 1.0.0
   * @apiName rooms.leave.event
   * @apiGroup RoomsBroadcast
-  * @apiSchema {jsonschema=../../schemas/rooms.leave.event.json} apiSuccess
+  * @apiSchema {jsonschema=../../schemas/rooms.leave.broadcast.json} apiSuccess
   */
 function RoomsLeaveAction(request) {
   const { room, socket } = request;
@@ -23,15 +25,9 @@ function RoomsLeaveAction(request) {
 
   return Promise
     .fromCallback(callback => socket.leave(roomId, callback))
-    .then(() => {
-      const response = {
-        user: socket.user,
-      };
-
-      socket.nsp.in(roomId).emit(`rooms.leave.${roomId}`, response);
-
-      return Promise.resolve(response);
-    });
+    .then(() => modelResponse(socket.user, TYPE_USER))
+    .tap(response => socket.broadcast.to(roomId).emit(`rooms.leave.${roomId}`, response))
+    .then(successResponse);
 }
 
 const allowed = (request) => {

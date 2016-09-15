@@ -1,6 +1,7 @@
 const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
 const fetchRoom = require('../fetchers/room')('roomId');
+const { successResponse, modelResponse, TYPE_USER } = require('../utils/response');
 
 /**
  * @api {http} <prefix>.messages.unpin Unpin last message
@@ -25,13 +26,9 @@ function messagesUnpinAction(request) {
 
   return this.services.pin
     .unpin(room.id, admin)
-    .return({
-      meta: {
-        user: admin,
-        status: 'success',
-      },
-    })
-    .tap(response => socketIO.in(params.roomId).emit(`messages.unpin.${params.roomId}`, response));
+    .then(() => modelResponse(admin, TYPE_USER))
+    .tap(response => socketIO.in(params.roomId).emit(`messages.unpin.${params.roomId}`, response))
+    .then(successResponse);
 }
 
 function allowed(request) {

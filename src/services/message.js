@@ -53,7 +53,7 @@ class MessageService
     const MessageModel = this.model;
     const messageParams = Object.assign({}, properties, {
       id: datatypes.Long.fromString(this.flakeless.next()),
-      createdAt: Date.now(),
+      createdAt: new Date().toISOString(),
       properties: {},
       attachments: {},
     });

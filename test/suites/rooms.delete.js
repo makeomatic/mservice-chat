@@ -89,7 +89,7 @@ describe('rooms.delete', function testSuite() {
       .then(() => request(uri, { id, token }))
       .then((response) => {
         expect(response.statusCode).to.be.equals(200);
-        expect(response.body).to.be.equals(true);
+        expect(response.body.meta.status).to.be.equals('success');
       })
       .then(() => chat.services.room.find())
       .then((roomsAfter) => {

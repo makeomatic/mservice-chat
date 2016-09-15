@@ -1,28 +1,203 @@
 {
   "id": "common.json",
   "definitions": {
-    "userId": {
-      "type": "string",
-      "description": "User identificator"
+    "ban": {
+      "description": "`ban` object",
+      "type": "object",
+      "required": ["attributes", "type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["ban"]
+        },
+        "attributes": {
+          "type": "object",
+          "required": ["roomId", "userId", "user", "bannedAt", "bannedBy", "reason"],
+          "properties": {
+            "roomId": {
+              "$ref": "#/definitions/roomId"
+            },
+            "userId": {
+              "$ref": "#/definitions/userId"
+            },
+            "user": {
+              "$ref": "#/definitions/user"
+            },
+            "bannedAt": {
+              "$ref": "#/definitions/isoDate"
+            },
+            "bannedBy": {
+              "$ref": "#/definitions/user"
+            },
+            "reason": {
+              "type": "string",
+              "description": "Ban reason"
+            }
+          }
+        }
+      }
+    },
+    "banResponse": {
+      "additionalProperties": false,
+      "description": "`ban` object response",
+      "type": "object",
+      "required": ["data"],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/ban"
+        }
+      }
+    },
+    "message": {
+      "description": "`message` object",
+      "type": "object",
+      "required": ["id", "type", "attributes"],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/messageId"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["message"]
+        },
+        "attributes": {
+          "additionalProperties": false,
+          "description": "Message properties",
+          "required": ["text", "user"],
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "Message text"
+            },
+            "user": {
+              "$ref": "#/definitions/user"
+            },
+            "createdAt": {
+              "$ref": "#/definitions/isoDate"
+            }
+          }
+        }
+      }
+    },
+    "messagesCollection": {
+      "additionalProperties": false,
+      "description": "Messages response",
+      "type": "object",
+      "required": ["meta", "data"],
+      "properties": {
+        "meta": {
+          "$ref": "#/definitions/collectionMeta"
+        },
+        "data": {
+          "description": "Collection of messages",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/message"
+          }
+        }
+      }
+    },
+    "messageResponse": {
+      "additionalProperties": false,
+      "description": "`message` object response",
+      "type": "object",
+      "required": ["data"],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/message"
+        }
+      }
+    },
+    "pin": {
+      "description": "`pin` object",
+      "type": "object",
+      "required": ["attributes", "type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["pin"]
+        },
+        "attributes": {
+          "type": "object",
+          "required": ["roomId", "messageId", "message", "pinnedAt", "unpinnedAt"],
+          "properties": {
+            "roomId": {
+              "$ref": "#/definitions/roomId"
+            },
+            "messageId": {
+              "$ref": "#/definitions/messageId"
+            },
+            "message": {
+              "$ref": "#/definitions/message"
+            },
+            "pinnedAt": {
+              "$ref": "#/definitions/isoDate"
+            },
+            "unpinnedAt": {
+              "$ref": "#/definitions/isoDate"
+            },
+            "pinnedBy": {
+              "$ref": "#/definitions/user"
+            },
+            "unpinnedBy": {
+              "$ref": "#/definitions/user"
+            }
+          }
+        }
+      }
+    },
+    "pinResponse": {
+      "additionalProperties": false,
+      "description": "`pin` object response",
+      "type": "object",
+      "required": ["data"],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/pin"
+        }
+      }
     },
     "user": {
       "description": "User object",
       "type": "object",
-      "required": ["id", "name", "roles"],
+      "required": ["id", "type", "attributes"],
       "properties": {
         "id": {
           "$ref": "#/definitions/userId"
         },
-        "name": {
+        "type": {
           "type": "string",
-          "description": "User name"
+          "enum": ["user"]
         },
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Array of user roles"
+        "attributes": {
+          "description": "User properties",
+          "type": "object",
+          "required": ["name", "roles"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "User name"
+            },
+            "roles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Array of user roles"
+            }
+          }
+        }
+      }
+    },
+    "userResponse": {
+      "additionalProperties": false,
+      "description": "`user` object response",
+      "type": "object",
+      "required": ["data"],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/user"
         }
       }
     },
@@ -31,57 +206,51 @@
       "type": "string",
       "pattern": "^\\d+$"
     },
+    "userId": {
+      "type": "string",
+      "description": "User identificator"
+    },
     "roomId": {
       "description": "`room` identificator",
       "type": "string",
       "format": "uuid"
     },
-    "message": {
-      "description": "`message` object",
+    "collectionMeta": {
+      "description": "Collection metadata",
       "type": "object",
-      "required": ["id", "text", "user"],
+      "additionalProperties": false,
+      "required": ["count"],
       "properties": {
-        "id": {
-          "$ref": "#/definitions/messageId"
+        "count": {
+          "type": "integer",
+          "description": "Count of results"
         },
-        "text": {
-          "type": "string",
-          "description": "Message text"
+        "before": {
+          "$ref": "common.json#/definitions/messageId"
         },
-        "user": {
-          "$ref": "#/definitions/user"
+        "last": {
+          "$ref": "common.json#/definitions/messageId"
         }
       }
     },
-    "messagesCollection": {
-      "additionalProperties": false,
+    "successResponse": {
+      "description": "Success response",
       "type": "object",
-      "required": ["meta", "data"],
+      "additionalProperties": false,
+      "required": ["meta"],
       "properties": {
         "meta": {
-          "description": "Response metadata",
+          "description": "Success metadata",
           "type": "object",
           "additionalProperties": false,
-          "required": ["count"],
+          "required": ["status"],
           "properties": {
-            "count": {
-              "type": "integer",
-              "description": "Count of results"
-            },
-            "before": {
-              "$ref": "common.json#/definitions/messageId"
-            },
-            "last": {
-              "$ref": "common.json#/definitions/messageId"
+            "status": {
+              "description": "Response status",
+              "type": "string",
+              "enum": ["success"]
             }
           }
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/message"
-          },
-          "description": "Collection of messages"
         }
       }
     },
@@ -89,63 +258,9 @@
       "type": "string",
       "description": "Auth token"
     },
-    "timestamp": {
+    "isoDate": {
       "type": "string",
-      "description": "Timestamp"
-    },
-    "pin": {
-      "description": "`pin` object",
-      "type": "object",
-      "required": ["roomId", "messageId", "message", "pinnedAt", "unpinnedAt"],
-      "properties": {
-        "roomId": {
-          "$ref": "#/definitions/roomId"
-        },
-        "messageId": {
-          "$ref": "#/definitions/messageId"
-        },
-        "message": {
-          "$ref": "#/definitions/message"
-        },
-        "pinnedAt": {
-          "$ref": "#/definitions/timestamp"
-        },
-        "unpinnedAt": {
-          "$ref": "#/definitions/timestamp"
-        },
-        "pinnedBy": {
-          "$ref": "#/definitions/user"
-        },
-        "unpinnedBy": {
-          "$ref": "#/definitions/user"
-        }
-      }
-    },
-    "ban": {
-      "description": "`ban` object",
-      "type": "object",
-      "required": ["roomId", "userId", "user", "bannedAt", "bannedBy", "reason"],
-      "properties": {
-        "roomId": {
-          "$ref": "#/definitions/roomId"
-        },
-        "userId": {
-          "$ref": "#/definitions/userId"
-        },
-        "user": {
-          "$ref": "#/definitions/user"
-        },
-        "bannedAt": {
-          "$ref": "#/definitions/timestamp"
-        },
-        "bannedBy": {
-          "$ref": "#/definitions/user"
-        },
-        "reason": {
-          "type": "string",
-          "description": "Ban reason"
-        }
-      }
+      "description": "ISO Date"
     }
   }
 }

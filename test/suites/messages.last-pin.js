@@ -59,17 +59,17 @@ describe('messages.last-pin', function suite() {
         const { body, statusCode } = response;
 
         assert.equal(statusCode, 200);
-        assert.equal(body.data.messageId, this.messageId);
-        assert.equal(body.data.message.id, this.messageId);
-        assert.equal(body.data.message.text, 'foo');
-        assert.deepEqual(body.data.message.user, {
+        assert.equal(body.data.attributes.messageId, this.messageId);
+        assert.equal(body.data.attributes.message.id, this.messageId);
+        assert.equal(body.data.attributes.message.text, 'foo');
+        assert.deepEqual(body.data.attributes.message.user, {
           id: 'admin@foo.com',
           name: 'Admin Admin',
           roles: ['admin'],
         });
-        assert.equal(body.data.roomId, this.roomId);
-        assert.ok(body.data.pinnedAt);
-        assert.deepEqual(body.data.pinnedBy, {
+        assert.equal(body.data.attributes.roomId, this.roomId);
+        assert.ok(body.data.attributes.pinnedAt);
+        assert.deepEqual(body.data.attributes.pinnedBy, {
           id: 'admin@foo.com',
           name: 'Admin Admin',
           roles: ['admin'],
@@ -86,7 +86,7 @@ describe('messages.last-pin', function suite() {
         const { body, statusCode } = response;
 
         assert.equal(statusCode, 200);
-        assert.equal(body.data, null);
+        assert.deepEqual(body.data, null);
       });
   });
 
