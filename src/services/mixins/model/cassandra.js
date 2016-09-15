@@ -5,7 +5,17 @@ const mapValues = require('lodash/mapValues');
 const Promise = require('bluebird');
 
 module.exports = superclass => class Mixin extends superclass {
-  constructor(cassandraClient, socketIO) {
+  static getDefaultData() {
+    const defaultData = superclass.defaultData;
+
+    if (is.object(defaultData) === true) {
+      return mapValues(defaultData, value => (is.fn(value) === true ? value() : value));
+    }
+
+    return Promise.resolve({});
+  }
+
+  constructor(cassandraClient, socketIO, services) {
     super();
 
     if (superclass.modelName === undefined) {
@@ -19,6 +29,7 @@ module.exports = superclass => class Mixin extends superclass {
     }
 
     this.model = Promise.promisifyAll(model);
+    this.services = services;
     this.socketIO = socketIO;
   }
 
@@ -33,16 +44,6 @@ module.exports = superclass => class Mixin extends superclass {
       .tap(model => model.saveAsync());
   }
 
-  static getDefaultData() {
-    const defaultData = superclass.defaultData;
-
-    if (is.object(defaultData) === true) {
-      return mapValues(defaultData, value => (is.fn(value) === true ? value() : value));
-    }
-
-    return Promise.resolve({});
-  }
-
   find(cond = {}, sort = {}, limit = 20) {
     const query = this.makeCond(cond, sort, limit);
 
@@ -55,10 +56,24 @@ module.exports = superclass => class Mixin extends superclass {
     return this.model.findOneAsync(query);
   }
 
+  update(cond = {}, update = {}, options = {}) {
+    const query = this.makeCond(cond);
+    
+    return this.model.updateAsync(query, update, options);
+  }
+
   delete(cond = {}) {
     const query = this.makeCond(cond);
 
-    return this.model.deleteAsync(query);
+    return this.model
+      .deleteAsync(query)
+      .tap(() => {
+        if (super.afterDelete) {
+          return super.afterDelete(cond);
+        }
+
+        return Promise.resolve();
+      });
   }
 
   cast(value, type) {

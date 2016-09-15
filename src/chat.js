@@ -1,5 +1,4 @@
 const merge = require('lodash/merge');
-const Flakeless = require('ms-flakeless');
 const getAuthMiddleware = require('./middlewares/socketIO/auth');
 const { globFiles } = require('ms-conf/lib/load-config');
 const MessageService = require('./services/message');
@@ -11,10 +10,6 @@ const RoomService = require('./services/room');
 const UserService = require('./services/user');
 
 const defaultConfig = globFiles(path.resolve(__dirname, 'configs'));
-const flakeless = new Flakeless({
-  epochStart: Date.now(),
-  outputType: 'base10',
-});
 
 class Chat extends MService {
   /**
@@ -25,10 +20,10 @@ class Chat extends MService {
     this.services = {};
 
     this.on('plugin:connect:cassandra', (cassandra) => {
-      this.services.ban = new BanService(cassandra);
-      this.services.message = new MessageService(cassandra, flakeless);
-      this.services.pin = new PinService(cassandra, this.socketIO);
-      this.services.room = new RoomService(cassandra);
+      this.services.ban = new BanService(cassandra, this.socketIO, this.services);
+      this.services.message = new MessageService(cassandra, this.socketIO, this.services);
+      this.services.pin = new PinService(cassandra, this.socketIO, this.services);
+      this.services.room = new RoomService(cassandra, this.socketIO, this.services);
     });
 
     this.on('plugin:connect:amqp', (amqp) => {

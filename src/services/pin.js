@@ -10,7 +10,7 @@ class PinService
   };
 
   static defaultData = {
-    pinnedAt: () => Date.now(),
+    pinnedAt: () => new Date().toISOString(),
   };
 
   static modelName = 'pin';
@@ -37,13 +37,13 @@ class PinService
       .tap(response => this.socketIO.in(id).emit(`messages.pin.${id}`, response));
   }
 
-  unpin(roomId, user) {
+  unpin(roomId, unpinnedBy) {
     return this
       .last(roomId)
       .then((pin) => {
         if (pin !== null) {
           pin.unpinnedAt = Date.now();
-          pin.unpinnedBy = user;
+          pin.unpinnedBy = unpinnedBy;
 
           return pin.saveAsync();
         }

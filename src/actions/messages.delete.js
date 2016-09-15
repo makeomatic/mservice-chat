@@ -22,12 +22,12 @@ const { successResponse, modelResponse, TYPE_MESSAGE } = require('../utils/respo
   * @apiSchema {jsonschema=../../schemas/messages.delete.broadcast.json} apiSuccess
   */
 function messageDeleteAction(request) {
-  const { message, room } = request;
+  const { message, params } = request;
+  const { id, roomId } = params;
   const { socketIO } = this;
-  const roomId = room.id.toString();
 
-  return message
-    .deleteAsync()
+  return this.services.message
+    .delete({ id, roomId })
     .then(() => modelResponse(message, TYPE_MESSAGE))
     .tap(response => socketIO.in(roomId).emit(`messages.delete.${roomId}`, response))
     .then(successResponse);

@@ -38,10 +38,12 @@ function messageSendAction(request) {
 
   return messageService
     .create(message)
-    .tap((createdMessage) => { // eslint-disable-line consistent-return
+    .tap((createdMessage) => {
       if (params.message.type === 'sticky') {
         return pinService.pinAndBroadcast(room.id, createdMessage, user);
       }
+
+      return Promise.resolve();
     })
     .then(createdMessage => modelResponse(createdMessage, TYPE_MESSAGE))
     .tap(response => socket.broadcast.to(roomId).emit(`messages.send.${roomId}`, response));

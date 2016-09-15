@@ -34,4 +34,5 @@ module.exports = {
   },
   key: [['roomId'], 'pinnedAt'],
   clustering_order: { pinnedAt: 'desc' },
+  indexes: ['messageId'],
 };
