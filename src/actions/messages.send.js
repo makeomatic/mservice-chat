@@ -3,6 +3,7 @@ const fetchRoom = require('../fetchers/room');
 const fetchBan = require('../fetchers/ban');
 const isElevated = require('../services/roles/isElevated');
 const Promise = require('bluebird');
+const { modelResponse, TYPE_MESSAGE } = require('../utils/response');
 
 /**
  * @api {socket.io} <prefix>.messages.send Send message to a room
@@ -13,6 +14,7 @@ const Promise = require('bluebird');
  * @apiParam (Payload) {Object} message - Message object
  * @apiParam (Payload) {String} message.text - Text
  * @apiParam (Payload) {String} [message.type] - `sticky` if sticky message
+ * @apiSchema {jsonschema=../../schemas/messages.send.response.json} apiSuccess
  */
  /**
   * @api {socket.io} messages.send.<roomId> Send message to a room
@@ -36,12 +38,15 @@ function messageSendAction(request) {
 
   return messageService
     .create(message)
-    .tap(createdMessage => socket.nsp.in(roomId).emit(`messages.send.${roomId}`, createdMessage))
-    .tap((createdMessage) => { // eslint-disable-line consistent-return
+    .tap((createdMessage) => {
       if (params.message.type === 'sticky') {
-        return pinService.pin(room.id, createdMessage, user);
+        return pinService.pinAndBroadcast(room.id, createdMessage, user);
       }
-    });
+
+      return null;
+    })
+    .then(createdMessage => modelResponse(createdMessage, TYPE_MESSAGE))
+    .tap(response => socket.broadcast.to(roomId).emit(`messages.send.${roomId}`, response));
 }
 
 function allowed(request) {

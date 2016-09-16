@@ -3,7 +3,7 @@ const isElevated = require('../services/roles/isElevated');
 const fetchBan = require('../fetchers/ban');
 const fetchRoom = require('../fetchers/room');
 const fetchUser = require('../fetchers/user');
-const makeModelResponse = require('../services/response/model');
+const { modelResponse, TYPE_BAN } = require('../utils/response');
 
 /**
  * @api {http} <prefix>.users.ban Ban an user
@@ -29,7 +29,7 @@ function usersBanAction(request) {
 
   return this.services.ban
     .add(room.id, bannedUser, admin, reason)
-    .then(makeModelResponse)
+    .then(ban => modelResponse(ban, TYPE_BAN))
     .tap(response => socketIO.in(roomId).emit(`users.ban.${roomId}`, response));
 }
 

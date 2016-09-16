@@ -1,5 +1,7 @@
 const assert = require('assert');
 const Chat = require('../../src');
+const is = require('is');
+const { isISODate } = require('../helpers/asserts');
 const { login } = require('../helpers/users');
 const request = require('../helpers/request');
 const socketIOClient = require('socket.io-client');
@@ -188,22 +190,24 @@ describe('users.ban', function suite() {
     return request(uri, params)
       .then((response) => {
         const { body, statusCode } = response;
+        const { type, attributes } = body.data;
 
         assert.equal(statusCode, 200);
-        assert.equal(body.data.roomId, this.roomId);
-        assert.equal(body.data.userId, 'user@foo.com');
-        assert.deepEqual(body.data.user, {
+        assert.equal(type, 'ban');
+        assert.equal(attributes.roomId, this.roomId);
+        assert.equal(attributes.userId, 'user@foo.com');
+        assert.deepEqual(attributes.user, {
           id: 'user@foo.com',
           name: 'User User',
           roles: ['user'],
         });
-        assert.ok(body.data.bannedAt);
-        assert.deepEqual(body.data.bannedBy, {
+        assert.equal(isISODate(attributes.bannedAt), true);
+        assert.deepEqual(attributes.bannedBy, {
           id: 'admin@foo.com',
           name: 'Admin Admin',
           roles: ['admin'],
         });
-        assert.equal(body.data.reason, 'foo');
+        assert.equal(attributes.reason, 'foo');
       })
       .then(() => chat.services.ban.findById(this.roomId, 'user@foo.com'))
       .tap((ban) => {
@@ -214,7 +218,7 @@ describe('users.ban', function suite() {
           name: 'User User',
           roles: ['user'],
         });
-        assert.ok(ban.bannedAt);
+        assert.equal(is.date(ban.bannedAt), true);
         assert.deepEqual(ban.bannedBy, {
           id: 'admin@foo.com',
           name: 'Admin Admin',
@@ -238,22 +242,23 @@ describe('users.ban', function suite() {
     client.on('connect', () => {
       client.emit('chat.rooms.join', { id: this.roomId }, () => {
         client.on(`users.ban.${this.roomId}`, (response) => {
-          const ban = response.data;
+          const { type, attributes } = response.data;
 
-          assert.equal(ban.roomId, this.roomId);
-          assert.equal(ban.userId, 'second.user@foo.com');
-          assert.deepEqual(ban.user, {
+          assert.equal(type, 'ban');
+          assert.equal(attributes.roomId, this.roomId);
+          assert.equal(attributes.userId, 'second.user@foo.com');
+          assert.deepEqual(attributes.user, {
             id: 'second.user@foo.com',
             name: 'SecondUser User',
             roles: ['user'],
           });
-          assert.ok(ban.bannedAt);
-          assert.deepEqual(ban.bannedBy, {
+          assert.equal(isISODate(attributes.bannedAt), true);
+          assert.deepEqual(attributes.bannedBy, {
             id: 'admin@foo.com',
             name: 'Admin Admin',
             roles: ['admin'],
           });
-          assert.equal(ban.reason, 'foo');
+          assert.equal(attributes.reason, 'foo');
 
           client.disconnect();
           done();
@@ -296,22 +301,24 @@ describe('users.ban', function suite() {
     return request(uri, params)
       .then((response) => {
         const { body, statusCode } = response;
+        const { type, attributes } = body.data;
 
         assert.equal(statusCode, 200);
-        assert.equal(body.data.roomId, this.roomId);
-        assert.equal(body.data.userId, 'admin@foo.com');
-        assert.deepEqual(body.data.user, {
+        assert.equal(type, 'ban');
+        assert.equal(attributes.roomId, this.roomId);
+        assert.equal(attributes.userId, 'admin@foo.com');
+        assert.deepEqual(attributes.user, {
           id: 'admin@foo.com',
           name: 'Admin Admin',
           roles: ['admin'],
         });
-        assert.ok(body.data.bannedAt);
-        assert.deepEqual(body.data.bannedBy, {
+        assert.equal(isISODate(attributes.bannedAt), true);
+        assert.deepEqual(attributes.bannedBy, {
           id: 'root@foo.com',
           name: 'Root Admin',
           roles: ['admin', 'root'],
         });
-        assert.equal(body.data.reason, 'foo');
+        assert.equal(attributes.reason, 'foo');
       })
       .then(() => chat.services.ban.findById(this.roomId, 'admin@foo.com'))
       .then((ban) => {
@@ -322,7 +329,7 @@ describe('users.ban', function suite() {
           name: 'Admin Admin',
           roles: ['admin'],
         });
-        assert.ok(ban.bannedAt);
+        assert.equal(is.date(ban.bannedAt), true);
         assert.deepEqual(ban.bannedBy, {
           id: 'root@foo.com',
           name: 'Root Admin',

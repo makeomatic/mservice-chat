@@ -2,7 +2,7 @@ const Errors = require('common-errors');
 const fetchRoom = require('./../fetchers/room')();
 const isElevated = require('../services/roles/isElevated');
 const Promise = require('bluebird');
-
+const { successResponse } = require('../utils/response');
 /**
  * @api {http} <prefix>.rooms.delete Delete a room
  * @apiVersion 1.0.0
@@ -11,7 +11,11 @@ const Promise = require('bluebird');
  * @apiSchema {jsonschema=../../schemas/rooms.delete.json} apiParam
  */
 function RoomsDeleteAction(request) {
-  return request.room.deleteAsync().return(true);
+  const { id } = request.params;
+
+  return this.services.room
+    .delete({ id })
+    .then(successResponse);
 }
 
 const allowed = (request) => {

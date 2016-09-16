@@ -38,14 +38,14 @@ describe('messages.history', function suite() {
         assert.equal(data.length, 4);
         assert.equal(meta.last, fourth.id);
         assert.equal(meta.count, 4);
-        assert.equal(fourth.roomId, params.roomId);
-        assert.equal(fourth.text, 'qux');
-        assert.equal(third.roomId, params.roomId);
-        assert.equal(third.text, 'baz');
-        assert.equal(second.roomId, params.roomId);
-        assert.equal(second.text, 'bar');
-        assert.equal(first.roomId, params.roomId);
-        assert.equal(first.text, 'foo');
+        assert.equal(fourth.attributes.roomId, params.roomId);
+        assert.equal(fourth.attributes.text, 'qux');
+        assert.equal(third.attributes.roomId, params.roomId);
+        assert.equal(third.attributes.text, 'baz');
+        assert.equal(second.attributes.roomId, params.roomId);
+        assert.equal(second.attributes.text, 'bar');
+        assert.equal(first.attributes.roomId, params.roomId);
+        assert.equal(first.attributes.text, 'foo');
       });
   });
 
@@ -65,10 +65,10 @@ describe('messages.history', function suite() {
         assert.equal(meta.before, this.messages.qux.id);
         assert.equal(meta.count, 2);
         assert.equal(meta.last, second.id);
-        assert.equal(second.roomId, params.roomId);
-        assert.equal(second.text, 'baz');
-        assert.equal(first.roomId, params.roomId);
-        assert.equal(first.text, 'bar');
+        assert.equal(second.attributes.roomId, params.roomId);
+        assert.equal(second.attributes.text, 'baz');
+        assert.equal(first.attributes.roomId, params.roomId);
+        assert.equal(first.attributes.text, 'bar');
       });
   });
 
@@ -88,8 +88,8 @@ describe('messages.history', function suite() {
         assert.equal(meta.before, this.messages.bar.id);
         assert.equal(meta.count, 1);
         assert.equal(meta.last, first.id);
-        assert.equal(first.roomId, params.roomId);
-        assert.equal(first.text, 'foo');
+        assert.equal(first.attributes.roomId, params.roomId);
+        assert.equal(first.attributes.text, 'foo');
       });
   });
 

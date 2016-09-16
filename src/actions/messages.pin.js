@@ -2,7 +2,6 @@ const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
 const fetchRoom = require('../fetchers/room')('roomId');
 const fetchMessage = require('../fetchers/message')();
-const makeModelResponse = require('../services/response/model');
 
 /**
  * @api {http} <prefix>.messages.pin Pin a message
@@ -21,15 +20,11 @@ const makeModelResponse = require('../services/response/model');
   * @apiSchema {jsonschema=../../schemas/messages.pin.broadcast.json} apiSuccess
   */
 function messagesPinAction(request) {
-  const { socketIO } = this;
-  const { auth, room, message, params } = request;
+  const { auth, room, message } = request;
   const admin = auth.credentials.user;
   const pinService = this.services.pin;
 
-  return pinService
-    .pin(room.id, message, admin)
-    .then(makeModelResponse)
-    .tap(response => socketIO.in(params.roomId).emit(`messages.pin.${params.roomId}`, response));
+  return pinService.pinAndBroadcast(room.id, message, admin);
 }
 
 function allowed(request) {

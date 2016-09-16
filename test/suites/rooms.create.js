@@ -58,12 +58,12 @@ describe('rooms.create', function testSuite() {
     request(uri, { token, name: 'test room' })
       .then((response) => {
         expect(response.statusCode).to.be.equals(200);
-        expect(response.body.name).to.be.equals('test room');
-        assert.equal(response.body.createdBy, 'root@foo.com');
+        expect(response.body.data.attributes.name).to.be.equals('test room');
+        assert.equal(response.body.data.attributes.createdBy, 'root@foo.com');
 
         return response;
       })
-      .then(response => chat.services.room.getById(response.body.id))
+      .then(response => chat.services.room.getById(response.body.data.id))
       .then((room) => {
         expect(room.name).to.be.equals('test room');
         return room.deleteAsync();

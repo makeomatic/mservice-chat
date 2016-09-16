@@ -1,5 +1,6 @@
 const assert = require('assert');
 const Chance = require('chance');
+const { create } = require('../helpers/messages');
 const request = require('./../helpers/request');
 const socketIOClient = require('socket.io-client');
 
@@ -9,9 +10,9 @@ const Chat = require('../../src');
 describe('messages.delete', function testSuite() {
   const chat = new Chat(global.SERVICES);
   const uri = 'http://0.0.0.0:3000/api/chat/messages/delete';
+  const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
   let adminToken;
   let room;
-  let roomService;
   let userId;
   let userToken;
 
@@ -19,9 +20,8 @@ describe('messages.delete', function testSuite() {
 
   before('create room', () => {
     const params = { name: 'test room', createdBy: 'admin@foo.com' };
-    roomService = chat.services.room;
 
-    return roomService
+    return chat.services.room
       .create(params)
       .tap((createdRoom) => {
         room = createdRoom;
@@ -61,6 +61,18 @@ describe('messages.delete', function testSuite() {
         userToken = jwt;
       });
   });
+
+  before('create messages', () => {
+    const messages = ['foo'];
+
+    return create(chat.services.message, messages, { roomId: room.id, user: admin })
+      .spread((message) => {
+        this.message = message;
+        this.messageId = message.id.toString();
+      });
+  });
+
+  before('create pin', () => chat.services.pin.pin(room.id, this.message, admin));
 
   it('should returns error if invalid `id`', () => {
     const params = { token: adminToken, id: 0, roomId: room.id.toString() };
@@ -117,10 +129,10 @@ describe('messages.delete', function testSuite() {
         const messageParams = { roomId: room.id.toString(), message: { text: 'foo' } };
 
         client.emit('chat.messages.send', messageParams, (error, message) => {
-          request(uri, { token: userToken, id: message.id, roomId: room.id.toString() })
+          request(uri, { token: userToken, id: message.data.id, roomId: room.id.toString() })
             .then(({ statusCode, body }) => {
               assert.equal(statusCode, 200);
-              assert.equal(body.id, message.id);
+              assert.equal(body.meta.status, 'success');
               done();
             });
         });
@@ -137,10 +149,10 @@ describe('messages.delete', function testSuite() {
         const messageParams = { roomId: room.id.toString(), message: { text: 'foo' } };
 
         client.emit('chat.messages.send', messageParams, (error, message) => {
-          request(uri, { token: adminToken, id: message.id, roomId: room.id.toString() })
+          request(uri, { token: adminToken, id: message.data.id, roomId: room.id.toString() })
             .then(({ statusCode, body }) => {
               assert.equal(statusCode, 200);
-              assert.equal(body.id, message.id);
+              assert.equal(body.meta.status, 'success');
               done();
             });
         });
@@ -157,15 +169,25 @@ describe('messages.delete', function testSuite() {
         const messageParams = { roomId: room.id.toString(), message: { text: 'foo' } };
 
         client.emit('chat.messages.send', messageParams, (error, message) => {
-          client.on(`messages.delete.${room.id}`, (result) => {
-            assert.equal(result.id, message.id);
+          client.on(`messages.delete.${room.id.toString()}`, (result) => {
+            assert.equal(result.data.type, 'message');
+
+            client.disconnect();
             done();
           });
-          request(uri, { token: userToken, id: message.id, roomId: room.id.toString() });
+          request(uri, { token: userToken, id: message.data.id, roomId: room.id.toString() });
         });
       });
     });
   });
+
+  it('should be able to remove last pinned message', () =>
+    request(uri, { token: adminToken, id: this.messageId, roomId: room.id.toString() })
+      .then(() => chat.services.pin.last(room.id.toString()))
+      .then((pin) => {
+        assert.equal(pin, null);
+      })
+  );
 
   after('delete first room', () => room.deleteAsync());
   after('shutdown chat', () => chat.close());

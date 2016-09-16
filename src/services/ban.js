@@ -1,6 +1,3 @@
-const CassandraMixin = require('./mixins/model/cassandra');
-const { mix } = require('mixwith');
-
 class BanService
 {
   static castOptions = {
@@ -8,7 +5,7 @@ class BanService
   };
 
   static defaultData = {
-    bannedAt: () => Date.now(),
+    bannedAt: () => new Date().toISOString(),
   };
 
   static modelName = 'ban';
@@ -30,4 +27,4 @@ class BanService
   }
 }
 
-module.exports = mix(BanService).with(CassandraMixin);
+module.exports = BanService;

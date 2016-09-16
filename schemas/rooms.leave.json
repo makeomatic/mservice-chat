@@ -5,9 +5,7 @@
   "required": ["id"],
   "properties": {
     "id": {
-      "format": "uuid",
-      "description": "Room id",
-      "type": "string"
+      "$ref": "common.json#/definitions/roomId"
     }
   }
 }

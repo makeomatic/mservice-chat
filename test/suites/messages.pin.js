@@ -118,7 +118,7 @@ describe('messages.pin', function suite() {
     return request(uri, params)
       .then((response) => {
         const { body, statusCode } = response;
-        const { data } = body;
+        const data = body.data.attributes;
 
         assert.equal(statusCode, 200);
         assert.equal(data.messageId, this.messageId);
@@ -169,7 +169,7 @@ describe('messages.pin', function suite() {
     return request(uri, params)
       .then((response) => {
         const { body, statusCode } = response;
-        const { data } = body;
+        const data = body.data.attributes;
 
         assert.equal(statusCode, 200);
         assert.equal(data.messageId, this.secondMessageId);
@@ -246,7 +246,7 @@ describe('messages.pin', function suite() {
     client.on('connect', () => {
       client.emit('chat.rooms.join', { id: this.roomId }, () => {
         client.on(`messages.pin.${this.roomId}`, (response) => {
-          const pin = response.data;
+          const pin = response.data.attributes;
 
           assert.equal(pin.messageId, this.messageId);
           assert.equal(pin.message.id, this.messageId);

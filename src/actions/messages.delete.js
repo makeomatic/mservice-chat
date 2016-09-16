@@ -3,6 +3,7 @@ const fetchMessage = require('../fetchers/message')();
 const fetchRoom = require('../fetchers/room')('roomId');
 const isElevated = require('../services/roles/isElevated');
 const Promise = require('bluebird');
+const { successResponse, modelResponse, TYPE_MESSAGE } = require('../utils/response');
 
 /**
  * @api {http} <prefix>.messages.delete Delete a message
@@ -10,6 +11,7 @@ const Promise = require('bluebird');
  * @apiName messages.delete
  * @apiGroup Messages
  * @apiSchema {jsonschema=../../schemas/messages.delete.json} apiParam
+ * @apiSchema {jsonschema=../../schemas/messages.delete.response.json} apiSuccess
  */
  /**
   * @api {socket.io} messages.delete.<roomId> Delete a message
@@ -20,18 +22,15 @@ const Promise = require('bluebird');
   * @apiSchema {jsonschema=../../schemas/messages.delete.broadcast.json} apiSuccess
   */
 function messageDeleteAction(request) {
-  const { message, room } = request;
+  const { message, params } = request;
+  const { id, roomId } = params;
   const { socketIO } = this;
-  const response = { id: message.id.toString() };
-  const roomId = room.id.toString();
 
-  return message
-    .deleteAsync()
-    .then(() => {
-      socketIO.in(roomId).emit(`messages.delete.${roomId}`, response);
-
-      return response;
-    });
+  return this.services.message
+    .delete({ id, roomId })
+    .then(() => modelResponse(message, TYPE_MESSAGE))
+    .tap(response => socketIO.in(roomId).emit(`messages.delete.${roomId}`, response))
+    .then(successResponse);
 }
 
 function allowed(request) {

@@ -1,20 +1,23 @@
-const merge = require('lodash/merge');
-const Flakeless = require('ms-flakeless');
+const BanService = require('./services/ban');
+const CassandraMixin = require('./services/mixins/cassandra');
 const getAuthMiddleware = require('./middlewares/socketIO/auth');
 const { globFiles } = require('ms-conf/lib/load-config');
+const { mix } = require('mixwith');
+const merge = require('lodash/merge');
 const MessageService = require('./services/message');
 const MService = require('mservice');
 const path = require('path');
-const BanService = require('./services/ban');
 const PinService = require('./services/pin');
 const RoomService = require('./services/room');
 const UserService = require('./services/user');
 
 const defaultConfig = globFiles(path.resolve(__dirname, 'configs'));
-const flakeless = new Flakeless({
-  epochStart: Date.now(),
-  outputType: 'base10',
-});
+const cassandraServices = {
+  ban: BanService,
+  pin: PinService,
+  room: RoomService,
+  message: MessageService,
+};
 
 class Chat extends MService {
   /**
@@ -25,10 +28,15 @@ class Chat extends MService {
     this.services = {};
 
     this.on('plugin:connect:cassandra', (cassandra) => {
-      this.services.ban = new BanService(cassandra);
-      this.services.message = new MessageService(cassandra, flakeless);
-      this.services.pin = new PinService(cassandra);
-      this.services.room = new RoomService(cassandra);
+      Object
+        .keys(cassandraServices)
+        .forEach((key) => {
+          const serviceConfig = this.config.services[key];
+          const Service = mix(cassandraServices[key]).with(CassandraMixin);
+          const { socketIO, services } = this;
+
+          this.services[key] = new Service(serviceConfig, cassandra, socketIO, services);
+        });
     });
 
     this.on('plugin:connect:amqp', (amqp) => {

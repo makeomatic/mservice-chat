@@ -1,11 +1,4 @@
 {
   "id": "users.unban.broadcast",
-  "additionalProperties": false,
-  "type": "object",
-  "required": ["data"],
-  "properties": {
-    "data": {
-      "$ref": "common.json#/definitions/ban"
-    }
-  }
+  "$ref": "common.json#/definitions/banResponse"
 }

@@ -1,5 +1,6 @@
 const Errors = require('common-errors');
 const Promise = require('bluebird');
+const { modelResponse, TYPE_ROOM } = require('../utils/response');
 
 /**
  * @api {http} <prefix>.rooms.create Create a room
@@ -11,7 +12,9 @@ const Promise = require('bluebird');
 function RoomsCreateAction(request) {
   const { auth, params } = request;
   const properties = Object.assign({ createdBy: auth.credentials.user.id }, params);
-  return this.services.room.create(properties);
+  return this.services.room
+    .create(properties)
+    .then(room => modelResponse(room, TYPE_ROOM));
 }
 
 const allowed = (request) => {

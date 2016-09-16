@@ -8,8 +8,7 @@
       "type": "string"
     },
     "createdBy": {
-      "description": "User `id`",
-      "type": "string"
+      "$ref": "common.json#/definitions/userId"
     }
   }
 }

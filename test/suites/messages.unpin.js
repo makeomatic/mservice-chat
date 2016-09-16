@@ -114,11 +114,6 @@ describe('messages.unpin', function suite() {
         assert.equal(statusCode, 200);
         assert.deepEqual(body.meta, {
           status: 'success',
-          user: {
-            id: 'admin@foo.com',
-            name: 'Admin Admin',
-            roles: ['admin'],
-          },
         });
       })
       .then(() => chat.services.pin.find({ roomId: this.roomId }))
@@ -181,12 +176,14 @@ describe('messages.unpin', function suite() {
     client.on('connect', () => {
       client.emit('chat.rooms.join', { id: this.roomId }, () => {
         client.on(`messages.unpin.${this.roomId}`, (response) => {
-          assert.deepEqual(response.meta, {
-            status: 'success',
-            user: {
+          assert.deepEqual(response, {
+            data: {
               id: 'admin@foo.com',
-              name: 'Admin Admin',
-              roles: ['admin'],
+              type: 'user',
+              attributes: {
+                name: 'Admin Admin',
+                roles: ['admin'],
+              },
             },
           });
 

@@ -1,71 +1,26 @@
 const Errors = require('common-errors');
-const is = require('is');
-const merge = require('lodash/merge');
-const mapValues = require('lodash/mapValues');
-const Promise = require('bluebird');
-const { uuidFromString, datatypes } = require('express-cassandra');
-
-function makeCond(cond = {}, sort = {}, limit) {
-  const query = merge({}, cond);
-
-  if (is.string(query.roomId) === true) {
-    query.roomId = uuidFromString(query.roomId);
-  }
-
-  if (is.string(query.id) === true) {
-    query.id = datatypes.Long.fromString(query.id);
-  } else if (is.object(query.id) === true) {
-    query.id = mapValues(query.id, value => datatypes.Long.fromString(value));
-  }
-
-  if (Object.keys(sort).length) {
-    query.$orderby = sort;
-  }
-
-  if (limit) {
-    query.$limit = limit;
-  }
-
-  return query;
-}
+const { datatypes } = require('express-cassandra');
 
 class MessageService
 {
-  constructor(cassandraClient, flakeless) {
-    if (is.object(cassandraClient.modelInstance) === false) {
-      throw new Errors.Argument('cassandraClient');
-    }
+  static castOptions = {
+    id: 'Long',
+    roomId: 'Uuid',
+  };
 
-    if (is.fn(cassandraClient.modelInstance.message) === false) {
-      throw new Errors.Argument('cassandraClient', 'Model \'message\' not found');
-    }
+  static modelName = 'message';
 
-    this.cassandraClient = cassandraClient;
-    this.flakeless = flakeless;
-    this.model = Promise.promisifyAll(cassandraClient.modelInstance.message);
-  }
-
-  /**
-   * @param properties
-   * @returns {*}
-   */
-  create(properties) {
-    const MessageModel = this.model;
-    const messageParams = Object.assign({}, properties, {
-      id: datatypes.Long.fromString(this.flakeless.next()),
-      createdAt: Date.now(),
-      properties: {},
-      attachments: {},
-    });
-    const message = new MessageModel(messageParams);
-
-    return message
-      .saveAsync()
-      .return(message);
+  defaultData() {
+    return {
+      attachments: () => ({}),
+      createdAt: () => new Date().toISOString(),
+      id: () => datatypes.Long.fromString(this.flakeless.next()),
+      properties: () => ({}),
+    };
   }
 
   getById(id, roomId) {
-    const query = makeCond({ id, roomId });
+    const query = this.makeCond({ id, roomId });
 
     return this.model
       .findOneAsync(query)
@@ -76,12 +31,6 @@ class MessageService
       });
   }
 
-  find(cond = {}, sort = {}, limit = 20) {
-    const query = makeCond(cond, sort, limit);
-
-    return this.model.findAsync(query);
-  }
-
   history(roomId, before, limit = 20) {
     const query = { roomId };
 
@@ -90,6 +39,20 @@ class MessageService
     }
 
     return this.find(query, { $desc: 'id' }, limit);
+  }
+
+  afterDelete(cond) {
+    const { pin: pinService } = this.services;
+    const { id, roomId } = cond;
+    const query = { roomId };
+
+    if (cond.id) {
+      query.messageId = id;
+    }
+
+    return pinService
+      .find(query)
+      .each(pin => pin.deleteAsync());
   }
 }
 

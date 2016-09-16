@@ -1,20 +1,21 @@
 const { datatypes } = require('express-cassandra');
 const Errors = require('common-errors');
+const Flakeless = require('ms-flakeless');
 const is = require('is');
 const mapValues = require('lodash/mapValues');
 const Promise = require('bluebird');
 
+function defaultDataMapper(value) {
+  if (is.fn(value) === true) {
+    return value();
+  }
+
+  return value;
+}
+
 module.exports = superclass => class Mixin extends superclass {
-  constructor(cassandraClient) {
+  constructor(config, cassandraClient, socketIO, services) {
     super();
-
-    if (is.object(cassandraClient.modelInstance) === false) {
-      throw new Errors.Argument('cassandraClient');
-    }
-
-    if (is.fn(cassandraClient.modelInstance.pin) === false) {
-      throw new Errors.Argument('cassandraClient', 'Model \'pin\' not found');
-    }
 
     if (superclass.modelName === undefined) {
       throw new Errors.Argument('this.model');
@@ -26,28 +27,35 @@ module.exports = superclass => class Mixin extends superclass {
       throw new Errors.Argument('cassandraClient', `Model "${superclass.modelName}" not found`);
     }
 
+    if (config && config.flakeless) {
+      this.flakeless = new Flakeless(config.flakeless);
+    }
+
+    this.config = config;
     this.model = Promise.promisifyAll(model);
+    this.services = services;
+    this.socketIO = socketIO;
+  }
+
+  getDefaultData() {
+    const defaultData = superclass.defaultData || this.defaultData();
+
+    if (is.object(defaultData) === true) {
+      return mapValues(defaultData, defaultDataMapper);
+    }
+
+    return {};
   }
 
   create(properties) {
     const Model = this.model;
-    const defaultData = Mixin.getDefaultData();
+    const defaultData = this.getDefaultData();
 
     return Promise
       .resolve(defaultData)
       .then(data => Object.assign(data, properties))
       .then(data => new Model(data))
       .tap(model => model.saveAsync());
-  }
-
-  static getDefaultData() {
-    const defaultData = superclass.defaultData;
-
-    if (is.object(defaultData) === true) {
-      return mapValues(defaultData, value => (is.fn(value) === true ? value() : value));
-    }
-
-    return Promise.resolve({});
   }
 
   find(cond = {}, sort = {}, limit = 20) {
@@ -62,10 +70,24 @@ module.exports = superclass => class Mixin extends superclass {
     return this.model.findOneAsync(query);
   }
 
+  update(cond = {}, update = {}, options = {}) {
+    const query = this.makeCond(cond);
+
+    return this.model.updateAsync(query, update, options);
+  }
+
   delete(cond = {}) {
     const query = this.makeCond(cond);
 
-    return this.model.deleteAsync(query);
+    return this.model
+      .deleteAsync(query)
+      .tap(() => {
+        if (super.afterDelete) {
+          return super.afterDelete(cond);
+        }
+
+        return null;
+      });
   }
 
   cast(value, type) {

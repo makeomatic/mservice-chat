@@ -2,7 +2,7 @@ const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
 const fetchBan = require('../fetchers/ban');
 const fetchRoom = require('../fetchers/room');
-const makeModelResponse = require('../services/response/model');
+const { modelResponse, TYPE_BAN } = require('../utils/response');
 
 /**
  * @api {http} <prefix>.users.unban Unban an user
@@ -25,7 +25,7 @@ function usersUnbanAction(request) {
   const { ban, params } = request;
 
   return ban.deleteAsync()
-    .then(() => makeModelResponse(ban))
+    .then(() => modelResponse(ban, TYPE_BAN))
     .tap(response => socketIO.in(params.roomId).emit(`users.unban.${params.roomId}`, response));
 }
 

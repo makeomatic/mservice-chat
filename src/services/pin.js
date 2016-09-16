@@ -1,5 +1,4 @@
-const CassandraMixin = require('./mixins/model/cassandra');
-const { mix } = require('mixwith');
+const { modelResponse, TYPE_PIN, TYPE_USER } = require('../utils/response');
 
 class PinService
 {
@@ -9,7 +8,7 @@ class PinService
   };
 
   static defaultData = {
-    pinnedAt: () => Date.now(),
+    pinnedAt: () => new Date().toISOString(),
   };
 
   static modelName = 'pin';
@@ -27,19 +26,37 @@ class PinService
       .then(() => this.create(params));
   }
 
-  unpin(roomId, user) {
+  pinAndBroadcast(roomId, message, user) {
+    const id = roomId.toString();
+
+    return this
+      .pin(roomId, message, user)
+      .then(pin => modelResponse(pin, TYPE_PIN))
+      .tap(response => this.socketIO.in(id).emit(`messages.pin.${id}`, response));
+  }
+
+  unpin(roomId, unpinnedBy) {
     return this
       .last(roomId)
       .then((pin) => {
         if (pin !== null) {
           pin.unpinnedAt = Date.now();
-          pin.unpinnedBy = user;
+          pin.unpinnedBy = unpinnedBy;
 
           return pin.saveAsync();
         }
 
         return pin;
       });
+  }
+
+  unpinAndBroadcast(roomId, admin) {
+    const id = roomId.toString();
+
+    return this
+      .unpin(roomId, admin)
+      .then(() => modelResponse(admin, TYPE_USER))
+      .tap(response => this.socketIO.in(id).emit(`messages.unpin.${id}`, response));
   }
 
   last(roomId) {
@@ -55,4 +72,4 @@ class PinService
   }
 }
 
-module.exports = mix(PinService).with(CassandraMixin);
+module.exports = PinService;

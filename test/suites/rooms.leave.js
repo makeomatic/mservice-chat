@@ -1,4 +1,4 @@
-const { expect } = require('chai');
+const assert = require('assert');
 const Chat = require('../../src');
 const socketIOClient = require('socket.io-client');
 
@@ -13,7 +13,10 @@ describe('rooms.leave', function testSuite() {
 
     return chat.services.room
       .create(params)
-      .then(room => (this.room = room));
+      .then((room) => {
+        this.room = room;
+        this.roomId = room.id.toString();
+      });
   });
 
   it('should return validation error if invalid room id', (done) => {
@@ -21,9 +24,10 @@ describe('rooms.leave', function testSuite() {
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, { id: '1' }, (error) => {
-        expect(error.name).to.be.equals('ValidationError');
-        expect(error.message).to.be
-          .equals('rooms.leave validation failed: data.id should match format "uuid"');
+        assert.equal(error.name, 'ValidationError');
+        assert.equal(error.message, 'rooms.leave validation failed:' +
+          ' data.id should match format "uuid"');
+
         client.disconnect();
         done();
       });
@@ -35,9 +39,10 @@ describe('rooms.leave', function testSuite() {
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, { id: '00000000-0000-0000-0000-000000000000' }, (error) => {
-        expect(error.name).to.be.equals('NotFoundError');
-        expect(error.message).to.be.equals('Not Found:' +
+        assert.equal(error.name, 'NotFoundError');
+        assert.equal(error.message, 'Not Found:' +
           ' "Room #00000000-0000-0000-0000-000000000000 not found"');
+
         client.disconnect();
         done();
       });
@@ -48,10 +53,11 @@ describe('rooms.leave', function testSuite() {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, { id: this.room.id.toString() }, (error) => {
-        expect(error.name).to.be.equals('NotPermittedError');
-        expect(error.message).to.be.equals('An attempt was made to perform an operation that is '
+      client.emit(action, { id: this.roomId }, (error) => {
+        assert.equal(error.name, 'NotPermittedError');
+        assert.equal(error.message, 'An attempt was made to perform an operation that is '
           + 'not permitted: Not in the room');
+
         client.disconnect();
         done();
       });
@@ -62,11 +68,14 @@ describe('rooms.leave', function testSuite() {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit('chat.rooms.join', { id: this.room.id.toString() }, (joinError) => {
-        expect(joinError).to.be.equals(null);
-        client.emit(action, { id: this.room.id.toString() }, (error, response) => {
-          expect(error).to.be.equals(null);
-          expect(response).to.have.property('user').that.is.an('object');
+      client.emit('chat.rooms.join', { id: this.roomId }, (joinError) => {
+        assert.equal(joinError, null);
+
+        client.emit(action, { id: this.roomId }, (error, response) => {
+          const { status } = response.meta;
+
+          assert.equal(status, 'success');
+
           client.disconnect();
           done();
         });
@@ -77,23 +86,22 @@ describe('rooms.leave', function testSuite() {
   it('should emit when leave room', (done) => {
     const client1 = socketIOClient('http://0.0.0.0:3000');
     const client2 = socketIOClient('http://0.0.0.0:3000');
-    const roomId = this.room.id.toString();
 
-    client1.on(`rooms.leave.${roomId}`, (response) => {
-      expect(response).to.have.property('user').that.is.an('object');
+    client1.on(`rooms.leave.${this.roomId}`, (response) => {
+      const { type, attributes } = response.data;
+
+      assert.equal(type, 'user');
+      assert.deepEqual(attributes.roles, []);
+
       client1.disconnect();
       client2.disconnect();
       done();
     });
 
     client1.on('connect', () => {
-      client1.emit('chat.rooms.join', { id: roomId }, (firstJoinError) => {
-        expect(firstJoinError).to.be.equals(null);
-        client2.emit('chat.rooms.join', { id: roomId }, (secondJoinError) => {
-          expect(secondJoinError).to.be.equals(null);
-          client2.emit(action, { id: roomId }, (error) => {
-            expect(error).to.be.equals(null);
-          });
+      client1.emit('chat.rooms.join', { id: this.roomId }, () => {
+        client2.emit('chat.rooms.join', { id: this.roomId }, () => {
+          client2.emit(action, { id: this.roomId });
         });
       });
     });

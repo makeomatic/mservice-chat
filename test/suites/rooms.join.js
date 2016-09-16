@@ -21,7 +21,17 @@ describe('rooms.join', function testSuite() {
   before('create messages', () => {
     const messages = ['foo', 'bar'];
 
-    return create(chat.services.message, messages, { roomId: this.room.id });
+    return create(chat.services.message, messages, { roomId: this.room.id })
+      .spread((message) => {
+        this.message = message;
+        this.messageId = message.id.toString();
+      });
+  });
+
+  before('create pin', () => {
+    const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
+
+    return chat.services.pin.pin(this.room.id, this.message, admin);
   });
 
   it('should return validation error if invalid room id', (done) => {
@@ -71,6 +81,7 @@ describe('rooms.join', function testSuite() {
 
   it('should join a room', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
+
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, { id: this.room.id.toString() }, (error, response) => {
@@ -78,8 +89,10 @@ describe('rooms.join', function testSuite() {
 
         assert.equal(error, null);
         assert.equal(meta.count, 2);
-        assert.equal(data[0].text, 'bar');
-        assert.equal(data[1].text, 'foo');
+        assert.equal(data[0].type, 'pin');
+        assert.equal(data[0].attributes.messageId, this.messageId);
+        assert.equal(data[1].attributes.text, 'bar');
+        assert.equal(data[2].attributes.text, 'foo');
 
         client.disconnect();
         done();
@@ -93,7 +106,9 @@ describe('rooms.join', function testSuite() {
     const roomId = this.room.id.toString();
 
     client1.on(`rooms.join.${roomId}`, (response) => {
-      expect(response).to.have.property('user').that.is.an('object');
+      assert.equal(response.data.type, 'user');
+      assert.ok(response.data.attributes.name);
+
       client1.disconnect();
       client2.disconnect();
       done();

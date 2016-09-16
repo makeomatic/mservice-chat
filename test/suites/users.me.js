@@ -1,5 +1,5 @@
+const assert = require('assert');
 const Chat = require('../../src');
-const { expect } = require('chai');
 const socketIOClient = require('socket.io-client');
 
 const action = 'chat.users.me';
@@ -12,10 +12,14 @@ describe('users.me', function testSuite() {
     const client = socketIOClient('http://0.0.0.0:3000');
     client.on('error', done);
     client.on('connect', () => {
-      client.emit(action, {}, (error, user) => {
-        expect(error).to.be.equals(null);
-        expect(user.name.startsWith('Guest')).to.be.equal(true);
-        expect(user.roles).to.be.deep.equal([]);
+      client.emit(action, {}, (error, response) => {
+        const { type, attributes } = response.data;
+
+        assert.equal(error, null);
+        assert.equal(type, 'user');
+        assert.equal(attributes.name.startsWith('Guest'), true);
+        assert.deepEqual(attributes.roles, []);
+
         client.disconnect();
         done();
       });
@@ -25,8 +29,9 @@ describe('users.me', function testSuite() {
   it('should return invalid token error', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000', { query: 'token=invalidToken' });
     client.on('error', (error) => {
-      expect(error).to.be.equals('An attempt was made to perform an operation' +
+      assert.equal(error, 'An attempt was made to perform an operation' +
         ' without authentication: Auth failed');
+
       client.disconnect();
       done();
     });
@@ -42,11 +47,15 @@ describe('users.me', function testSuite() {
       const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${reply.jwt}` });
       client.on('error', done);
       client.on('connect', () => {
-        client.emit(action, {}, (error, user) => {
-          expect(error).to.be.equals(null);
-          expect(user.id).to.be.equal('root@foo.com');
-          expect(user.name).to.be.equal('Root Admin');
-          expect(user.roles).to.be.deep.equal(['admin', 'root']);
+        client.emit(action, {}, (error, response) => {
+          const { id, type, attributes } = response.data;
+
+          assert.equal(error, null);
+          assert.equal(type, 'user');
+          assert.equal(id, 'root@foo.com');
+          assert.equal(attributes.name, 'Root Admin');
+          assert.deepEqual(attributes.roles, ['admin', 'root']);
+
           client.disconnect();
           done();
         });
