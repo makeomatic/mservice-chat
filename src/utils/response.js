@@ -8,19 +8,16 @@ const TYPE_ROOM = 'room';
 const TYPE_USER = 'user';
 
 function transform(object, type) {
-  const response = { type };
+  const attributes = omit(is.fn(object.toJSON) ? object.toJSON() : object, 'id');
+  const id = type === TYPE_PIN
+    ? `${attributes.roomId}.${attributes.pinnedAt}`
+    : object.id;
 
-  if (type === TYPE_PIN) {
-    if (is.date(object.pinnedAt)) {
-      object.pinnedAt = object.pinnedAt.toISOString();
-    }
-
-    response.id = `${object.roomId}.${object.pinnedAt}`;
-  } else if (object.id) {
-    response.id = object.id;
-  }
-
-  response.attributes = omit(is.fn(object.toJSON) ? object.toJSON() : object, 'id');
+  const response = {
+    id,
+    type,
+    attributes,
+  };
 
   return response;
 }
