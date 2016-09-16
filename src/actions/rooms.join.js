@@ -42,7 +42,7 @@ function RoomsJoinAction(request) {
     )
     .then(() => Promise.join(
       this.services.message.history(id),
-      this.services.pin.last(id),
+      this.services.pin.last(id)
     ))
     .spread((messages, pin) => {
       const response = collectionResponse(messages, TYPE_MESSAGE, before);
