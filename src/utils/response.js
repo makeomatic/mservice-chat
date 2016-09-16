@@ -26,7 +26,7 @@ function collectionResponse(objects, type, before) {
 
   const response = {
     meta: {
-      count: objects,
+      count: length,
     },
     data: objects.map(object => transform(object, type)),
   };
