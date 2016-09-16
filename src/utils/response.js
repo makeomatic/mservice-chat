@@ -11,8 +11,10 @@ function transform(object, type) {
     type,
     attributes: omit(object.toJSON ? object.toJSON() : object, 'id'),
   };
-
-  if (object.id) {
+  
+  if (type === TYPE_PIN) {
+    response.id = `${object.roomId}.${object.pinnedAt}`;
+  } else if (object.id) {
     response.id = object.id;
   }
 

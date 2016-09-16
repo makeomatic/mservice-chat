@@ -48,7 +48,7 @@ function RoomsJoinAction(request) {
       const response = collectionResponse(messages, TYPE_MESSAGE, before);
 
       if (pin) {
-        response.data.unshift(transform(pin, TYPE_PIN));
+        response.data.push(transform(pin, TYPE_PIN));
       }
 
       return response;
