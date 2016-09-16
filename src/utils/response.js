@@ -32,7 +32,7 @@ function collectionResponse(objects, type, before) {
   };
 
   if (length) {
-    response.meta.last = objects[length - 1].id;
+    response.meta.last = objects[0].id;
   }
 
   if (before) {
