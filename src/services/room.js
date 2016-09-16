@@ -1,5 +1,3 @@
-const CassandraMixin = require('./mixins/model/cassandra');
-const { mix } = require('mixwith');
 const Errors = require('common-errors');
 const { uuid } = require('express-cassandra');
 
@@ -10,7 +8,7 @@ class RoomService
   };
 
   static defaultData = {
-    banned: [],
+    banned: () => [],
     id: () => uuid(),
     createdAt: () => new Date().toISOString(),
   };
@@ -41,4 +39,4 @@ class RoomService
   }
 }
 
-module.exports = mix(RoomService).with(CassandraMixin);
+module.exports = RoomService;

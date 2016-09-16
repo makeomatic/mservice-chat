@@ -1,5 +1,3 @@
-const CassandraMixin = require('./mixins/model/cassandra');
-const { mix } = require('mixwith');
 const { modelResponse, TYPE_PIN, TYPE_USER } = require('../utils/response');
 
 class PinService
@@ -74,4 +72,4 @@ class PinService
   }
 }
 
-module.exports = mix(PinService).with(CassandraMixin);
+module.exports = PinService;

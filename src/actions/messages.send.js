@@ -43,7 +43,7 @@ function messageSendAction(request) {
         return pinService.pinAndBroadcast(room.id, createdMessage, user);
       }
 
-      return Promise.resolve();
+      return null;
     })
     .then(createdMessage => modelResponse(createdMessage, TYPE_MESSAGE))
     .tap(response => socket.broadcast.to(roomId).emit(`messages.send.${roomId}`, response));

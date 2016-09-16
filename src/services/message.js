@@ -1,13 +1,5 @@
-const CassandraMixin = require('./mixins/model/cassandra');
 const Errors = require('common-errors');
-const Flakeless = require('ms-flakeless');
-const { mix } = require('mixwith');
 const { datatypes } = require('express-cassandra');
-
-const flakeless = new Flakeless({
-  epochStart: Date.now(),
-  outputType: 'base10',
-});
 
 class MessageService
 {
@@ -16,14 +8,16 @@ class MessageService
     roomId: 'Uuid',
   };
 
-  static defaultData = {
-    attachments: {},
-    createdAt: () => new Date().toISOString(),
-    id: () => datatypes.Long.fromString(flakeless.next()),
-    properties: {},
-  };
-
   static modelName = 'message';
+
+  defaultData() {
+    return {
+      attachments: () => ({}),
+      createdAt: () => new Date().toISOString(),
+      id: () => datatypes.Long.fromString(this.flakeless.next()),
+      properties: () => ({}),
+    };
+  }
 
   getById(id, roomId) {
     const query = this.makeCond({ id, roomId });
@@ -62,4 +56,4 @@ class MessageService
   }
 }
 
-module.exports = mix(MessageService).with(CassandraMixin);
+module.exports = MessageService;

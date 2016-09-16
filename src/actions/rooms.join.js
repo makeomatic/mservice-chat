@@ -40,14 +40,10 @@ function RoomsJoinAction(request) {
         .to(id)
         .emit(`rooms.join.${id}`, modelResponse(user, TYPE_USER))
     )
-    .then(() => {
-      const promises = [
-        this.services.message.history(id),
-        this.services.pin.last(id),
-      ];
-
-      return Promise.all(promises);
-    })
+    .then(() => Promise.join(
+      this.services.message.history(id),
+      this.services.pin.last(id),
+    ))
     .spread((messages, pin) => {
       const response = collectionResponse(messages, TYPE_MESSAGE, before);
 

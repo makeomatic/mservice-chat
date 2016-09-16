@@ -1,6 +1,3 @@
-const CassandraMixin = require('./mixins/model/cassandra');
-const { mix } = require('mixwith');
-
 class BanService
 {
   static castOptions = {
@@ -30,4 +27,4 @@ class BanService
   }
 }
 
-module.exports = mix(BanService).with(CassandraMixin);
+module.exports = BanService;

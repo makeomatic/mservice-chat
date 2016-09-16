@@ -1,21 +1,20 @@
 const { datatypes } = require('express-cassandra');
 const Errors = require('common-errors');
+const Flakeless = require('ms-flakeless');
 const is = require('is');
 const mapValues = require('lodash/mapValues');
 const Promise = require('bluebird');
 
-module.exports = superclass => class Mixin extends superclass {
-  static getDefaultData() {
-    const defaultData = superclass.defaultData;
-
-    if (is.object(defaultData) === true) {
-      return mapValues(defaultData, value => (is.fn(value) === true ? value() : value));
-    }
-
-    return Promise.resolve({});
+function defaultDataMapper(value) {
+  if (is.fn(value) === true) {
+    return value();
   }
 
-  constructor(cassandraClient, socketIO, services) {
+  return value;
+}
+
+module.exports = superclass => class Mixin extends superclass {
+  constructor(config, cassandraClient, socketIO, services) {
     super();
 
     if (superclass.modelName === undefined) {
@@ -28,14 +27,29 @@ module.exports = superclass => class Mixin extends superclass {
       throw new Errors.Argument('cassandraClient', `Model "${superclass.modelName}" not found`);
     }
 
+    if (config && config.flakeless) {
+      this.flakeless = new Flakeless(config.flakeless);
+    }
+
+    this.config = config;
     this.model = Promise.promisifyAll(model);
     this.services = services;
     this.socketIO = socketIO;
   }
 
+  getDefaultData() {
+    const defaultData = superclass.defaultData || this.defaultData();
+
+    if (is.object(defaultData) === true) {
+      return mapValues(defaultData, defaultDataMapper);
+    }
+
+    return {};
+  }
+
   create(properties) {
     const Model = this.model;
-    const defaultData = Mixin.getDefaultData();
+    const defaultData = this.getDefaultData();
 
     return Promise
       .resolve(defaultData)
@@ -72,7 +86,7 @@ module.exports = superclass => class Mixin extends superclass {
           return super.afterDelete(cond);
         }
 
-        return Promise.resolve();
+        return null;
       });
   }
 
