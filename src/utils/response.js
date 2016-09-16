@@ -13,7 +13,7 @@ function transform(object, type) {
   };
 
   if (type === TYPE_PIN) {
-    response.id = `${object.roomId}.${object.pinnedAt}`;
+    response.id = `${object.roomId}.${object.pinnedAt.getTime()}`;
   } else if (object.id) {
     response.id = object.id;
   }
@@ -22,15 +22,17 @@ function transform(object, type) {
 }
 
 function collectionResponse(objects, type, before) {
+  const length = objects.length;
+
   const response = {
     meta: {
-      count: objects.length,
+      count: objects,
     },
     data: objects.map(object => transform(object, type)),
   };
 
-  if (objects.length) {
-    response.meta.last = objects[0].id;
+  if (length) {
+    response.meta.last = objects[length - 1].id;
   }
 
   if (before) {
