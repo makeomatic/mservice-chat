@@ -1,4 +1,5 @@
 const omit = require('lodash/omit');
+const is = require('is');
 
 const TYPE_BAN = 'ban';
 const TYPE_MESSAGE = 'message';
@@ -7,29 +8,34 @@ const TYPE_ROOM = 'room';
 const TYPE_USER = 'user';
 
 function transform(object, type) {
-  const response = {
-    type,
-    attributes: omit(object.toJSON ? object.toJSON() : object, 'id'),
-  };
+  const response = { type };
 
   if (type === TYPE_PIN) {
+    if (is.date(object.pinnedAt)) {
+      object.pinnedAt = object.pinnedAt.toISOString();
+    }
+
     response.id = `${object.roomId}.${object.pinnedAt}`;
   } else if (object.id) {
     response.id = object.id;
   }
 
+  response.attributes = omit(is.fn(object.toJSON) ? object.toJSON() : object, 'id');
+
   return response;
 }
 
 function collectionResponse(objects, type, before) {
+  const length = objects.length;
+
   const response = {
     meta: {
-      count: objects.length,
+      count: length,
     },
     data: objects.map(object => transform(object, type)),
   };
 
-  if (objects.length) {
+  if (length) {
     response.meta.last = objects[0].id;
   }
 
