@@ -121,6 +121,8 @@ describe('messages.pin', function suite() {
         const data = body.data.attributes;
 
         assert.equal(statusCode, 200);
+        assert.equal(body.data.type, 'pin');
+        assert.equal(body.data.id.startsWith(this.roomId), true);
         assert.equal(data.messageId, this.messageId);
         assert.equal(data.message.id, this.messageId);
         assert.equal(data.message.text, 'foo');

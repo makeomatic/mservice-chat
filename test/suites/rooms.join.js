@@ -89,10 +89,10 @@ describe('rooms.join', function testSuite() {
 
         assert.equal(error, null);
         assert.equal(meta.count, 2);
-        assert.equal(data[0].type, 'pin');
-        assert.equal(data[0].attributes.messageId, this.messageId);
-        assert.equal(data[1].attributes.text, 'bar');
-        assert.equal(data[2].attributes.text, 'foo');
+        assert.equal(data[0].attributes.text, 'bar');
+        assert.equal(data[1].attributes.text, 'foo');
+        assert.equal(data[2].type, 'pin');
+        assert.equal(data[2].attributes.messageId, this.messageId);
 
         client.disconnect();
         done();
