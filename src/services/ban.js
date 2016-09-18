@@ -5,7 +5,7 @@ class BanService
   };
 
   static defaultData = {
-    bannedAt: () => new Date().toISOString(),
+    bannedAt: () => new Date(),
   };
 
   static modelName = 'ban';
