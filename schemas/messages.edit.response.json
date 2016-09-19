@@ -1,4 +1,4 @@
 {
-  "id": "messages.unpin.response",
+  "id": "messages.edit.response",
   "$ref": "common.json#/definitions/successResponse"
 }

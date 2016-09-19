@@ -1,0 +1,22 @@
+{
+  "id": "messages.edit",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["id", "roomId", "text", "token"],
+  "properties": {
+    "id": {
+      "$ref": "common.json#/definitions/messageId"
+    },
+    "roomId": {
+      "$ref": "common.json#/definitions/roomId"
+    },
+    "text": {
+      "type": "string",
+      "description": "Message text",
+      "maxLength": 1024
+    },
+    "token": {
+      "$ref": "common.json#/definitions/token"
+    }
+  }
+}

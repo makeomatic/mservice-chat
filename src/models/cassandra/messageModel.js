@@ -30,12 +30,10 @@ module.exports = {
     properties: {
       type: 'map',
       typeDef: '<varchar, varchar>',
-      rule: required,
     },
     attachments: {
       type: 'map',
       typeDef: '<varchar, varchar>',
-      rule: required,
     },
   },
   key: [['roomId'], 'id'],

@@ -54,6 +54,16 @@ class MessageService
       .find(query)
       .each(pin => pin.deleteAsync());
   }
+
+  edit(message, text) {
+    const { id, roomId } = message;
+
+    message.text = text;
+
+    return this
+      .update({ id, roomId }, { text })
+      .return(message);
+  }
 }
 
 module.exports = MessageService;
