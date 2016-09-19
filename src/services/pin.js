@@ -8,7 +8,7 @@ class PinService
   };
 
   static defaultData = {
-    pinnedAt: () => new Date().toISOString(),
+    pinnedAt: () => new Date(),
   };
 
   static modelName = 'pin';
@@ -69,6 +69,16 @@ class PinService
 
         return pin;
       });
+  }
+
+  history(roomId, before, limit = 20) {
+    const query = { roomId };
+
+    if (before) {
+      query.pinnedAt = { $lt: before };
+    }
+
+    return this.find(query, { $desc: 'pinnedAt' }, limit);
   }
 }
 
