@@ -1,5 +1,7 @@
 const assert = require('assert');
 const Chat = require('../../src');
+const { connect, emit } = require('../helpers/socketIO');
+const { login } = require('../helpers/users');
 const socketIOClient = require('socket.io-client');
 
 const action = 'chat.rooms.leave';
@@ -7,6 +9,11 @@ const chat = new Chat(global.SERVICES);
 
 describe('rooms.leave', function testSuite() {
   before('start up chat', () => chat.connect());
+
+  before('login user', () =>
+    login(chat.amqp, 'user@foo.com', 'userpassword000000')
+      .tap(({ jwt }) => (this.userToken = jwt))
+  );
 
   before('create room', () => {
     const params = { name: 'test', createdBy: 'admin@foo.com' };
@@ -107,6 +114,20 @@ describe('rooms.leave', function testSuite() {
     });
   });
 
+  it('should be able to remove a participant', () => {
+    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
+
+    return connect(client)
+      .then(() => emit(client, 'chat.rooms.join', { id: this.roomId }))
+      .then(() => emit(client, action, { id: this.roomId }))
+      .then(() => chat.services.participant.findOne({ roomId: this.roomId, id: 'user@foo.com' }))
+      .then((participant) => {
+        assert.equal(participant, null);
+      })
+      .tap(() => client.disconnect());
+  });
+
   after('delete room', () => this.room.deleteAsync());
+
   after('shutdown chat', () => chat.close());
 });

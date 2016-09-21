@@ -15,7 +15,7 @@ function messagePinsHistoryAction(request) {
   const { roomId, before, limit } = request.params;
   return this.services.pin
     .history(roomId, before, limit)
-    .then(pins => collectionResponse(pins, TYPE_PIN, before));
+    .then(pins => collectionResponse(pins, TYPE_PIN, { before }));
 }
 
 function allowed(request) {

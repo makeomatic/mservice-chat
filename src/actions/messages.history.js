@@ -12,7 +12,7 @@ function messageHistoryAction(request) {
   const { roomId, before, limit } = request.params;
   return this.services.message
     .history(roomId, before, limit)
-    .then(messages => collectionResponse(messages, TYPE_MESSAGE, before));
+    .then(messages => collectionResponse(messages, TYPE_MESSAGE, { before }));
 }
 
 messageHistoryAction.schema = 'messages.history';
