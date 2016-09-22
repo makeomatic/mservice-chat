@@ -33,14 +33,14 @@ describe('users.unban', function suite() {
   });
 
   before('create room ban', () => {
-    const bannedUser = { id: 'user@foo.com', name: 'User User', roles: ['user'] };
+    const bannedUser = { id: 'user@foo.com', name: 'User User', roles: [] };
     const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
 
     return chat.services.ban.add(this.room.id, bannedUser, admin, 'foo');
   });
 
   before('create room second ban', () => {
-    const bannedUser = { id: 'second.user@foo.com', name: 'SecondUser User', roles: ['user'] };
+    const bannedUser = { id: 'second.user@foo.com', name: 'SecondUser User', roles: [] };
     const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
 
     return chat.services.ban.add(this.room.id, bannedUser, admin, 'foo');
@@ -151,7 +151,7 @@ describe('users.unban', function suite() {
         assert.deepEqual(attributes.user, {
           id: 'user@foo.com',
           name: 'User User',
-          roles: ['user'],
+          roles: null,
         });
         assert.equal(isISODate(attributes.bannedAt), true);
         assert.deepEqual(attributes.bannedBy, {
@@ -202,7 +202,7 @@ describe('users.unban', function suite() {
           assert.deepEqual(attributes.user, {
             id: 'second.user@foo.com',
             name: 'SecondUser User',
-            roles: ['user'],
+            roles: null,
           });
           assert.equal(isISODate(attributes.bannedAt), true);
           assert.deepEqual(attributes.bannedBy, {
@@ -220,6 +220,16 @@ describe('users.unban', function suite() {
       });
     });
   });
+
+  // depends on previous test
+  it('should be able to mark participant as banned', () =>
+    chat.services.participant
+      .findOne({ roomId: this.roomId, id: 'second.user@foo.com' })
+      .then((participant) => {
+        assert.equal(participant.id, 'second.user@foo.com');
+        assert.equal(participant.banned, false);
+      })
+  );
 
   after('shutdown chat', () => chat.close());
 

@@ -23,10 +23,12 @@ const { modelResponse, TYPE_BAN } = require('../utils/response');
 function usersUnbanAction(request) {
   const { socketIO } = this;
   const { ban, params } = request;
+  const { roomId, id } = params;
 
   return ban.deleteAsync()
+    .tap(() => this.services.participant.markAsBanned(roomId, id, false))
     .then(() => modelResponse(ban, TYPE_BAN))
-    .tap(response => socketIO.in(params.roomId).emit(`users.unban.${params.roomId}`, response));
+    .tap(response => socketIO.in(roomId).emit(`users.unban.${roomId}`, response));
 }
 
 function allowed(request) {

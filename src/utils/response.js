@@ -1,39 +1,42 @@
 const omit = require('lodash/omit');
-const is = require('is');
 
 const TYPE_BAN = 'ban';
 const TYPE_MESSAGE = 'message';
 const TYPE_PIN = 'pin';
 const TYPE_ROOM = 'room';
 const TYPE_USER = 'user';
+const TYPE_PARTICIPANT = 'participant';
 
 function transform(object, type) {
-  const attributes = omit(is.fn(object.toJSON) ? object.toJSON() : object, 'id');
-  const id = type === TYPE_PIN
-    ? `${attributes.roomId}.${attributes.pinnedAt}`
-    : object.id;
-
   const response = {
-    id,
     type,
-    attributes,
+    attributes: omit(object.toJSON ? object.toJSON() : object, 'id'),
   };
+
+  if (type === TYPE_PIN) {
+    response.id = `${object.roomId}.${object.pinnedAt.toISOString()}`;
+  } else if (object.id) {
+    response.id = object.id;
+  }
 
   return response;
 }
 
-function collectionResponse(objects, type, before) {
-  const length = objects.length;
-
+function collectionResponse(objects, type, options = {}) {
+  const { before } = options;
+  const count = objects.length;
+  const cursor = options.cursor || 'id';
+  const direction = options.direction || 'desc';
   const response = {
     meta: {
-      count: length,
+      count,
     },
     data: objects.map(object => transform(object, type)),
   };
 
-  if (length) {
-    response.meta.last = objects[0].id;
+  if (count) {
+    const lastItem = direction === 'desc' ? 0 : count - 1;
+    response.meta.last = objects[lastItem][cursor];
   }
 
   if (before) {
@@ -65,4 +68,5 @@ module.exports = {
   TYPE_PIN,
   TYPE_ROOM,
   TYPE_USER,
+  TYPE_PARTICIPANT,
 };

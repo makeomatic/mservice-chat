@@ -13,7 +13,7 @@ class MessageService
   defaultData() {
     return {
       attachments: () => ({}),
-      createdAt: () => new Date().toISOString(),
+      createdAt: () => new Date(),
       id: () => datatypes.Long.fromString(this.flakeless.next()),
       properties: () => ({}),
     };

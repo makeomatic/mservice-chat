@@ -1,3 +1,4 @@
+const assert = require('assert');
 const { expect } = require('chai');
 const request = require('./../helpers/request');
 const Chat = require('../../src');
@@ -28,7 +29,7 @@ describe('rooms.list', function testSuite() {
     request(uri)
       .then((response) => {
         expect(response.statusCode).to.be.equals(200);
-        expect(response.body.data.length).to.be.equals(2);
+        assert.equal(response.body.data.length > 1, true);
         done();
       });
   });

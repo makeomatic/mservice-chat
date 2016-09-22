@@ -1,5 +1,5 @@
 {
-  "id": "messages.history",
+  "id": "rooms.participants",
   "additionalProperties": false,
   "type": "object",
   "required": ["roomId"],
@@ -8,7 +8,7 @@
       "$ref": "common.json#/definitions/roomId"
     },
     "before": {
-      "$ref": "common.json#/definitions/messageId"
+      "$ref": "common.json#/definitions/ISODate"
     },
     "limit": {
       "$ref": "common.json#/definitions/limit"

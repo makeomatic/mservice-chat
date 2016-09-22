@@ -51,7 +51,7 @@ describe('messages.delete', function testSuite() {
       metadata: {
         firstName: 'Simple',
         lastName: 'User',
-        roles: ['user'],
+        roles: [],
       },
     };
 

@@ -24,7 +24,7 @@
               "$ref": "#/definitions/user"
             },
             "bannedAt": {
-              "$ref": "#/definitions/isoDate"
+              "$ref": "#/definitions/ISODate"
             },
             "bannedBy": {
               "$ref": "#/definitions/user"
@@ -74,7 +74,7 @@
               "$ref": "#/definitions/user"
             },
             "createdAt": {
-              "$ref": "#/definitions/isoDate"
+              "$ref": "#/definitions/ISODate"
             }
           }
         }
@@ -132,10 +132,10 @@
               "$ref": "#/definitions/message"
             },
             "pinnedAt": {
-              "$ref": "#/definitions/isoDate"
+              "$ref": "#/definitions/ISODate"
             },
             "unpinnedAt": {
-              "$ref": "#/definitions/isoDate"
+              "$ref": "#/definitions/ISODate"
             },
             "pinnedBy": {
               "$ref": "#/definitions/user"
@@ -143,6 +143,24 @@
             "unpinnedBy": {
               "$ref": "#/definitions/user"
             }
+          }
+        }
+      }
+    },
+    "pinsCollection": {
+      "additionalProperties": false,
+      "description": "Pins response",
+      "type": "object",
+      "required": ["meta", "data"],
+      "properties": {
+        "meta": {
+          "$ref": "#/definitions/collectionMeta"
+        },
+        "data": {
+          "description": "Collection of pins",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/pin"
           }
         }
       }
@@ -155,6 +173,65 @@
       "properties": {
         "data": {
           "$ref": "#/definitions/pin"
+        }
+      }
+    },
+    "participant": {
+      "description": "`participant` object",
+      "type": "object",
+      "required": ["id", "type", "attributes"],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/userId"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["participant"]
+        },
+        "attributes": {
+          "additionalProperties": false,
+          "description": "Participant properties",
+          "required": ["roomId", "name", "roles", "banned", "joinedAt", "lastActivityAt"],
+          "type": "object",
+          "properties": {
+            "roomId": {
+              "$ref": "#/definitions/roomId"
+            },
+            "name": {
+              "$ref": "#/definitions/user/properties/attributes/properties/name"
+            },
+            "roles": {
+              "$ref": "#/definitions/user/properties/attributes/properties/roles"
+            },
+            "banned": {
+              "type": "boolean",
+              "description": "User status"
+            },
+            "joinedAt": {
+              "$ref": "#/definitions/ISODate"
+            },
+            "lastActivityAt": {
+              "$ref": "#/definitions/ISODate"
+            }
+          }
+        }
+      }
+    },
+    "participantsCollection": {
+      "additionalProperties": false,
+      "description": "Participants response",
+      "type": "object",
+      "required": ["meta", "data"],
+      "properties": {
+        "meta": {
+          "$ref": "#/definitions/collectionMeta"
+        },
+        "data": {
+          "description": "Collection of participants",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/participant"
+          }
         }
       }
     },
@@ -258,9 +335,17 @@
       "type": "string",
       "description": "Auth token"
     },
-    "isoDate": {
+    "ISODate": {
       "type": "string",
+      "format": "date-time",
       "description": "ISO Date"
+    },
+    "limit": {
+      "description": "Limitation of results",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 20,
+      "default": 20
     }
   }
 }

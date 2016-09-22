@@ -3,6 +3,9 @@
  */
 class LightUserModel
 {
+  static ROLE_GUEST = 'guest';
+  static ROLE_ROOT = 'root';
+
   /**
    * @param id
    * @param name
@@ -18,14 +21,14 @@ class LightUserModel
    * @returns {boolean}
    */
   get isGuest() {
-    return this.id === null || this.roles.length === 0;
+    return this.roles.includes(LightUserModel.ROLE_GUEST);
   }
 
   /**
    * @returns {boolean}
    */
   get isRoot() {
-    return this.roles.includes('root');
+    return this.roles.includes(LightUserModel.ROLE_ROOT);
   }
 }
 

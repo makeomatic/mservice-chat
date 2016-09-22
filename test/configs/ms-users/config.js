@@ -58,7 +58,7 @@ module.exports = {
       metadata: {
         firstName: 'User',
         lastName: 'User',
-        roles: ['user'],
+        roles: [],
       },
     },
     {
@@ -67,7 +67,7 @@ module.exports = {
       metadata: {
         firstName: 'SecondUser',
         lastName: 'User',
-        roles: ['user'],
+        roles: [],
       },
     },
   ],

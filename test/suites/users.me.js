@@ -18,7 +18,7 @@ describe('users.me', function testSuite() {
         assert.equal(error, null);
         assert.equal(type, 'user');
         assert.equal(attributes.name.startsWith('Guest'), true);
-        assert.deepEqual(attributes.roles, []);
+        assert.deepEqual(attributes.roles, ['guest']);
 
         client.disconnect();
         done();

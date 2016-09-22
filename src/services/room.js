@@ -10,7 +10,7 @@ class RoomService
   static defaultData = {
     banned: () => [],
     id: () => uuid(),
-    createdAt: () => new Date().toISOString(),
+    createdAt: () => new Date(),
   };
 
   static modelName = 'room';

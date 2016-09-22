@@ -8,6 +8,7 @@ const MessageService = require('./services/message');
 const MService = require('mservice');
 const path = require('path');
 const PinService = require('./services/pin');
+const ParticipantService = require('./services/participant');
 const RoomService = require('./services/room');
 const UserService = require('./services/user');
 
@@ -15,6 +16,7 @@ const defaultConfig = globFiles(path.resolve(__dirname, 'configs'));
 const cassandraServices = {
   ban: BanService,
   pin: PinService,
+  participant: ParticipantService,
   room: RoomService,
   message: MessageService,
 };
