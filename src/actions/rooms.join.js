@@ -7,7 +7,7 @@ const {
   TYPE_MESSAGE,
 } = require('../utils/response');
 const Errors = require('common-errors');
-const fetchRoom = require('./../fetchers/room')();
+const fetchRoom = require('./../fetchers/room');
 const Promise = require('bluebird');
 
 /**
@@ -32,20 +32,25 @@ function RoomsJoinAction(request) {
   const { socket, params } = request;
   const { id, before } = params;
   const { user } = socket;
+  const userResponse = modelResponse(user, TYPE_USER);
+
+  socket.on('disconnect', () =>
+    this.services.participant
+      .delete({ roomId: id, id: user.id })
+      .then(() => modelResponse(user, TYPE_USER))
+      .tap(response => socket.broadcast.to(id).emit(`rooms.leave.${id}`, response))
+  );
 
   return Promise
     .fromCallback(callback => socket.join(id, callback))
-    .tap(() =>
-      socket.broadcast
-        .to(id)
-        .emit(`rooms.join.${id}`, modelResponse(user, TYPE_USER))
-    )
+    .tap(() => socket.broadcast.to(id).emit(`rooms.join.${id}`, userResponse))
     .then(() => Promise.join(
       this.services.message.history(id),
-      this.services.pin.last(id)
+      this.services.pin.last(id),
+      this.services.participant.add(id, user)
     ))
     .spread((messages, pin) => {
-      const response = collectionResponse(messages, TYPE_MESSAGE, before);
+      const response = collectionResponse(messages, TYPE_MESSAGE, { before });
 
       if (pin) {
         response.data.push(transform(pin, TYPE_PIN));
@@ -66,7 +71,7 @@ const allowed = (request) => {
 };
 
 RoomsJoinAction.allowed = allowed;
-RoomsJoinAction.fetcher = fetchRoom;
+RoomsJoinAction.fetcher = fetchRoom();
 RoomsJoinAction.schema = 'rooms.join';
 RoomsJoinAction.transports = ['socketIO'];
 

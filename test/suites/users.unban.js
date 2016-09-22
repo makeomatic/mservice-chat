@@ -221,6 +221,16 @@ describe('users.unban', function suite() {
     });
   });
 
+  // depends on previous test
+  it('should be able to mark participant as banned', () =>
+    chat.services.participant
+      .findOne({ roomId: this.roomId, id: 'second.user@foo.com' })
+      .then((participant) => {
+        assert.equal(participant.id, 'second.user@foo.com');
+        assert.equal(participant.banned, false);
+      })
+  );
+
   after('shutdown chat', () => chat.close());
 
   after('delete room', () => this.room.deleteAsync());

@@ -47,21 +47,22 @@ module.exports = superclass => class Mixin extends superclass {
     return {};
   }
 
-  create(properties) {
+  create(properties, options = {}) {
     const Model = this.model;
     const defaultData = this.getDefaultData();
 
     return Promise
-      .resolve(defaultData)
+      .bind(this, defaultData)
       .then(data => Object.assign(data, properties))
+      .then(this.castData)
       .then(data => new Model(data))
-      .tap(model => model.saveAsync());
+      .tap(model => model.saveAsync(options));
   }
 
-  find(cond = {}, sort = {}, limit = 20) {
+  find(cond = {}, sort = {}, limit = 20, options = {}) {
     const query = this.makeCond(cond, sort, limit);
 
-    return this.model.findAsync(query);
+    return this.model.findAsync(query, options);
   }
 
   findOne(cond = {}, sort = {}) {
@@ -93,7 +94,7 @@ module.exports = superclass => class Mixin extends superclass {
   cast(value, type) {
     const cassandraType = datatypes[type];
 
-    // @todo use express-cassandra/orm/check-types for more complicated case
+    // @todo use express-cassandra/orm/check-types for more complicated cases
     if (value instanceof cassandraType) {
       return value;
     }

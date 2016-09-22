@@ -26,7 +26,7 @@ const { modelResponse, TYPE_MESSAGE } = require('../utils/response');
   */
 function messageSendAction(request) {
   const { params, room, socket } = request;
-  const { message: messageService, pin: pinService } = this.services;
+  const { message: messageService, pin: pinService, participant } = this.services;
   const roomId = room.id.toString();
   const { user } = socket;
   const message = {
@@ -46,7 +46,8 @@ function messageSendAction(request) {
       return null;
     })
     .then(createdMessage => modelResponse(createdMessage, TYPE_MESSAGE))
-    .tap(response => socket.broadcast.to(roomId).emit(`messages.send.${roomId}`, response));
+    .tap(response => socket.broadcast.to(roomId).emit(`messages.send.${roomId}`, response))
+    .tap(() => participant.updateActivity(roomId, user.id));
 }
 
 function allowed(request) {

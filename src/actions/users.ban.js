@@ -29,6 +29,7 @@ function usersBanAction(request) {
 
   return this.services.ban
     .add(room.id, bannedUser, admin, reason)
+    .tap(() => this.services.participant.markAsBanned(roomId, bannedUser.id))
     .then(ban => modelResponse(ban, TYPE_BAN))
     .tap(response => socketIO.in(roomId).emit(`users.ban.${roomId}`, response));
 }

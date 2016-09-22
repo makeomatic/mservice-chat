@@ -1,7 +1,9 @@
 const assert = require('assert');
 const Chat = require('../../src');
+const { connect, emit } = require('../helpers/socketIO');
 const { expect } = require('chai');
 const { login } = require('../helpers/users');
+const Promise = require('bluebird');
 const socketIOClient = require('socket.io-client');
 
 const action = 'chat.messages.send';
@@ -321,6 +323,24 @@ describe('messages.send', function testSuite() {
         client.emit(action, { roomId: this.roomId, message });
       });
     });
+  });
+
+  it('should be able to update participant\'s activity', () => {
+    const { userToken, roomId } = this;
+    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${userToken}` });
+    const testCase = [
+      () => chat.services.participant.findOne({ roomId, id: 'user@foo.com' }),
+      () => emit(client, action, { roomId, message: { text: 'foo' } }),
+      () => chat.services.participant.findOne({ roomId, id: 'user@foo.com' }),
+    ];
+
+    return connect(client)
+      .then(() => emit(client, 'chat.rooms.join', { id: this.roomId }))
+      .then(() => Promise.mapSeries(testCase, handler => handler()))
+      .spread((prev, message, current) => {
+        assert.equal(prev.lastActivityAt < current.lastActivityAt, true);
+      })
+      .tap(() => client.disconnect());
   });
 
   after('delete room', () => this.room.deleteAsync());

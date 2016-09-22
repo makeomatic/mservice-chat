@@ -1,3 +1,4 @@
+const assert = require('assert');
 const Chance = require('chance');
 const Chat = require('../../src');
 const { expect } = require('chai');
@@ -80,21 +81,18 @@ describe('rooms.delete', function testSuite() {
       });
   });
 
-  it('should delete room if user is admin and room creator', (done) => {
+  it('should delete room if user is admin and room creator', () => {
     const id = this.room.id.toString();
     const token = this.firstAdminToken;
 
-    chat.services.room.find()
-      .then(roomsBefore => expect(roomsBefore.length).to.be.equals(1))
-      .then(() => request(uri, { id, token }))
+    return request(uri, { id, token })
       .then((response) => {
         expect(response.statusCode).to.be.equals(200);
         expect(response.body.meta.status).to.be.equals('success');
       })
-      .then(() => chat.services.room.find())
-      .then((roomsAfter) => {
-        expect(roomsAfter.length).to.be.equals(0);
-        done();
+      .then(() => chat.services.room.findOne({ id }))
+      .then((room) => {
+        assert.equal(room, null);
       });
   });
 

@@ -1,0 +1,17 @@
+{
+  "id": "rooms.participants",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["roomId"],
+  "properties": {
+    "roomId": {
+      "$ref": "common.json#/definitions/roomId"
+    },
+    "before": {
+      "$ref": "common.json#/definitions/ISODate"
+    },
+    "limit": {
+      "$ref": "common.json#/definitions/limit"
+    }
+  }
+}

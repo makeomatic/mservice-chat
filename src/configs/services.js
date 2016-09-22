@@ -7,5 +7,8 @@ module.exports = {
         workerID: 0,
       },
     },
+    participant: {
+      ttl: 60 * 60 * 24 * 3,
+    },
   },
 };

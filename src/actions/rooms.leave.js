@@ -20,13 +20,15 @@ const { successResponse, modelResponse, TYPE_USER } = require('../utils/response
   * @apiSchema {jsonschema=../../schemas/rooms.leave.broadcast.json} apiSuccess
   */
 function RoomsLeaveAction(request) {
-  const { room, socket } = request;
-  const roomId = room.id.toString();
+  const { params, socket } = request;
+  const { id } = params;
+  const { user } = socket;
 
   return Promise
-    .fromCallback(callback => socket.leave(roomId, callback))
-    .then(() => modelResponse(socket.user, TYPE_USER))
-    .tap(response => socket.broadcast.to(roomId).emit(`rooms.leave.${roomId}`, response))
+    .fromCallback(callback => socket.leave(id, callback))
+    .tap(() => this.services.participant.delete({ roomId: id, id: user.id }))
+    .then(() => modelResponse(user, TYPE_USER))
+    .tap(response => socket.broadcast.to(id).emit(`rooms.leave.${id}`, response))
     .then(successResponse);
 }
 

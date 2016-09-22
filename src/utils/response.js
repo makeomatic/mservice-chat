@@ -5,6 +5,7 @@ const TYPE_MESSAGE = 'message';
 const TYPE_PIN = 'pin';
 const TYPE_ROOM = 'room';
 const TYPE_USER = 'user';
+const TYPE_PARTICIPANT = 'participant';
 
 function transform(object, type) {
   const response = {
@@ -21,16 +22,21 @@ function transform(object, type) {
   return response;
 }
 
-function collectionResponse(objects, type, before) {
+function collectionResponse(objects, type, options = {}) {
+  const { before } = options;
+  const count = objects.length;
+  const cursor = options.cursor || 'id';
+  const direction = options.direction || 'desc';
   const response = {
     meta: {
-      count: objects.length,
+      count,
     },
     data: objects.map(object => transform(object, type)),
   };
 
-  if (objects.length) {
-    response.meta.last = objects[0].id;
+  if (count) {
+    const lastItem = direction === 'desc' ? 0 : count - 1;
+    response.meta.last = objects[lastItem][cursor];
   }
 
   if (before) {
@@ -62,4 +68,5 @@ module.exports = {
   TYPE_PIN,
   TYPE_ROOM,
   TYPE_USER,
+  TYPE_PARTICIPANT,
 };
