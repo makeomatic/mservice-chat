@@ -40,7 +40,7 @@ describe('messages.send', function testSuite() {
   });
 
   before('create ban', () => {
-    const bannedUser = { id: 'second.user@foo.com', name: 'SecondUser User', roles: ['user'] };
+    const bannedUser = { id: 'second.user@foo.com', name: 'SecondUser User', roles: [] };
     const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
 
     return chat.services.ban.add(this.room.id, bannedUser, admin, 'foo');
@@ -165,7 +165,7 @@ describe('messages.send', function testSuite() {
           assert.equal(data.attributes.userId, 'user@foo.com');
           assert.equal(data.attributes.user.id, 'user@foo.com');
           assert.equal(data.attributes.user.name, 'User User');
-          assert.deepEqual(data.attributes.user.roles, ['user']);
+          assert.deepEqual(data.attributes.user.roles, []);
           assert.deepEqual(data.attributes.properties, {});
           assert.deepEqual(data.attributes.attachments, {});
 
@@ -260,7 +260,7 @@ describe('messages.send', function testSuite() {
       assert.equal(attributes.userId, 'user@foo.com');
       assert.equal(attributes.user.id, 'user@foo.com');
       assert.equal(attributes.user.name, 'User User');
-      assert.deepEqual(attributes.user.roles, ['user']);
+      assert.deepEqual(attributes.user.roles, []);
       assert.deepEqual(attributes.properties, {});
       assert.deepEqual(attributes.attachments, {});
 

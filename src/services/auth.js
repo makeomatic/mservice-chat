@@ -4,9 +4,11 @@ const Promise = require('bluebird');
 const uid2 = require('uid2');
 const uuid = require('node-uuid');
 
+const { ROLE_GUEST } = LightUserModel;
+
 function auth(token, application) {
   if (is.undefined(token) === true) {
-    return Promise.resolve(new LightUserModel(uuid.v4(), `Guest#${uid2(6)}`));
+    return Promise.resolve(new LightUserModel(uuid.v4(), `Guest#${uid2(6)}`, [ROLE_GUEST]));
   }
 
   const { user } = application.services;

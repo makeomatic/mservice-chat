@@ -16,8 +16,8 @@ describe('rooms.participants', function suite() {
     const users = [
       { id: 'root@foo.com', name: 'Root Admin', roles: ['root', 'admin'] },
       { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] },
-      { id: 'user@foo.com', name: 'User User', roles: ['user'] },
-      { id: 'second.user@foo.com', name: 'SecondUser User', roles: ['user'] },
+      { id: 'user@foo.com', name: 'User User', roles: [] },
+      { id: 'second.user@foo.com', name: 'SecondUser User', roles: [] },
     ];
 
     return Promise

@@ -8,7 +8,7 @@ function create(messageService, messages = ['foo'], params) {
     user: {
       id: 'user@foo.com',
       name: 'User User',
-      roles: ['user'],
+      roles: [],
     },
   };
 

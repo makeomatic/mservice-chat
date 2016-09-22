@@ -199,7 +199,7 @@ describe('users.ban', function suite() {
         assert.deepEqual(attributes.user, {
           id: 'user@foo.com',
           name: 'User User',
-          roles: ['user'],
+          roles: [],
         });
         assert.equal(isISODate(attributes.bannedAt), true);
         assert.deepEqual(attributes.bannedBy, {
@@ -216,7 +216,7 @@ describe('users.ban', function suite() {
         assert.deepEqual(ban.user, {
           id: 'user@foo.com',
           name: 'User User',
-          roles: ['user'],
+          roles: null,
         });
         assert.equal(is.date(ban.bannedAt), true);
         assert.deepEqual(ban.bannedBy, {
@@ -250,7 +250,7 @@ describe('users.ban', function suite() {
           assert.deepEqual(attributes.user, {
             id: 'second.user@foo.com',
             name: 'SecondUser User',
-            roles: ['user'],
+            roles: [],
           });
           assert.equal(isISODate(attributes.bannedAt), true);
           assert.deepEqual(attributes.bannedBy, {
