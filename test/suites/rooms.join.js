@@ -50,7 +50,7 @@ describe('rooms.join', function testSuite() {
   });
 
   before('create ban', () => {
-    const bannedUser = { id: 'second.user@foo.com', name: 'SecondUser User', roles: ['user'] };
+    const bannedUser = { id: 'second.user@foo.com', name: 'SecondUser User', roles: [] };
     const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
 
     return chat.services.ban.add(this.room.id, bannedUser, admin, 'foo');
@@ -159,7 +159,7 @@ describe('rooms.join', function testSuite() {
         assert.equal(is.date(participant.joinedAt), true);
         assert.equal(is.date(participant.lastActivityAt), true);
         assert.equal(participant.name, 'User User');
-        assert.deepEqual(participant.roles, ['user']);
+        assert.deepEqual(participant.roles, null);
       })
       .tap(() => client.disconnect());
   });
@@ -180,7 +180,7 @@ describe('rooms.join', function testSuite() {
         assert.equal(is.date(participant.joinedAt), true);
         assert.equal(is.date(participant.lastActivityAt), true);
         assert.equal(participant.name, 'SecondUser User');
-        assert.deepEqual(participant.roles, ['user']);
+        assert.deepEqual(participant.roles, null);
       })
       .tap(() => client.disconnect());
   });

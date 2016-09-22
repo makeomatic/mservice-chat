@@ -98,7 +98,7 @@ describe('rooms.leave', function testSuite() {
       const { type, attributes } = response.data;
 
       assert.equal(type, 'user');
-      assert.deepEqual(attributes.roles, []);
+      assert.deepEqual(attributes.roles, ['guest']);
 
       client1.disconnect();
       client2.disconnect();
