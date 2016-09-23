@@ -11,7 +11,7 @@ const { collectionResponse, TYPE_PARTICIPANT } = require('../utils/response');
  */
 function roomsParticipantsAction(request) {
   const { roomId, before, limit } = request.params;
-  const collectionOptions = { before, cursor: 'joinedAt', direction: 'asc' };
+  const collectionOptions = { before, cursor: 'joinedAt' };
 
   return this.services.participant
     .list(roomId, before, limit)

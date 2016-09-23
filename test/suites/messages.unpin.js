@@ -116,7 +116,7 @@ describe('messages.unpin', function suite() {
           status: 'success',
         });
       })
-      .then(() => chat.services.pin.find({ roomId: this.roomId }))
+      .then(() => chat.services.pin.history(this.roomId))
       .then((pins) => {
         const [pin, secondPin] = pins;
 

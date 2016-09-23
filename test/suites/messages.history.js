@@ -36,7 +36,7 @@ describe('messages.history', function suite() {
         const [fourth, third, second, first] = data;
 
         assert.equal(data.length, 4);
-        assert.equal(meta.last, fourth.id);
+        assert.equal(meta.last, first.id);
         assert.equal(meta.count, 4);
         assert.equal(fourth.attributes.roomId, params.roomId);
         assert.equal(fourth.attributes.text, 'qux');
@@ -64,7 +64,7 @@ describe('messages.history', function suite() {
         assert.equal(data.length, 2);
         assert.equal(meta.before, this.messages.qux.id);
         assert.equal(meta.count, 2);
-        assert.equal(meta.last, second.id);
+        assert.equal(meta.last, first.id);
         assert.equal(second.attributes.roomId, params.roomId);
         assert.equal(second.attributes.text, 'baz');
         assert.equal(first.attributes.roomId, params.roomId);

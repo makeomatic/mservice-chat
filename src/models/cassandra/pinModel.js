@@ -32,7 +32,15 @@ module.exports = {
       typeDef: '<"User">',
     },
   },
-  key: [['roomId'], 'pinnedAt'],
-  clustering_order: { pinnedAt: 'desc' },
-  indexes: ['messageId'],
+  key: [['roomId'], 'messageId'],
+  materialized_views: {
+    pinsSortedByPinnedAt: {
+      select: ['*'],
+      key: [['roomId'], 'pinnedAt', 'messageId'],
+      clustering_order: {
+        pinnedAt: 'desc',
+        messageId: 'desc',
+      },
+    },
+  },
 };

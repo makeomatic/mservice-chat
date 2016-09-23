@@ -1,6 +1,8 @@
 const assert = require('assert');
 const Chat = require('../../src');
 const { create } = require('../helpers/messages');
+const is = require('is');
+const { isISODate } = require('../helpers/asserts');
 const { login } = require('../helpers/users');
 const request = require('./../helpers/request');
 const socketIOClient = require('socket.io-client');
@@ -52,6 +54,8 @@ describe('messages.edit', function testSuite() {
       })
   );
 
+  before('create pin', () => chat.services.pin.pin(this.room.id, this.message, this.admin));
+
   it('should returns error if invalid `id`', () =>
     request(uri, { token: this.adminToken, id: 0, roomId: this.roomId, text: 'foo' })
       .then(({ statusCode, body }) => {
@@ -97,10 +101,21 @@ describe('messages.edit', function testSuite() {
       .then(() => chat.services.message.findOne({ id: this.secondMessageId, roomId: this.roomId }))
       .then((message) => {
         assert.equal(message.text, 'baz');
+        assert.equal(is.date(message.editedAt), true);
+        assert.equal(message.editedBy.id, 'user@foo.com');
       });
   });
 
-  it('should be able to delete message by admin', () => {
+  // depends on previous test
+  it('should be able to edit pin', () =>
+    chat.services.pin
+      .findOne({ roomId: this.roomId, messageId: this.secondMessageId })
+      .then((pin) => {
+        assert.equal(pin.message.text, 'baz');
+      })
+  );
+
+  it('should be able to edit message by admin', () => {
     const params = {
       id: this.secondMessageId,
       roomId: this.roomId,
@@ -116,10 +131,12 @@ describe('messages.edit', function testSuite() {
       .then(() => chat.services.message.findOne({ id: this.secondMessageId, roomId: this.roomId }))
       .then((message) => {
         assert.equal(message.text, 'qux');
+        assert.equal(is.date(message.editedAt), true);
+        assert.equal(message.editedBy.id, 'admin@foo.com');
       });
   });
 
-  it('should be able to emit event when delete a message', (done) => {
+  it('should be able to emit event when edit a message', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
     const params = {
       id: this.secondMessageId,
@@ -134,6 +151,8 @@ describe('messages.edit', function testSuite() {
         client.on(`messages.edit.${this.roomId}`, (result) => {
           assert.equal(result.data.type, 'message');
           assert.equal(result.data.attributes.text, 'quux');
+          assert.equal(isISODate(result.data.attributes.editedAt), true);
+          assert.equal(result.data.attributes.editedBy.id, 'user@foo.com');
 
           client.disconnect();
           done();

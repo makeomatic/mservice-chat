@@ -22,12 +22,14 @@ const { successResponse, modelResponse, TYPE_MESSAGE } = require('../utils/respo
   * @apiSchema {jsonschema=../../schemas/messages.edit.broadcast.json} apiSuccess
   */
 function messageEditAction(request) {
-  const { message, params } = request;
+  const { auth, message, params } = request;
   const { roomId, text } = params;
   const { socketIO, services } = this;
+  const { user } = auth.credentials;
 
   return services.message
-    .edit(message, text)
+    .edit(message, text, user)
+    .tap(() => services.pin.updateMessage(message))
     .then(() => modelResponse(message, TYPE_MESSAGE))
     .tap(response => socketIO.in(roomId).emit(`messages.edit.${roomId}`, response))
     .then(successResponse);

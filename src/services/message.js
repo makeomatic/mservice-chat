@@ -12,10 +12,8 @@ class MessageService
 
   defaultData() {
     return {
-      attachments: () => ({}),
       createdAt: () => new Date(),
       id: () => datatypes.Long.fromString(this.flakeless.next()),
-      properties: () => ({}),
     };
   }
 
@@ -55,13 +53,13 @@ class MessageService
       .each(pin => pin.deleteAsync());
   }
 
-  edit(message, text) {
-    const { id, roomId } = message;
-
+  edit(message, text, user) { // eslint-disable-line class-methods-use-this
     message.text = text;
+    message.editedAt = new Date();
+    message.editedBy = user;
 
-    return this
-      .update({ id, roomId }, { text })
+    return message
+      .saveAsync()
       .return(message);
   }
 }
