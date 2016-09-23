@@ -91,7 +91,7 @@ describe('messages.pins-history', function suite() {
         const [fourth, third, second, first] = data;
 
         assert.equal(data.length, 4);
-        assert.equal(meta.last, fourth.pinnedAt);
+        assert.equal(meta.last, first.attributes.pinnedAt);
         assert.equal(meta.count, 4);
         assert.equal(fourth.attributes.roomId, this.roomId);
         assert.equal(fourth.attributes.message.text, 'qux');
@@ -120,7 +120,7 @@ describe('messages.pins-history', function suite() {
         assert.equal(data.length, 2);
         assert.equal(meta.before, this.pins.qux.pinnedAt.toISOString());
         assert.equal(meta.count, 2);
-        assert.equal(meta.last, second.pinnedAt);
+        assert.equal(meta.last, first.attributes.pinnedAt);
         assert.equal(second.attributes.roomId, params.roomId);
         assert.equal(second.attributes.message.text, 'baz');
         assert.equal(first.attributes.roomId, params.roomId);
@@ -144,7 +144,7 @@ describe('messages.pins-history', function suite() {
         assert.equal(data.length, 1);
         assert.equal(meta.before, this.pins.bar.pinnedAt.toISOString());
         assert.equal(meta.count, 1);
-        assert.equal(meta.last, first.pinnedAt);
+        assert.equal(meta.last, first.attributes.pinnedAt);
         assert.equal(first.attributes.roomId, this.roomId);
         assert.equal(first.attributes.message.text, 'foo');
       });

@@ -108,13 +108,15 @@ describe('rooms.join', function testSuite() {
     client.on('connect', () => {
       client.emit(action, { id: this.room.id.toString() }, (error, response) => {
         const { meta, data } = response;
+        const [first, second, third] = data;
 
         assert.equal(error, null);
         assert.equal(meta.count, 2);
-        assert.equal(data[0].attributes.text, 'bar');
-        assert.equal(data[1].attributes.text, 'foo');
-        assert.equal(data[2].type, 'pin');
-        assert.equal(data[2].attributes.messageId, this.messageId);
+        assert.equal(meta.last, second.id);
+        assert.equal(first.attributes.text, 'bar');
+        assert.equal(second.attributes.text, 'foo');
+        assert.equal(third.type, 'pin');
+        assert.equal(third.attributes.messageId, this.messageId);
 
         client.disconnect();
         done();

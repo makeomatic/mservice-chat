@@ -60,8 +60,10 @@ class PinService
   }
 
   last(roomId) {
+    const options = { materialized_view: 'pinsSortedByPinnedAt' };
+
     return this
-      .findOne({ roomId }, { $desc: 'pinnedAt' }, 1)
+      .findOne({ roomId }, { $desc: 'pinnedAt' }, options)
       .then((pin) => {
         if (pin === undefined || pin.unpinnedAt) {
           return null;
@@ -73,12 +75,19 @@ class PinService
 
   history(roomId, before, limit = 20) {
     const query = { roomId };
+    const options = { materialized_view: 'pinsSortedByPinnedAt' };
 
     if (before) {
       query.pinnedAt = { $lt: before };
     }
 
-    return this.find(query, { $desc: 'pinnedAt' }, limit);
+    return this.find(query, { $desc: 'pinnedAt' }, limit, options);
+  }
+
+  updateMessage(message) {
+    const { roomId, id: messageId } = message;
+
+    return this.update({ roomId, messageId }, { message });
   }
 }
 

@@ -166,8 +166,6 @@ describe('messages.send', function testSuite() {
           assert.equal(data.attributes.user.id, 'user@foo.com');
           assert.equal(data.attributes.user.name, 'User User');
           assert.deepEqual(data.attributes.user.roles, []);
-          assert.deepEqual(data.attributes.properties, {});
-          assert.deepEqual(data.attributes.attachments, {});
 
           client.disconnect();
           done();
@@ -220,8 +218,6 @@ describe('messages.send', function testSuite() {
                   assert.equal(first.user.id, 'admin@foo.com');
                   assert.equal(first.user.name, 'Admin Admin');
                   assert.deepEqual(first.user.roles, ['admin']);
-                  assert.equal(first.properties, null);
-                  assert.equal(first.attachments, null);
 
                   assert.ok(second.id);
                   assert.equal(second.text, 'bar');
@@ -231,8 +227,6 @@ describe('messages.send', function testSuite() {
                   assert.equal(second.user.id, 'admin@foo.com');
                   assert.equal(second.user.name, 'Admin Admin');
                   assert.deepEqual(second.user.roles, ['admin']);
-                  assert.equal(second.properties, null);
-                  assert.equal(second.attachments, null);
 
                   client.disconnect();
                   done();
@@ -261,8 +255,6 @@ describe('messages.send', function testSuite() {
       assert.equal(attributes.user.id, 'user@foo.com');
       assert.equal(attributes.user.name, 'User User');
       assert.deepEqual(attributes.user.roles, []);
-      assert.deepEqual(attributes.properties, {});
-      assert.deepEqual(attributes.attachments, {});
 
       client1.disconnect();
       client2.disconnect();

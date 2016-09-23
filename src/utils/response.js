@@ -26,7 +26,6 @@ function collectionResponse(objects, type, options = {}) {
   const { before } = options;
   const count = objects.length;
   const cursor = options.cursor || 'id';
-  const direction = options.direction || 'desc';
   const response = {
     meta: {
       count,
@@ -35,8 +34,7 @@ function collectionResponse(objects, type, options = {}) {
   };
 
   if (count) {
-    const lastItem = direction === 'desc' ? 0 : count - 1;
-    response.meta.last = objects[lastItem][cursor];
+    response.meta.last = objects[count - 1][cursor];
   }
 
   if (before) {

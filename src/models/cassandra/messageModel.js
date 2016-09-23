@@ -27,15 +27,12 @@ module.exports = {
       typeDef: '<"User">',
       rule: required,
     },
-    properties: {
-      type: 'map',
-      typeDef: '<varchar, varchar>',
-      rule: required,
+    editedAt: {
+      type: 'timestamp',
     },
-    attachments: {
-      type: 'map',
-      typeDef: '<varchar, varchar>',
-      rule: required,
+    editedBy: {
+      type: 'frozen',
+      typeDef: '<"User">',
     },
   },
   key: [['roomId'], 'id'],

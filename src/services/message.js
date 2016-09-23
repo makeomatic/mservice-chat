@@ -12,10 +12,8 @@ class MessageService
 
   defaultData() {
     return {
-      attachments: () => ({}),
       createdAt: () => new Date(),
       id: () => datatypes.Long.fromString(this.flakeless.next()),
-      properties: () => ({}),
     };
   }
 
@@ -53,6 +51,16 @@ class MessageService
     return pinService
       .find(query)
       .each(pin => pin.deleteAsync());
+  }
+
+  edit(message, text, user) { // eslint-disable-line class-methods-use-this
+    message.text = text;
+    message.editedAt = new Date();
+    message.editedBy = user;
+
+    return message
+      .saveAsync()
+      .return(message);
   }
 }
 

@@ -65,10 +65,10 @@ module.exports = superclass => class Mixin extends superclass {
     return this.model.findAsync(query, options);
   }
 
-  findOne(cond = {}, sort = {}) {
+  findOne(cond = {}, sort = {}, options = {}) {
     const query = this.makeCond(cond, sort);
 
-    return this.model.findOneAsync(query);
+    return this.model.findOneAsync(query, options);
   }
 
   update(cond = {}, update = {}, options = {}) {
