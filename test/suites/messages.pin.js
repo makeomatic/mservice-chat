@@ -122,7 +122,7 @@ describe('messages.pin', function suite() {
 
         assert.equal(statusCode, 200);
         assert.equal(body.data.type, 'pin');
-        assert.equal(body.data.id.startsWith(this.roomId), true);
+        assert.equal(body.data.id, this.messageId);
         assert.equal(data.messageId, this.messageId);
         assert.equal(data.message.id, this.messageId);
         assert.equal(data.message.text, 'foo');
@@ -146,13 +146,6 @@ describe('messages.pin', function suite() {
         assert.equal(pins.length, 1);
 
         assert.equal(pins[0].messageId, this.messageId);
-        assert.equal(pins[0].message.id, this.messageId);
-        assert.equal(pins[0].message.text, 'foo');
-        assert.deepEqual(pins[0].message.user, {
-          id: 'admin@foo.com',
-          name: 'Admin Admin',
-          roles: ['admin'],
-        });
         assert.equal(pins[0].roomId, this.roomId);
         assert.ok(pins[0].pinnedAt);
         assert.deepEqual(pins[0].pinnedBy, {
@@ -231,7 +224,7 @@ describe('messages.pin', function suite() {
           name: 'Admin Admin',
           roles: ['admin'],
         });
-        assert.ok(secondPin.unpinnedAt, undefined);
+        assert.ok(secondPin.unpinnedAt);
         assert.deepEqual(secondPin.unpinnedBy, {
           id: 'admin@foo.com',
           name: 'Admin Admin',

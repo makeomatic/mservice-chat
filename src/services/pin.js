@@ -1,4 +1,19 @@
 const { modelResponse, TYPE_PIN, TYPE_USER } = require('../utils/response');
+const Promise = require('bluebird');
+
+function collectMessagesIds(pin) {
+  return pin.messageId;
+}
+
+function indexCollectionReducer(indexedCollection, current) {
+  indexedCollection[current.id.toString()] = current;
+
+  return indexedCollection;
+}
+
+function indexCollection(collection) {
+  return collection.reduce(indexCollectionReducer, {});
+}
 
 class PinService
 {
@@ -15,15 +30,18 @@ class PinService
 
   pin(roomId, message, user) {
     const params = {
-      message,
       roomId,
       messageId: message.id,
       pinnedBy: user,
+      unpinnedAt: null,
+      unpinnedBy: null,
     };
 
     return this
       .unpin(roomId, user)
-      .then(() => this.create(params));
+      .then(() => this.create(params))
+      // express-cassandra doesn't set up virtual fields in constructor
+      .tap(pin => (pin.message = message));
   }
 
   pinAndBroadcast(roomId, message, user) {
@@ -46,7 +64,7 @@ class PinService
           return pin.saveAsync();
         }
 
-        return pin;
+        return null;
       });
   }
 
@@ -69,7 +87,7 @@ class PinService
           return null;
         }
 
-        return pin;
+        return this.fetchMessage(pin);
       });
   }
 
@@ -81,13 +99,38 @@ class PinService
       query.pinnedAt = { $lt: before };
     }
 
-    return this.find(query, { $desc: 'pinnedAt' }, limit, options);
+    return this
+      .find(query, { $desc: 'pinnedAt' }, limit, options)
+      .then(collection => this.fetchMessages(roomId, collection));
   }
 
-  updateMessage(message) {
-    const { roomId, id: messageId } = message;
+  fetchMessages(roomId, collection) {
+    const { message: messageService } = this.services;
 
-    return this.update({ roomId, messageId }, { message });
+    return Promise
+      .bind(this, collection)
+      .map(collectMessagesIds)
+      .then(messagesIds => messageService.find({ roomId, id: { $in: messagesIds } }))
+      .then(indexCollection)
+      .then((messages) => {
+        collection.forEach((pin) => {
+          pin.message = messages[pin.messageId.toString()];
+        });
+
+        return collection;
+      });
+  }
+
+  fetchMessage(pin) {
+    const { message: messageService } = this.services;
+
+    return messageService
+      .findOne({ roomId: pin.roomId, id: pin.messageId })
+      .then((message) => {
+        pin.message = message;
+
+        return pin;
+      });
   }
 }
 

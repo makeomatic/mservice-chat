@@ -99,6 +99,10 @@ module.exports = superclass => class Mixin extends superclass {
       return value;
     }
 
+    if (Array.isArray(value)) {
+      return value.map(val => this.cast(val, type));
+    }
+
     if (is.object(value) === true) {
       return mapValues(value, val => this.cast(val, type));
     }

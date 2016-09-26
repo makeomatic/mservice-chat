@@ -95,12 +95,16 @@ describe('messages.pins-history', function suite() {
         assert.equal(meta.count, 4);
         assert.equal(fourth.attributes.roomId, this.roomId);
         assert.equal(fourth.attributes.message.text, 'qux');
+        assert.ok(fourth.attributes.message.createdAt);
         assert.equal(third.attributes.roomId, this.roomId);
         assert.equal(third.attributes.message.text, 'baz');
+        assert.ok(third.attributes.message.createdAt);
         assert.equal(second.attributes.roomId, this.roomId);
         assert.equal(second.attributes.message.text, 'bar');
+        assert.ok(second.attributes.message.createdAt);
         assert.equal(first.attributes.roomId, this.roomId);
         assert.equal(first.attributes.message.text, 'foo');
+        assert.ok(first.attributes.message.createdAt);
       })
   );
 

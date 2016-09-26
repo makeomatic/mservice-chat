@@ -29,7 +29,6 @@ function messageEditAction(request) {
 
   return services.message
     .edit(message, text, user)
-    .tap(() => services.pin.updateMessage(message))
     .then(() => modelResponse(message, TYPE_MESSAGE))
     .tap(response => socketIO.in(roomId).emit(`messages.edit.${roomId}`, response))
     .then(successResponse);

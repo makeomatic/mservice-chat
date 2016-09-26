@@ -106,15 +106,6 @@ describe('messages.edit', function testSuite() {
       });
   });
 
-  // depends on previous test
-  it('should be able to edit pin', () =>
-    chat.services.pin
-      .findOne({ roomId: this.roomId, messageId: this.secondMessageId })
-      .then((pin) => {
-        assert.equal(pin.message.text, 'baz');
-      })
-  );
-
   it('should be able to edit message by admin', () => {
     const params = {
       id: this.secondMessageId,

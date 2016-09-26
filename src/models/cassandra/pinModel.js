@@ -8,8 +8,14 @@ module.exports = {
     },
     message: {
       type: 'frozen',
-      typeDef: '<"Message">',
-      rule: required,
+      virtual: {
+        get: function getMessage() {
+          return this.message;
+        },
+        set: function setMessage(message) {
+          this.message = message;
+        },
+      },
     },
     roomId: {
       type: 'uuid',
@@ -32,11 +38,15 @@ module.exports = {
       typeDef: '<"User">',
     },
   },
-  key: [['roomId'], 'messageId'],
+  key: [
+    ['roomId'], 'messageId',
+  ],
   materialized_views: {
     pinsSortedByPinnedAt: {
       select: ['*'],
-      key: [['roomId'], 'pinnedAt', 'messageId'],
+      key: [
+        ['roomId'], 'pinnedAt', 'messageId',
+      ],
       clustering_order: {
         pinnedAt: 'desc',
         messageId: 'desc',
