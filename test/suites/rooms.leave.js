@@ -114,19 +114,6 @@ describe('rooms.leave', function testSuite() {
     });
   });
 
-  it('should be able to remove a participant', () => {
-    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
-
-    return connect(client)
-      .then(() => emit(client, 'chat.rooms.join', { id: this.roomId }))
-      .then(() => emit(client, action, { id: this.roomId }))
-      .then(() => chat.services.participant.findOne({ roomId: this.roomId, id: 'user@foo.com' }))
-      .then((participant) => {
-        assert.equal(participant, null);
-      })
-      .tap(() => client.disconnect());
-  });
-
   after('delete room', () => this.room.deleteAsync());
 
   after('shutdown chat', () => chat.close());

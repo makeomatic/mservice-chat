@@ -49,7 +49,7 @@ describe('rooms.participants', function suite() {
 
   it('should be able to paginate', () => {
     const params = {
-      before: this.participants[0].joinedAt.toISOString(),
+      before: this.participants[0].joinedAt.toString(),
       limit: 2,
       roomId: roomId.toString(),
     };
@@ -59,7 +59,7 @@ describe('rooms.participants', function suite() {
         const { meta, data } = response.body;
         const [first, second] = data;
 
-        assert.equal(meta.before, this.participants[0].joinedAt.toISOString());
+        assert.equal(meta.before, this.participants[0].joinedAt.toString());
         assert.equal(meta.count, 2);
         assert.equal(meta.last, second.attributes.joinedAt);
         assert.equal(data.length, 2);
@@ -72,7 +72,7 @@ describe('rooms.participants', function suite() {
 
   it('should be able to paginate last item', () => {
     const params = {
-      before: this.participants[2].joinedAt.toISOString(),
+      before: this.participants[2].joinedAt.toString(),
       limit: 2,
       roomId: roomId.toString(),
     };
@@ -83,7 +83,7 @@ describe('rooms.participants', function suite() {
         const [first] = data;
 
         assert.equal(data.length, 1);
-        assert.equal(meta.before, this.participants[2].joinedAt.toISOString());
+        assert.equal(meta.before, this.participants[2].joinedAt.toString());
         assert.equal(meta.count, 1);
         assert.equal(meta.last, first.attributes.joinedAt);
         assert.equal(first.attributes.roomId, params.roomId);

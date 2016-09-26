@@ -35,10 +35,7 @@ function RoomsJoinAction(request) {
   const userResponse = modelResponse(user, TYPE_USER);
 
   socket.on('disconnect', () =>
-    this.services.participant
-      .delete({ roomId: id, id: user.id })
-      .then(() => modelResponse(user, TYPE_USER))
-      .tap(response => socket.broadcast.to(id).emit(`rooms.leave.${id}`, response))
+    socket.broadcast.to(id).emit(`rooms.leave.${id}`, modelResponse(user, TYPE_USER))
   );
 
   return Promise

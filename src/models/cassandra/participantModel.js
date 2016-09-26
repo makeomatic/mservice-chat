@@ -24,7 +24,7 @@ module.exports = {
       rule: required,
     },
     joinedAt: {
-      type: 'timestamp',
+      type: 'timeuuid',
       rule: required,
     },
     lastActivityAt: {

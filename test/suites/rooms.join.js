@@ -158,7 +158,7 @@ describe('rooms.join', function testSuite() {
         assert.equal(participant.roomId.toString(), this.roomId);
         assert.equal(participant.id, 'user@foo.com');
         assert.equal(participant.banned, false);
-        assert.equal(is.date(participant.joinedAt), true);
+        assert.ok(participant.joinedAt);
         assert.equal(is.date(participant.lastActivityAt), true);
         assert.equal(participant.name, 'User User');
         assert.deepEqual(participant.roles, null);
@@ -179,25 +179,12 @@ describe('rooms.join', function testSuite() {
         assert.equal(participant.roomId.toString(), this.roomId);
         assert.equal(participant.id, 'second.user@foo.com');
         assert.equal(participant.banned, true);
-        assert.equal(is.date(participant.joinedAt), true);
+        assert.ok(participant.joinedAt);
         assert.equal(is.date(participant.lastActivityAt), true);
         assert.equal(participant.name, 'SecondUser User');
         assert.deepEqual(participant.roles, null);
       })
       .tap(() => client.disconnect());
-  });
-
-  it('should be able to delete a participant if client was disconnected', () => {
-    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
-
-    return connect(client)
-      .tap(() => emit(client, action, { id: this.roomId }))
-      .tap(() => client.disconnect())
-      .tap(() => Promise.delay(100))
-      .then(() => chat.services.participant.findOne({ roomId: this.roomId, id: 'user@foo.com' }))
-      .then((participant) => {
-        assert.equal(participant, null);
-      });
   });
 
   it('should be able to emit "leave" event if client was disconnected', (done) => {
