@@ -46,7 +46,7 @@ function messageSendAction(request) {
       return null;
     })
     .then(createdMessage => modelResponse(createdMessage, TYPE_MESSAGE))
-    .tap(response => {
+    .tap((response) => {
       if (params.message.type !== 'sticky') {
         socket.broadcast.to(roomId).emit(`messages.send.${roomId}`, response);
       }
