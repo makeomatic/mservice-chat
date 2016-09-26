@@ -14,7 +14,7 @@ try {
 // suitable for configuring this in the docker env
 const configuration = require('ms-conf');
 
-const Chat = require(dir);
+const Chat = require(dir); // eslint-disable-line import/no-dynamic-require
 
 const chat = new Chat(configuration.get('/'));
 

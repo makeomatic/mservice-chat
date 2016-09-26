@@ -14,7 +14,7 @@ function transform(object, type) {
   };
 
   if (type === TYPE_PIN) {
-    response.id = `${object.roomId}.${object.pinnedAt.toISOString()}`;
+    response.id = `${object.messageId}`;
   } else if (object.id) {
     response.id = object.id;
   }
