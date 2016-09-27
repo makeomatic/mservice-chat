@@ -39,11 +39,22 @@ describe('messages.send', function testSuite() {
       });
   });
 
-  before('create ban', () => {
-    const bannedUser = { id: 'second.user@foo.com', name: 'SecondUser User', roles: [] };
+  before('create participants', () => {
+    const service = chat.services.participant;
     const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
+    const participants = [
+      {
+        id: 'second.user@foo.com',
+        name: 'Second User',
+        roles: [],
+        roomId: this.roomId,
+        bannedBy: admin,
+        bannedAt: new Date(),
+        reason: 'foo',
+      },
+    ];
 
-    return chat.services.ban.add(this.room.id, bannedUser, admin, 'foo');
+    return Promise.map(participants, participant => service.create(participant));
   });
 
   it('should return validation error if invalid params', (done) => {
@@ -118,9 +129,7 @@ describe('messages.send', function testSuite() {
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, { roomId: this.room.id.toString(), message: { text: 'foo' } }, (error) => {
-        expect(error.name).to.be.equals('NotPermittedError');
-        expect(error.message).to.be.equals('An attempt was made to perform an operation that' +
-          ' is not permitted: Not in the room');
+        expect(error.name).to.be.equals('NotFoundError');
         client.disconnect();
         done();
       });
@@ -334,8 +343,6 @@ describe('messages.send', function testSuite() {
       })
       .tap(() => client.disconnect());
   });
-
-  after('delete room', () => this.room.deleteAsync());
 
   after('shutdown chat', () => chat.close());
 });

@@ -1,53 +1,6 @@
 {
   "id": "common.json",
   "definitions": {
-    "ban": {
-      "description": "`ban` object",
-      "type": "object",
-      "required": ["attributes", "type"],
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": ["ban"]
-        },
-        "attributes": {
-          "type": "object",
-          "required": ["roomId", "userId", "user", "bannedAt", "bannedBy", "reason"],
-          "properties": {
-            "roomId": {
-              "$ref": "#/definitions/roomId"
-            },
-            "userId": {
-              "$ref": "#/definitions/userId"
-            },
-            "user": {
-              "$ref": "#/definitions/user"
-            },
-            "bannedAt": {
-              "$ref": "#/definitions/ISODate"
-            },
-            "bannedBy": {
-              "$ref": "#/definitions/user"
-            },
-            "reason": {
-              "type": "string",
-              "description": "Ban reason"
-            }
-          }
-        }
-      }
-    },
-    "banResponse": {
-      "additionalProperties": false,
-      "description": "`ban` object response",
-      "type": "object",
-      "required": ["data"],
-      "properties": {
-        "data": {
-          "$ref": "#/definitions/ban"
-        }
-      }
-    },
     "message": {
       "description": "`message` object",
       "type": "object",
@@ -71,7 +24,7 @@
               "description": "Message text"
             },
             "user": {
-              "$ref": "#/definitions/user"
+              "$ref": "users.json#/definitions/model"
             },
             "createdAt": {
               "$ref": "#/definitions/ISODate"
@@ -138,10 +91,10 @@
               "$ref": "#/definitions/ISODate"
             },
             "pinnedBy": {
-              "$ref": "#/definitions/user"
+              "$ref": "users.json#/definitions/model"
             },
             "unpinnedBy": {
-              "$ref": "#/definitions/user"
+              "$ref": "users.json#/definitions/model"
             }
           }
         }
@@ -176,116 +129,10 @@
         }
       }
     },
-    "participant": {
-      "description": "`participant` object",
-      "type": "object",
-      "required": ["id", "type", "attributes"],
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/userId"
-        },
-        "type": {
-          "type": "string",
-          "enum": ["participant"]
-        },
-        "attributes": {
-          "additionalProperties": false,
-          "description": "Participant properties",
-          "required": ["roomId", "name", "roles", "banned", "joinedAt", "lastActivityAt"],
-          "type": "object",
-          "properties": {
-            "roomId": {
-              "$ref": "#/definitions/roomId"
-            },
-            "name": {
-              "$ref": "#/definitions/user/properties/attributes/properties/name"
-            },
-            "roles": {
-              "$ref": "#/definitions/user/properties/attributes/properties/roles"
-            },
-            "banned": {
-              "type": "boolean",
-              "description": "User status"
-            },
-            "joinedAt": {
-              "$ref": "#/definitions/ISODate"
-            },
-            "lastActivityAt": {
-              "$ref": "#/definitions/ISODate"
-            }
-          }
-        }
-      }
-    },
-    "participantsCollection": {
-      "additionalProperties": false,
-      "description": "Participants response",
-      "type": "object",
-      "required": ["meta", "data"],
-      "properties": {
-        "meta": {
-          "$ref": "#/definitions/collectionMeta"
-        },
-        "data": {
-          "description": "Collection of participants",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/participant"
-          }
-        }
-      }
-    },
-    "user": {
-      "description": "User object",
-      "type": "object",
-      "required": ["id", "type", "attributes"],
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/userId"
-        },
-        "type": {
-          "type": "string",
-          "enum": ["user"]
-        },
-        "attributes": {
-          "description": "User properties",
-          "type": "object",
-          "required": ["name", "roles"],
-          "properties": {
-            "name": {
-              "type": "string",
-              "description": "User name"
-            },
-            "roles": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": "Array of user roles"
-            }
-          }
-        }
-      }
-    },
-    "userResponse": {
-      "additionalProperties": false,
-      "description": "`user` object response",
-      "type": "object",
-      "required": ["data"],
-      "properties": {
-        "data": {
-          "$ref": "#/definitions/user"
-        }
-      }
-    },
     "messageId": {
       "description": "`message` identificator",
       "type": "string",
       "pattern": "^\\d+$"
-    },
-    "userId": {
-      "type": "string",
-      "description": "User identificator"
     },
     "roomId": {
       "description": "`room` identificator",

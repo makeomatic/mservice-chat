@@ -8,7 +8,7 @@
       "type": "string"
     },
     "createdBy": {
-      "$ref": "common.json#/definitions/userId"
+      "$ref": "users.json#/definitions/model/properties/id"
     }
   }
 }

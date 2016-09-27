@@ -1,14 +1,17 @@
 {
-  "id": "users.unban",
+  "id": "participants.ban",
   "additionalProperties": false,
   "type": "object",
-  "required": ["id", "roomId", "token"],
+  "required": ["id", "roomId", "reason", "token"],
   "properties": {
     "id": {
-      "$ref": "common.json#/definitions/userId"
+      "$ref": "users.json#/definitions/model/properties/id"
     },
     "roomId": {
       "$ref": "common.json#/definitions/roomId"
+    },
+    "reason": {
+      "$ref": "participants.json#/definitions/model/properties/reason"
     },
     "token": {
       "$ref": "common.json#/definitions/token"

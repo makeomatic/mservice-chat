@@ -1,14 +1,14 @@
 const assert = require('assert');
 const Chat = require('../../src');
-const { isISODate } = require('../helpers/asserts');
 const { login } = require('../helpers/users');
+const Promise = require('bluebird');
 const request = require('../helpers/request');
 const socketIOClient = require('socket.io-client');
 
 const chat = new Chat(global.SERVICES);
-const uri = 'http://0.0.0.0:3000/api/chat/users/unban';
+const uri = 'http://0.0.0.0:3000/api/chat/participants/unban';
 
-describe('users.unban', function suite() {
+describe('participants.unban', function suite() {
   before('start up chat', () => chat.connect());
 
   before('login admin', () =>
@@ -32,20 +32,6 @@ describe('users.unban', function suite() {
       });
   });
 
-  before('create room ban', () => {
-    const bannedUser = { id: 'user@foo.com', name: 'User User', roles: [] };
-    const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
-
-    return chat.services.ban.add(this.room.id, bannedUser, admin, 'foo');
-  });
-
-  before('create room second ban', () => {
-    const bannedUser = { id: 'second.user@foo.com', name: 'SecondUser User', roles: [] };
-    const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
-
-    return chat.services.ban.add(this.room.id, bannedUser, admin, 'foo');
-  });
-
   before('create second room', () => {
     const params = { name: 'second test room', createdBy: 'admin@foo.com' };
 
@@ -57,11 +43,41 @@ describe('users.unban', function suite() {
       });
   });
 
-  before('create second room ban', () => {
-    const bannedUser = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
-    const admin = { id: 'root@foo.com', name: 'Root User', roles: ['admin', 'root'] };
+  before('create participants', () => {
+    const service = chat.services.participant;
+    const root = { id: 'root@foo.com', name: 'Root Admin', roles: ['root'] };
+    const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
+    const participants = [
+      Object.assign({ roomId: this.roomId }, root),
+      Object.assign({ roomId: this.roomId }, admin),
+      {
+        id: 'user@foo.com',
+        name: 'User User',
+        roles: [],
+        roomId: this.roomId,
+        bannedBy: admin,
+        bannedAt: new Date(),
+        reason: 'foo',
+      },
+      {
+        id: 'second.user@foo.com',
+        name: 'Second User',
+        roles: [],
+        roomId: this.roomId,
+        bannedBy: admin,
+        bannedAt: new Date(),
+        reason: 'foo',
+      },
+      Object.assign({ roomId: this.secondRoomId }, root),
+      Object.assign({
+        roomId: this.secondRoomId,
+        bannedBy: root,
+        bannedAt: new Date(),
+        reason: 'bar',
+      }, admin),
+    ];
 
-    return chat.services.ban.add(this.room.id, bannedUser, admin, 'bar');
+    return Promise.map(participants, participant => service.create(participant));
   });
 
   it('should not be able to unban if not authorized', () => {
@@ -74,7 +90,7 @@ describe('users.unban', function suite() {
         assert.equal(statusCode, 400);
         assert.equal(body.statusCode, 400);
         assert.equal(body.error, 'Bad Request');
-        assert.equal(body.message, 'users.unban validation failed:' +
+        assert.equal(body.message, 'participants.unban validation failed:' +
           ' data should have required property \'token\'');
         assert.equal(body.name, 'ValidationError');
       });
@@ -142,28 +158,25 @@ describe('users.unban', function suite() {
     return request(uri, params)
       .then((response) => {
         const { body, statusCode } = response;
-        const { type, attributes } = body.data;
+        const { id, type, attributes } = body.data;
 
         assert.equal(statusCode, 200);
-        assert.equal(type, 'ban');
+        assert.equal(type, 'participant');
+        assert.equal(id, 'user@foo.com');
         assert.equal(attributes.roomId, this.roomId);
-        assert.equal(attributes.userId, 'user@foo.com');
-        assert.deepEqual(attributes.user, {
-          id: 'user@foo.com',
-          name: 'User User',
-          roles: null,
-        });
-        assert.equal(isISODate(attributes.bannedAt), true);
-        assert.deepEqual(attributes.bannedBy, {
-          id: 'admin@foo.com',
-          name: 'Admin Admin',
-          roles: ['admin'],
-        });
-        assert.equal(attributes.reason, 'foo');
+        assert.equal(attributes.name, 'User User');
+        assert.equal(attributes.roles, null);
+        assert.equal(attributes.bannedAt, null);
+        assert.equal(attributes.bannedBy, null);
+        assert.equal(attributes.reason, null);
       })
-      .then(() => chat.services.ban.findById(this.roomId, 'user@foo.com'))
-      .then((ban) => {
-        assert.equal(ban, null);
+      .then(() => chat.services.participant.getById(this.roomId, 'user@foo.com'))
+      .tap((participant) => {
+        assert.equal(participant.roomId, this.roomId);
+        assert.equal(participant.id, 'user@foo.com');
+        assert.equal(participant.bannedAt, null);
+        assert.equal(participant.bannedBy, null);
+        assert.equal(participant.reason, null);
       });
   });
 
@@ -178,7 +191,7 @@ describe('users.unban', function suite() {
         assert.equal(body.statusCode, 403);
         assert.equal(body.error, 'Forbidden');
         assert.equal(body.message, 'An attempt was made to perform an operation that'
-          + ' is not permitted: User #user@foo.com isn\'t banned');
+          + ' is not permitted: Participant #user@foo.com isn\'t banned');
         assert.equal(body.name, 'NotPermittedError');
       });
   });
@@ -194,23 +207,17 @@ describe('users.unban', function suite() {
     client.on('error', done);
     client.on('connect', () => {
       client.emit('chat.rooms.join', { id: this.roomId }, () => {
-        client.on(`users.unban.${this.roomId}`, (response) => {
-          const { attributes } = response.data;
+        client.on(`participants.unban.${this.roomId}`, (response) => {
+          const { id, type, attributes } = response.data;
 
+          assert.equal(type, 'participant');
+          assert.equal(id, 'second.user@foo.com');
           assert.equal(attributes.roomId, this.roomId);
-          assert.equal(attributes.userId, 'second.user@foo.com');
-          assert.deepEqual(attributes.user, {
-            id: 'second.user@foo.com',
-            name: 'SecondUser User',
-            roles: null,
-          });
-          assert.equal(isISODate(attributes.bannedAt), true);
-          assert.deepEqual(attributes.bannedBy, {
-            id: 'admin@foo.com',
-            name: 'Admin Admin',
-            roles: ['admin'],
-          });
-          assert.equal(attributes.reason, 'foo');
+          assert.equal(attributes.name, 'Second User');
+          assert.equal(attributes.roles, null);
+          assert.equal(attributes.bannedAt, null);
+          assert.equal(attributes.bannedBy, null);
+          assert.equal(attributes.reason, null);
 
           client.disconnect();
           done();
@@ -221,17 +228,5 @@ describe('users.unban', function suite() {
     });
   });
 
-  // depends on previous test
-  it('should be able to mark participant as banned', () =>
-    chat.services.participant
-      .findOne({ roomId: this.roomId, id: 'second.user@foo.com' })
-      .then((participant) => {
-        assert.equal(participant.id, 'second.user@foo.com');
-        assert.equal(participant.banned, false);
-      })
-  );
-
   after('shutdown chat', () => chat.close());
-
-  after('delete room', () => this.room.deleteAsync());
 });

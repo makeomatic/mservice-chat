@@ -19,10 +19,6 @@ module.exports = {
       typeDef: '<set<varchar>>',
       rule: required,
     },
-    banned: {
-      type: 'boolean',
-      rule: required,
-    },
     joinedAt: {
       type: 'timeuuid',
       rule: required,
@@ -30,6 +26,16 @@ module.exports = {
     lastActivityAt: {
       type: 'timestamp',
       rule: required,
+    },
+    bannedAt: {
+      type: 'timestamp',
+    },
+    bannedBy: {
+      type: 'frozen',
+      typeDef: '<"User">',
+    },
+    reason: {
+      type: 'text',
     },
   },
   key: [

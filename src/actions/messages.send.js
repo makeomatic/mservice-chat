@@ -1,6 +1,6 @@
 const Errors = require('common-errors');
+const fetchParticipant = require('../fetchers/participant');
 const fetchRoom = require('../fetchers/room');
-const fetchBan = require('../fetchers/ban');
 const isElevated = require('../services/roles/isElevated');
 const Promise = require('bluebird');
 const { modelResponse, TYPE_MESSAGE } = require('../utils/response');
@@ -8,6 +8,7 @@ const { modelResponse, TYPE_MESSAGE } = require('../utils/response');
 /**
  * @api {socket.io} <prefix>.messages.send Send message to a room
  * @apiVersion 1.0.0
+ * @apiDescription If a message of type sticky is being send the event is not fired
  * @apiName messages.send
  * @apiGroup Messages
  * @apiParam (Payload) {String} roomId - Room identificator
@@ -55,7 +56,7 @@ function messageSendAction(request) {
 }
 
 function allowed(request) {
-  const { ban, params, room, socket } = request;
+  const { participant, params, room, socket } = request;
   const { user } = socket;
 
   if (!socket.rooms[room.id.toString()]) {
@@ -66,7 +67,7 @@ function allowed(request) {
     return Promise.reject(new Errors.NotPermittedError('Access denied for guests'));
   }
 
-  if (ban !== undefined) {
+  if (participant.bannedAt) {
     throw new Errors.NotPermittedError(`User #${user.id} is banned`);
   }
 
@@ -80,7 +81,7 @@ function allowed(request) {
 }
 
 messageSendAction.allowed = allowed;
-messageSendAction.fetchers = [fetchRoom('roomId'), fetchBan(null)];
+messageSendAction.fetchers = [fetchRoom('roomId'), fetchParticipant(null)];
 messageSendAction.schema = 'messages.send';
 messageSendAction.transports = ['socketIO'];
 

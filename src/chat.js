@@ -1,4 +1,3 @@
-const BanService = require('./services/ban');
 const CassandraMixin = require('./services/mixins/cassandra');
 const getAuthMiddleware = require('./middlewares/socketIO/auth');
 const { globFiles } = require('ms-conf/lib/load-config');
@@ -14,7 +13,6 @@ const UserService = require('./services/user');
 
 const defaultConfig = globFiles(path.resolve(__dirname, 'configs'));
 const cassandraServices = {
-  ban: BanService,
   pin: PinService,
   participant: ParticipantService,
   room: RoomService,

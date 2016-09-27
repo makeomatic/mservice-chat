@@ -1,6 +1,5 @@
 const assert = require('assert');
 const Chat = require('../../src');
-const { connect, emit } = require('../helpers/socketIO');
 const { login } = require('../helpers/users');
 const socketIOClient = require('socket.io-client');
 

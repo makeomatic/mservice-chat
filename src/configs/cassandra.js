@@ -9,6 +9,9 @@ module.exports = {
     client: {
       clientOptions: {
         contactPoints: ['0.0.0.0'],
+        encoding: {
+          useUndefinedAsUnset: true,
+        },
         protocolOptions: {
           port: 9042,
         },

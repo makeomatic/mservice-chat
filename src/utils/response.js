@@ -1,6 +1,5 @@
 const omit = require('lodash/omit');
 
-const TYPE_BAN = 'ban';
 const TYPE_MESSAGE = 'message';
 const TYPE_PIN = 'pin';
 const TYPE_ROOM = 'room';
@@ -61,7 +60,6 @@ module.exports = {
   modelResponse,
   successResponse,
   transform,
-  TYPE_BAN,
   TYPE_MESSAGE,
   TYPE_PIN,
   TYPE_ROOM,

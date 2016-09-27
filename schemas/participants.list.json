@@ -1,5 +1,5 @@
 {
-  "id": "rooms.participants",
+  "id": "participants.list",
   "additionalProperties": false,
   "type": "object",
   "required": ["roomId"],

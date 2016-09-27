@@ -7,9 +7,9 @@ const { uuid } = require('express-cassandra');
 const chat = new Chat(global.SERVICES);
 const fakeRoomId = '00000000-0000-0000-0000-000000000000';
 const roomId = uuid();
-const uri = 'http://0.0.0.0:3000/api/chat/rooms/participants';
+const uri = 'http://0.0.0.0:3000/api/chat/participants/list';
 
-describe('rooms.participants', function suite() {
+describe('participants.list', function suite() {
   before('start up chat', () => chat.connect());
 
   before('create participants', () => {
