@@ -8,7 +8,7 @@ module.exports = {
       },
     },
     participant: {
-      listInterval: 7 * 24 * 60 * 60 * 1000, // 7 days
+      listDaysNumber: 7,
     },
   },
 };

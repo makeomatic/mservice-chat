@@ -1,4 +1,5 @@
 const { collectionResponse, TYPE_PARTICIPANT } = require('../utils/response');
+const moment = require('moment');
 const { timeuuidFromDate } = require('express-cassandra');
 
 /**
@@ -14,10 +15,9 @@ function participantsListAction(request) {
   const { participant: participantService } = this.services;
   const { roomId, before, limit } = request.params;
   const collectionOptions = { before, cursor: 'joinedAt' };
-  const listInterval = timeuuidFromDate(
-    new Date(Date.now() - participantService.config.listInterval)
-  );
-  const listBefore = before || listInterval;
+  const { listDaysNumber } = participantService.config;
+  const listBefore = before
+    || timeuuidFromDate(moment().subtract(listDaysNumber, 'days').startOf('day').toDate());
 
   return participantService
     .list(roomId, listBefore, limit)

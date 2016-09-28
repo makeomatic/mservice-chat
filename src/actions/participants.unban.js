@@ -22,13 +22,12 @@ const { modelResponse, TYPE_PARTICIPANT } = require('../utils/response');
   */
 function participantsUnbanAction(request) {
   const { socketIO, services } = this;
-  const { participant, params } = request;
-  const { roomId } = params;
+  const { params } = request;
+  const { roomId, id } = params;
 
   return services.participant
-    // refactor it after https://github.com/masumsoft/express-cassandra/issues/71
-    .unban(participant)
-    .then(() => services.participant.findOne({ roomId, id: participant.id }))
+    .unban(roomId, id)
+    .then(() => services.participant.findOne({ roomId, id }))
     .then(unbannedParticipant => modelResponse(unbannedParticipant, TYPE_PARTICIPANT))
     .tap(response => socketIO.in(roomId).emit(`participants.unban.${roomId}`, response));
 }
@@ -54,7 +53,7 @@ function allowed(request) {
 
 participantsUnbanAction.allowed = allowed;
 participantsUnbanAction.auth = 'token';
-participantsUnbanAction.fetchers = [fetchRoom('roomId'), fetchParticipant()];
+participantsUnbanAction.syncFetchers = [fetchRoom('roomId'), fetchParticipant()];
 participantsUnbanAction.schema = 'participants.unban';
 participantsUnbanAction.transports = ['http'];
 

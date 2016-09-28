@@ -116,8 +116,6 @@ describe('messages.send', function testSuite() {
     client.on('connect', () => {
       client.emit(action, { roomId: fakeRoomId, message: { text: 'foo' } }, (error) => {
         expect(error.name).to.be.equals('NotFoundError');
-        expect(error.message).to.be.equals('Not Found:' +
-          ' "Room #00000000-0000-0000-0000-000000000000 not found"');
         client.disconnect();
         done();
       });

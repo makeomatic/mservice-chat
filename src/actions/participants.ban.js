@@ -59,7 +59,7 @@ function allowed(request) {
 
 participantsBanAction.allowed = allowed;
 participantsBanAction.auth = 'token';
-participantsBanAction.fetchers = [fetchRoom('roomId'), fetchParticipant()];
+participantsBanAction.syncFetchers = [fetchRoom('roomId'), fetchParticipant()];
 participantsBanAction.schema = 'participants.ban';
 participantsBanAction.transports = ['http'];
 

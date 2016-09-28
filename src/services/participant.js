@@ -39,17 +39,8 @@ class ParticipantService
     return this.update({ roomId, id }, { bannedBy, reason, bannedAt: new Date() });
   }
 
-  // refactor it after https://github.com/masumsoft/express-cassandra/issues/71
-  unban(participant) { // eslint-disable-line class-methods-use-this
-    participant.bannedBy = null;
-    participant.reason = null;
-    participant.bannedAt = null;
-
-    if (participant.roles === null) {
-      participant.roles = [];
-    }
-
-    return participant.saveAsync();
+  unban(roomId, id) {
+    return this.update({ roomId, id }, { bannedBy: null, reason: null, bannedAt: null });
   }
 
   list(roomId, before, limit = 20) {
