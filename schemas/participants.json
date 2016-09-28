@@ -1,0 +1,122 @@
+{
+  "id": "participants.json",
+  "definitions": {
+    "model": {
+      "description": "`participant` object",
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "roles",
+        "roomId",
+        "bannedAt",
+        "bannedBy",
+        "reason",
+        "joinedAt",
+        "lastActivityAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "users.json#/definitions/model/properties/id"
+        },
+        "name": {
+          "$ref": "users.json#/definitions/model/properties/name"
+        },
+        "roles": {
+          "$ref": "users.json#/definitions/model/properties/roles"
+        },
+        "roomId": {
+          "$ref": "common.json#/definitions/roomId"
+        },
+        "bannedAt": {
+          "$ref": "common.json#/definitions/ISODate"
+        },
+        "bannedBy": {
+          "$ref": "users.json#/definitions/model"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Ban reason"
+        },
+        "joinedAt": {
+          "$ref": "common.json#/definitions/ISODate"
+        },
+        "lastActivityAt": {
+          "$ref": "common.json#/definitions/ISODate"
+        }
+      }
+    },
+    "response": {
+      "description": "`participant` response",
+      "type": "object",
+      "required": ["id", "type", "attributes"],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/model/properties/id"
+        },
+        "type": {
+          "description": "Participant type",
+          "type": "string",
+          "enum": ["participant"]
+        },
+        "attributes": {
+          "description": "Participant attributes",
+          "required": [
+            "name",
+            "roles",
+            "roomId",
+            "bannedAt",
+            "bannedBy",
+            "reason",
+            "joinedAt",
+            "lastActivityAt"
+          ],
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "#/definitions/model/properties/name"
+            },
+            "roles": {
+              "$ref": "#/definitions/model/properties/roles"
+            },
+            "roomId": {
+              "$ref": "#/definitions/model/properties/roomId"
+            },
+            "bannedAt": {
+              "$ref": "#/definitions/model/properties/bannedAt"
+            },
+            "bannedBy": {
+              "$ref": "#/definitions/model/properties/bannedBy"
+            },
+            "reason": {
+              "$ref": "#/definitions/model/properties/reason"
+            },
+            "joinedAt": {
+              "$ref": "#/definitions/model/properties/joinedAt"
+            },
+            "lastActivityAt": {
+              "$ref": "#/definitions/model/properties/lastActivityAt"
+            }
+          }
+        }
+      }
+    },
+    "collectionResponse": {
+      "description": "`participant` collection response",
+      "type": "object",
+      "required": ["meta", "data"],
+      "properties": {
+        "meta": {
+          "$ref": "common.json#/definitions/collectionMeta"
+        },
+        "data": {
+          "description": "Collection of participants",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/response"
+          }
+        }
+      }
+    }
+  }
+}

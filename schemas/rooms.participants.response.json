@@ -1,4 +1,0 @@
-{
-  "id": "rooms.participants.response",
-  "$ref": "common.json#/definitions/participantsCollection"
-}

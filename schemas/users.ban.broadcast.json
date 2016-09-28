@@ -1,4 +1,0 @@
-{
-  "id": "users.ban.broadcast",
-  "$ref": "common.json#/definitions/banResponse"
-}

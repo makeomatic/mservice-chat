@@ -1,4 +1,0 @@
-{
-  "id": "users.unban.response",
-  "$ref": "common.json#/definitions/banResponse"
-}

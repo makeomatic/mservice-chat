@@ -5,7 +5,7 @@
   "required": ["user"],
   "properties": {
     "user": {
-      "$ref": "common.json#/definitions/user"
+      "$ref": "users.json#/definitions/model"
     }
   }
 }

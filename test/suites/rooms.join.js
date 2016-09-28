@@ -49,13 +49,6 @@ describe('rooms.join', function testSuite() {
     return chat.services.pin.pin(this.room.id, this.message, admin);
   });
 
-  before('create ban', () => {
-    const bannedUser = { id: 'second.user@foo.com', name: 'SecondUser User', roles: [] };
-    const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
-
-    return chat.services.ban.add(this.room.id, bannedUser, admin, 'foo');
-  });
-
   it('should return validation error if invalid room id', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000');
 
@@ -157,47 +150,15 @@ describe('rooms.join', function testSuite() {
       .then((participant) => {
         assert.equal(participant.roomId.toString(), this.roomId);
         assert.equal(participant.id, 'user@foo.com');
-        assert.equal(participant.banned, false);
-        assert.equal(is.date(participant.joinedAt), true);
+        assert.ok(participant.joinedAt);
         assert.equal(is.date(participant.lastActivityAt), true);
         assert.equal(participant.name, 'User User');
         assert.deepEqual(participant.roles, null);
+        assert.equal(participant.bannedAt, null);
+        assert.equal(participant.bannedBy, null);
+        assert.equal(participant.reason, null);
       })
       .tap(() => client.disconnect());
-  });
-
-  it('should be able to mark a participant as banned', () => {
-    const { secondUserToken } = this;
-    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${secondUserToken}` });
-
-    return connect(client)
-      .then(() => emit(client, action, { id: this.roomId }))
-      .then(() =>
-        chat.services.participant.findOne({ roomId: this.roomId, id: 'second.user@foo.com' })
-      )
-      .then((participant) => {
-        assert.equal(participant.roomId.toString(), this.roomId);
-        assert.equal(participant.id, 'second.user@foo.com');
-        assert.equal(participant.banned, true);
-        assert.equal(is.date(participant.joinedAt), true);
-        assert.equal(is.date(participant.lastActivityAt), true);
-        assert.equal(participant.name, 'SecondUser User');
-        assert.deepEqual(participant.roles, null);
-      })
-      .tap(() => client.disconnect());
-  });
-
-  it('should be able to delete a participant if client was disconnected', () => {
-    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
-
-    return connect(client)
-      .tap(() => emit(client, action, { id: this.roomId }))
-      .tap(() => client.disconnect())
-      .tap(() => Promise.delay(100))
-      .then(() => chat.services.participant.findOne({ roomId: this.roomId, id: 'user@foo.com' }))
-      .then((participant) => {
-        assert.equal(participant, null);
-      });
   });
 
   it('should be able to emit "leave" event if client was disconnected', (done) => {

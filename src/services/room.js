@@ -8,7 +8,6 @@ class RoomService
   };
 
   static defaultData = {
-    banned: () => [],
     id: () => uuid(),
     createdAt: () => new Date(),
   };

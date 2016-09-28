@@ -1,36 +1,46 @@
+const Errors = require('common-errors');
+const { timeuuid } = require('express-cassandra');
+
 class ParticipantService
 {
   static castOptions = {
     roomId: 'Uuid',
+    joinedAt: 'TimeUuid',
   };
 
   static defaultData = {
-    joinedAt: () => new Date(),
+    joinedAt: () => timeuuid(),
     lastActivityAt: () => new Date(),
   };
 
   static modelName = 'participant';
 
+  getById(roomId, id) {
+    return this
+      .findOne({ roomId, id })
+      .tap((participant) => {
+        if (!participant) {
+          throw new Errors.NotFoundError(`Participant #${id} not found`);
+        }
+      });
+  }
+
   add(roomId, user) {
-    const { ttl } = this.config;
     const { id, name, roles } = user;
 
-    return this.services.ban
-      .findById(roomId, id)
-      .then(ban => ban !== undefined)
-      .then(banned => this.create({ roomId, id, name, roles, banned }, { ttl }));
+    return this.create({ roomId, id, name, roles });
   }
 
   updateActivity(roomId, id) {
-    const { ttl } = this.config;
-
-    return this.update({ roomId, id }, { lastActivityAt: new Date() }, { ttl });
+    return this.update({ roomId, id }, { lastActivityAt: new Date() });
   }
 
-  markAsBanned(roomId, id, banned = true) {
-    const { ttl } = this.config;
+  ban(roomId, id, bannedBy, reason) {
+    return this.update({ roomId, id }, { bannedBy, reason, bannedAt: new Date() });
+  }
 
-    return this.update({ roomId, id }, { banned }, { ttl });
+  unban(roomId, id) {
+    return this.update({ roomId, id }, { bannedBy: null, reason: null, bannedAt: null });
   }
 
   list(roomId, before, limit = 20) {

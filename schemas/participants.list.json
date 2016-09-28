@@ -1,5 +1,5 @@
 {
-  "id": "rooms.participants",
+  "id": "participants.list",
   "additionalProperties": false,
   "type": "object",
   "required": ["roomId"],
@@ -8,7 +8,8 @@
       "$ref": "common.json#/definitions/roomId"
     },
     "before": {
-      "$ref": "common.json#/definitions/ISODate"
+      "type": "string",
+      "format": "uuid"
     },
     "limit": {
       "$ref": "common.json#/definitions/limit"

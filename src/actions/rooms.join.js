@@ -13,7 +13,7 @@ const Promise = require('bluebird');
 /**
  * @api {socket.io} <prefix>.rooms.join Join a room
  * @apiDescription Returns collection of `message` objects. If the room has pinned message
- * it will be first item in collection and will not affect meta.
+ * `pin` object will be first item in collection and will not affect meta.
  * @apiVersion 1.0.0
  * @apiName rooms.join
  * @apiGroup Rooms
@@ -35,10 +35,7 @@ function RoomsJoinAction(request) {
   const userResponse = modelResponse(user, TYPE_USER);
 
   socket.on('disconnect', () =>
-    this.services.participant
-      .delete({ roomId: id, id: user.id })
-      .then(() => modelResponse(user, TYPE_USER))
-      .tap(response => socket.broadcast.to(id).emit(`rooms.leave.${id}`, response))
+    socket.broadcast.to(id).emit(`rooms.leave.${id}`, modelResponse(user, TYPE_USER))
   );
 
   return Promise

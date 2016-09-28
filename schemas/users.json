@@ -1,0 +1,62 @@
+{
+  "id": "users.json",
+  "definitions": {
+    "model": {
+      "description": "`user` object",
+      "type": "object",
+      "required": ["id", "name", "roles"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "User identificator"
+        },
+        "name": {
+          "type": "string",
+          "description": "User name"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "User roles"
+        }
+      }
+    },
+    "response": {
+      "description": "`user` response",
+      "type": "object",
+      "required": ["data"],
+      "properties": {
+        "data": {
+          "description": "User data",
+          "type": "object",
+          "required": ["id", "type", "attributes"],
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/model/properties/id"
+            },
+            "type": {
+              "description": "User type",
+              "type": "string",
+              "enum": ["user"]
+            },
+            "attributes": {
+              "description": "User attributes",
+              "type": "object",
+              "required": ["name", "roles"],
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/model/properties/name"
+                },
+                "roles": {
+                  "$ref": "#/definitions/model/properties/roles"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

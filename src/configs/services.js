@@ -8,7 +8,7 @@ module.exports = {
       },
     },
     participant: {
-      ttl: 60 * 60 * 24 * 3,
+      listDaysNumber: 7,
     },
   },
 };
