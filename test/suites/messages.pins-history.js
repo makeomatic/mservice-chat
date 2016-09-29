@@ -34,6 +34,15 @@ describe('messages.pins-history', function suite() {
       })
   );
 
+  before('create second room', () =>
+    chat.services.room
+      .create({ name: 'second room', createdBy: 'admin@foo.com' })
+      .tap((createdRoom) => {
+        this.secondRoom = createdRoom;
+        this.secondRoomId = createdRoom.id.toString();
+      })
+  );
+
   before('create messages', () => {
     this.pins = {};
 
@@ -154,7 +163,19 @@ describe('messages.pins-history', function suite() {
       });
   });
 
-  after('delete room', () => this.room.deleteAsync());
+  it('should be able to get empty collection if room hasn\'t pins', () => {
+    const params = {
+      roomId: this.secondRoomId,
+      token: this.adminToken,
+    };
+
+    return request(uri, params)
+      .then((response) => {
+        const { meta, data } = response.body;
+        assert.equal(meta.count, 0);
+        assert.deepEqual(data, []);
+      });
+  });
 
   after('shutdown chat', () => chat.close());
 });
