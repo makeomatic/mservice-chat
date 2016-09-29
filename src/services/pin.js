@@ -105,6 +105,10 @@ class PinService
   }
 
   fetchMessages(roomId, collection) {
+    if (collection.length === 0) {
+      return collection;
+    }
+
     const { message: messageService } = this.services;
 
     return Promise
