@@ -5,9 +5,9 @@ const is = require('is');
 const mapValues = require('lodash/mapValues');
 const Promise = require('bluebird');
 
-function defaultDataMapper(value) {
+const defaultDataMapper = (properties) => (value) => {
   if (is.fn(value) === true) {
-    return value(this);
+    return value(properties);
   }
 
   return value;
@@ -41,7 +41,7 @@ module.exports = superclass => class Mixin extends superclass {
     const defaultData = superclass.defaultData || this.defaultData();
 
     if (is.object(defaultData) === true) {
-      return mapValues(defaultData, defaultDataMapper.bind(properties));
+      return mapValues(defaultData, defaultDataMapper(properties));
     }
 
     return {};
