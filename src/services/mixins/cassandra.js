@@ -7,7 +7,7 @@ const Promise = require('bluebird');
 
 function defaultDataMapper(value) {
   if (is.fn(value) === true) {
-    return value();
+    return value(this);
   }
 
   return value;
@@ -37,11 +37,11 @@ module.exports = superclass => class Mixin extends superclass {
     this.socketIO = socketIO;
   }
 
-  getDefaultData() {
+  getDefaultData(properties) {
     const defaultData = superclass.defaultData || this.defaultData();
 
     if (is.object(defaultData) === true) {
-      return mapValues(defaultData, defaultDataMapper);
+      return mapValues(defaultData, defaultDataMapper.bind(properties));
     }
 
     return {};
@@ -49,7 +49,7 @@ module.exports = superclass => class Mixin extends superclass {
 
   create(properties, options = {}) {
     const Model = this.model;
-    const defaultData = this.getDefaultData();
+    const defaultData = this.getDefaultData(properties);
 
     return Promise
       .bind(this, defaultData)

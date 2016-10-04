@@ -160,13 +160,14 @@ describe('messages.send', function testSuite() {
     client.on('error', done);
     client.on('connect', () => {
       client.emit('chat.rooms.join', { id: roomId }, () => {
-        client.emit(action, { roomId, message: { text: 'foo' } }, (error, response) => {
+        client.emit(action, { roomId, message: { text: 'foo bar ass' } }, (error, response) => {
           assert.equal(error, null);
 
           const { data } = response;
 
           assert.ok(data.id);
-          assert.equal(data.attributes.text, 'foo');
+          assert.equal(data.attributes.text, 'foo bar ass');
+          assert.ok(/^foo bar [!@#$%~*]{3}$/.test(data.attributes.sanitizedText));
           assert.equal(data.attributes.roomId, roomId);
           assert.ok(data.attributes.createdAt);
           assert.equal(data.attributes.userId, 'user@foo.com');
@@ -209,16 +210,17 @@ describe('messages.send', function testSuite() {
     client.on('error', done);
     client.on('connect', () => {
       client.emit('chat.rooms.join', { id: roomId }, () => {
-        client.emit(action, { roomId, message: { text: 'foo' } }, () => {
-          client.emit(action, { roomId, message: { text: 'bar' } }, () => {
-            client.emit(action, { roomId, message: { text: 'baz' } }, () => {
+        client.emit(action, { roomId, message: { text: 'foo bar ass' } }, () => {
+          client.emit(action, { roomId, message: { text: 'bar baz ass' } }, () => {
+            client.emit(action, { roomId, message: { text: 'baz qux ass' } }, () => {
               chat.services.message
                 .find({ roomId }, { $desc: 'id' }, 2)
                 .then((messages) => {
                   const [first, second] = messages;
 
                   assert.ok(first.id);
-                  assert.equal(first.text, 'baz');
+                  assert.equal(first.text, 'baz qux ass');
+                  assert.ok(/^baz qux [!@#$%~*]{3}$/.test(first.sanitizedText));
                   assert.equal(first.roomId, roomId);
                   assert.ok(first.createdAt);
                   assert.equal(first.userId, 'admin@foo.com');
@@ -227,7 +229,8 @@ describe('messages.send', function testSuite() {
                   assert.deepEqual(first.user.roles, ['admin']);
 
                   assert.ok(second.id);
-                  assert.equal(second.text, 'bar');
+                  assert.equal(second.text, 'bar baz ass');
+                  assert.ok(/^bar baz [!@#$%~*]{3}$/.test(second.sanitizedText));
                   assert.equal(second.roomId, roomId);
                   assert.ok(second.createdAt);
                   assert.equal(second.userId, 'admin@foo.com');
@@ -255,7 +258,8 @@ describe('messages.send', function testSuite() {
 
       assert.ok(id);
       assert.equal(type, 'message');
-      assert.equal(attributes.text, 'foo');
+      assert.equal(attributes.text, 'foo bar ass');
+      assert.ok(/^foo bar [!@#$%~*]{3}$/.test(attributes.sanitizedText));
       assert.equal(attributes.roomId, roomId);
       assert.ok(attributes.createdAt);
       assert.equal(attributes.userId, 'user@foo.com');
@@ -271,7 +275,7 @@ describe('messages.send', function testSuite() {
     client1.on('connect', () => {
       client1.emit('chat.rooms.join', { id: roomId }, () => {
         client2.emit('chat.rooms.join', { id: roomId }, () => {
-          client2.emit(action, { roomId, message: { text: 'foo' } }, (error) => {
+          client2.emit(action, { roomId, message: { text: 'foo bar ass' } }, (error) => {
             expect(error).to.be.equals(null);
           });
         });

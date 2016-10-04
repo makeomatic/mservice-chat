@@ -23,6 +23,10 @@
               "type": "string",
               "description": "Message text"
             },
+            "sanitizedText": {
+              "type": "string",
+              "description": "Message text processed by profanity filter"
+            },
             "user": {
               "$ref": "users.json#/definitions/model"
             },

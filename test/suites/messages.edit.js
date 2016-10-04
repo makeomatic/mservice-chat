@@ -110,7 +110,7 @@ describe('messages.edit', function testSuite() {
     const params = {
       id: this.secondMessageId,
       roomId: this.roomId,
-      text: 'qux',
+      text: 'qux ass',
       token: this.adminToken,
     };
 
@@ -121,7 +121,8 @@ describe('messages.edit', function testSuite() {
       })
       .then(() => chat.services.message.findOne({ id: this.secondMessageId, roomId: this.roomId }))
       .then((message) => {
-        assert.equal(message.text, 'qux');
+        assert.equal(message.text, 'qux ass');
+        assert.ok(/^qux [!@#$%~*]{3}$/.test(message.sanitizedText));
         assert.equal(is.date(message.editedAt), true);
         assert.equal(message.editedBy.id, 'admin@foo.com');
       });
@@ -132,7 +133,7 @@ describe('messages.edit', function testSuite() {
     const params = {
       id: this.secondMessageId,
       roomId: this.roomId,
-      text: 'quux',
+      text: 'quux ass',
       token: this.userToken,
     };
 
@@ -141,7 +142,8 @@ describe('messages.edit', function testSuite() {
       client.emit('chat.rooms.join', { id: this.roomId }, () => {
         client.on(`messages.edit.${this.roomId}`, (result) => {
           assert.equal(result.data.type, 'message');
-          assert.equal(result.data.attributes.text, 'quux');
+          assert.equal(result.data.attributes.text, 'quux ass');
+          assert.ok(/^quux [!@#$%~*]{3}$/.test(result.data.attributes.sanitizedText));
           assert.equal(isISODate(result.data.attributes.editedAt), true);
           assert.equal(result.data.attributes.editedBy.id, 'user@foo.com');
 
