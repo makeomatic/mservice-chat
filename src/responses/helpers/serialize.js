@@ -15,7 +15,7 @@ function serialize(model, group, groups) {
       return omit(jsonModel, rules.exclude);
     }
   }
-  
+
   return jsonModel;
 }
 
