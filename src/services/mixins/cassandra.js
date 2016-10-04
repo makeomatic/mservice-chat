@@ -5,13 +5,13 @@ const is = require('is');
 const mapValues = require('lodash/mapValues');
 const Promise = require('bluebird');
 
-function defaultDataMapper(value) {
+const defaultDataMapper = properties => (value) => {
   if (is.fn(value) === true) {
-    return value();
+    return value(properties);
   }
 
   return value;
-}
+};
 
 module.exports = superclass => class Mixin extends superclass {
   constructor(config, cassandraClient, socketIO, services) {
@@ -37,11 +37,11 @@ module.exports = superclass => class Mixin extends superclass {
     this.socketIO = socketIO;
   }
 
-  getDefaultData() {
+  getDefaultData(properties) {
     const defaultData = superclass.defaultData || this.defaultData();
 
     if (is.object(defaultData) === true) {
-      return mapValues(defaultData, defaultDataMapper);
+      return mapValues(defaultData, defaultDataMapper(properties));
     }
 
     return {};
@@ -49,7 +49,7 @@ module.exports = superclass => class Mixin extends superclass {
 
   create(properties, options = {}) {
     const Model = this.model;
-    const defaultData = this.getDefaultData();
+    const defaultData = this.getDefaultData(properties);
 
     return Promise
       .bind(this, defaultData)

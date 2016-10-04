@@ -10,6 +10,10 @@ module.exports = {
       type: 'text',
       rule: required,
     },
+    sanitizedText: {
+      type: 'text',
+      rule: required,
+    },
     roomId: {
       type: 'uuid',
       rule: required,

@@ -1,5 +1,6 @@
 const Errors = require('common-errors');
 const { datatypes } = require('express-cassandra');
+const { process } = require('ms-profanity');
 
 class MessageService
 {
@@ -14,6 +15,7 @@ class MessageService
     return {
       createdAt: () => new Date(),
       id: () => datatypes.Long.fromString(this.flakeless.next()),
+      sanitizedText: params => process(params.text),
     };
   }
 
@@ -55,6 +57,7 @@ class MessageService
 
   edit(message, text, user) { // eslint-disable-line class-methods-use-this
     message.text = text;
+    message.sanitizedText = process(text);
     message.editedAt = new Date();
     message.editedBy = user;
 
