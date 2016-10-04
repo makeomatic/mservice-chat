@@ -1,7 +1,8 @@
 const Errors = require('common-errors');
 const fetchRoom = require('./../fetchers/room')();
 const Promise = require('bluebird');
-const { successResponse, modelResponse, TYPE_USER } = require('../utils/response');
+const { successResponse } = require('../responses/success');
+const { modelResponse } = require('../responses/user');
 
 /**
  * @api {socket.io} <prefix>.rooms.join Leave a room
@@ -27,7 +28,7 @@ function RoomsLeaveAction(request) {
   return Promise
     .fromCallback(callback => socket.leave(id, callback))
     .tap(() => this.services.participant.delete({ roomId: id, id: user.id }))
-    .then(() => modelResponse(user, TYPE_USER))
+    .then(() => modelResponse(user))
     .tap(response => socket.broadcast.to(id).emit(`rooms.leave.${id}`, response))
     .then(successResponse);
 }

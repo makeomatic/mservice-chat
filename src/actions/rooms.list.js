@@ -1,4 +1,4 @@
-const { collectionResponse, TYPE_ROOM } = require('../utils/response');
+const { collectionResponse } = require('../responses/room');
 
 /**
  * @api {http} <prefix>.rooms.list Get a list of rooms
@@ -9,7 +9,7 @@ const { collectionResponse, TYPE_ROOM } = require('../utils/response');
 function RoomsListAction() {
   return this.services.room
     .find()
-    .then(rooms => collectionResponse(rooms, TYPE_ROOM));
+    .then(collectionResponse);
 }
 
 RoomsListAction.transports = ['http'];

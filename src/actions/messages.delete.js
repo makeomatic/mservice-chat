@@ -3,7 +3,8 @@ const fetchMessage = require('../fetchers/message')();
 const fetchRoom = require('../fetchers/room')('roomId');
 const isElevated = require('../services/roles/isElevated');
 const Promise = require('bluebird');
-const { successResponse, modelResponse, TYPE_MESSAGE } = require('../utils/response');
+const { successResponse } = require('../responses/success');
+const { modelResponse } = require('../responses/message');
 
 /**
  * @api {http} <prefix>.messages.delete Delete a message
@@ -28,7 +29,7 @@ function messageDeleteAction(request) {
 
   return this.services.message
     .delete({ id, roomId })
-    .then(() => modelResponse(message, TYPE_MESSAGE))
+    .then(() => modelResponse(message))
     .tap(response => socketIO.in(roomId).emit(`messages.delete.${roomId}`, response))
     .then(successResponse);
 }

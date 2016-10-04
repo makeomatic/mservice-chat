@@ -1,4 +1,4 @@
-const { collectionResponse, TYPE_PIN } = require('../utils/response');
+const { collectionResponse } = require('../responses/pin');
 const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
 const fetchRoom = require('../fetchers/room')('roomId');
@@ -15,7 +15,7 @@ function messagePinsHistoryAction(request) {
   const { roomId, before, limit } = request.params;
   return this.services.pin
     .history(roomId, before, limit)
-    .then(pins => collectionResponse(pins, TYPE_PIN, { before, cursor: 'pinnedAt' }));
+    .then(pins => collectionResponse(pins, { before, cursor: 'pinnedAt' }));
 }
 
 function allowed(request) {

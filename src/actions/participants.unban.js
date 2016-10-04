@@ -2,7 +2,7 @@ const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
 const fetchParticipant = require('../fetchers/participant');
 const fetchRoom = require('../fetchers/room');
-const { modelResponse, TYPE_PARTICIPANT } = require('../utils/response');
+const { modelResponse, SERIALIZATION_GROUP_ADMIN } = require('../responses/participant');
 
 /**
  * @api {http} <prefix>.participants.unban Unban an user
@@ -28,7 +28,7 @@ function participantsUnbanAction(request) {
   return services.participant
     .unban(roomId, id)
     .then(() => services.participant.findOne({ roomId, id }))
-    .then(unbannedParticipant => modelResponse(unbannedParticipant, TYPE_PARTICIPANT))
+    .then(unbannedParticipant => modelResponse(unbannedParticipant, SERIALIZATION_GROUP_ADMIN))
     .tap(response => socketIO.in(roomId).emit(`participants.unban.${roomId}`, response));
 }
 

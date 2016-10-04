@@ -165,7 +165,7 @@ describe('participants.unban', function suite() {
         assert.equal(id, 'user@foo.com');
         assert.equal(attributes.roomId, this.roomId);
         assert.equal(attributes.name, 'User User');
-        assert.equal(attributes.roles, null);
+        assert.deepEqual(attributes.roles, []);
         assert.equal(attributes.bannedAt, null);
         assert.equal(attributes.bannedBy, null);
         assert.equal(attributes.reason, null);
@@ -214,7 +214,7 @@ describe('participants.unban', function suite() {
           assert.equal(id, 'second.user@foo.com');
           assert.equal(attributes.roomId, this.roomId);
           assert.equal(attributes.name, 'Second User');
-          assert.equal(attributes.roles, null);
+          assert.deepEqual(attributes.roles, []);
           assert.equal(attributes.bannedAt, null);
           assert.equal(attributes.bannedBy, null);
           assert.equal(attributes.reason, null);

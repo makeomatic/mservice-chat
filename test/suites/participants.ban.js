@@ -229,7 +229,7 @@ describe('participants.ban', function suite() {
         assert.equal(id, 'user@foo.com');
         assert.equal(attributes.roomId, this.roomId);
         assert.equal(attributes.name, 'User User');
-        assert.deepEqual(attributes.roles, null);
+        assert.deepEqual(attributes.roles, []);
         assert.equal(isISODate(attributes.lastActivityAt), true);
         assert.equal(isISODate(attributes.bannedAt), true);
         assert.deepEqual(attributes.bannedBy, {

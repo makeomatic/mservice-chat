@@ -3,7 +3,7 @@ const fetchParticipant = require('../fetchers/participant');
 const fetchRoom = require('../fetchers/room');
 const isElevated = require('../services/roles/isElevated');
 const Promise = require('bluebird');
-const { modelResponse, TYPE_MESSAGE } = require('../utils/response');
+const { modelResponse } = require('../responses/message');
 
 /**
  * @api {socket.io} <prefix>.messages.send Send message to a room
@@ -46,7 +46,7 @@ function messageSendAction(request) {
 
       return null;
     })
-    .then(createdMessage => modelResponse(createdMessage, TYPE_MESSAGE))
+    .then(modelResponse)
     .tap((response) => {
       if (params.message.type !== 'sticky') {
         socket.broadcast.to(roomId).emit(`messages.send.${roomId}`, response);
