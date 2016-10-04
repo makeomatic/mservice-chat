@@ -1,4 +1,8 @@
-const { collectionResponse, TYPE_PARTICIPANT } = require('../utils/response');
+const {
+  collectionResponse,
+  SERIALIZATION_GROUP_ADMIN,
+  SERIALIZATION_GROUP_USER,
+} = require('../responses/participant');
 const moment = require('moment');
 const { timeuuidFromDate } = require('express-cassandra');
 
@@ -14,14 +18,17 @@ const { timeuuidFromDate } = require('express-cassandra');
 function participantsListAction(request) {
   const { participant: participantService } = this.services;
   const { roomId, before, limit } = request.params;
-  const collectionOptions = { before, cursor: 'joinedAt' };
   const { listDaysNumber } = participantService.config;
   const listBefore = before
     || timeuuidFromDate(moment().subtract(listDaysNumber, 'days').startOf('day').toDate());
+  const collectionOptions = { before, cursor: 'joinedAt' };
+  const serializationGroup = (request.auth && request.auth.credentials.user.isElevated)
+    ? SERIALIZATION_GROUP_ADMIN
+    : SERIALIZATION_GROUP_USER;
 
   return participantService
     .list(roomId, listBefore, limit)
-    .then(participants => collectionResponse(participants, TYPE_PARTICIPANT, collectionOptions));
+    .then(participants => collectionResponse(participants, serializationGroup, collectionOptions));
 }
 
 participantsListAction.schema = 'participants.list';

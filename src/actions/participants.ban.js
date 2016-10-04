@@ -2,7 +2,7 @@ const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
 const fetchRoom = require('../fetchers/room');
 const fetchParticipant = require('../fetchers/participant');
-const { modelResponse, TYPE_PARTICIPANT } = require('../utils/response');
+const { modelResponse, SERIALIZATION_GROUP_ADMIN } = require('../responses/participant');
 
 /**
  * @api {http} <prefix>.participants.ban Ban an user
@@ -29,7 +29,7 @@ function participantsBanAction(request) {
   return services.participant
     .ban(roomId, id, admin, reason)
     .then(() => services.participant.findOne({ roomId, id }))
-    .then(bannedParticipant => modelResponse(bannedParticipant, TYPE_PARTICIPANT))
+    .then(bannedParticipant => modelResponse(bannedParticipant, SERIALIZATION_GROUP_ADMIN))
     .tap(response => socketIO.in(roomId).emit(`participants.ban.${roomId}`, response));
 }
 
