@@ -1,5 +1,5 @@
 const Promise = require('bluebird');
-const { modelResponse, TYPE_USER } = require('../utils/response');
+const { modelResponse } = require('../responses/user');
 
 /**
  * @api {socket.io} <prefix>.users.me Get current user
@@ -11,7 +11,7 @@ const { modelResponse, TYPE_USER } = require('../utils/response');
 function UsersMeAction(request) {
   return Promise
     .resolve(request.socket.user)
-    .then(user => modelResponse(user, TYPE_USER));
+    .then(modelResponse);
 }
 
 UsersMeAction.transports = ['socketIO'];

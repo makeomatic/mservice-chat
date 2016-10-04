@@ -1,7 +1,7 @@
 const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
 const fetchRoom = require('../fetchers/room')('roomId');
-const { successResponse } = require('../utils/response');
+const { successResponse } = require('../responses/success');
 
 /**
  * @api {http} <prefix>.messages.unpin Unpin last message

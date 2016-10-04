@@ -3,16 +3,19 @@ const omit = require('lodash/omit');
 
 function serialize(model, group, groups) {
   const jsonModel = model.toJSON ? model.toJSON() : model;
-  const rules = groups[group];
 
-  if (rules === undefined) {
-    throw new Errors.ArgumentError('group');
+  if (group) {
+    const rules = groups[group];
+
+    if (rules === undefined) {
+      throw new Errors.ArgumentError('group');
+    }
+
+    if (rules.exclude) {
+      return omit(jsonModel, rules.exclude);
+    }
   }
-
-  if (rules.exclude) {
-    return omit(jsonModel, rules.exclude);
-  }
-
+  
   return jsonModel;
 }
 

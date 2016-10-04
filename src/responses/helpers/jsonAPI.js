@@ -2,13 +2,11 @@ const { cast } = require('./cast');
 const { serialize } = require('./serialize');
 const { transform } = require('./transform');
 
-function processModel(model, type, options) {
+function processModel(model, type, options = {}) {
   const { serializationGroup, serializationGroups, castOptions } = options;
   let response = model;
 
-  if (serializationGroup) {
-    response = serialize(response, serializationGroup, serializationGroups);
-  }
+  response = serialize(response, serializationGroup, serializationGroups);
 
   if (castOptions) {
     response = cast(response, castOptions);
@@ -19,7 +17,7 @@ function processModel(model, type, options) {
   return response;
 }
 
-function transformModel(model, type, options) {
+function transformModel(model, type, options = {}) {
   const response = { data: model };
 
   if (model === null) {
@@ -31,7 +29,7 @@ function transformModel(model, type, options) {
   return response;
 }
 
-function transformCollection(collection, type, collectionOptions, options) {
+function transformCollection(collection, type, collectionOptions, options = {}) {
   const { before } = collectionOptions;
   const count = collection.length;
   const cursor = collectionOptions.cursor || 'id';
@@ -58,6 +56,7 @@ function transformCollection(collection, type, collectionOptions, options) {
 }
 
 module.exports = {
+  processModel,
   transformCollection,
   transformModel,
 };

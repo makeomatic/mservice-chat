@@ -1,5 +1,5 @@
 const fetchRoom = require('../fetchers/room')('roomId');
-const { modelResponse, TYPE_PIN } = require('../utils/response');
+const { modelResponse } = require('../responses/pin');
 
 /**
  * @api {http} <prefix>.messages.last-pin Get last pin
@@ -14,7 +14,7 @@ function messagesUnpinAction(request) {
 
   return this.services.pin
     .last(room.id)
-    .then(pin => modelResponse(pin, TYPE_PIN));
+    .then(modelResponse);
 }
 
 messagesUnpinAction.fetcher = fetchRoom;

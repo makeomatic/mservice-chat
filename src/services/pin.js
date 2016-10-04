@@ -1,4 +1,5 @@
-const { modelResponse, TYPE_PIN, TYPE_USER } = require('../utils/response');
+const { modelResponse: pinResponse } = require('../responses/pin');
+const { modelResponse: userResponse } = require('../responses/user');
 const Promise = require('bluebird');
 
 function collectMessagesIds(pin) {
@@ -49,7 +50,7 @@ class PinService
 
     return this
       .pin(roomId, message, user)
-      .then(pin => modelResponse(pin, TYPE_PIN))
+      .then(pinResponse)
       .tap(response => this.socketIO.in(id).emit(`messages.pin.${id}`, response));
   }
 
@@ -73,7 +74,7 @@ class PinService
 
     return this
       .unpin(roomId, admin)
-      .then(() => modelResponse(admin, TYPE_USER))
+      .then(() => userResponse(admin))
       .tap(response => this.socketIO.in(id).emit(`messages.unpin.${id}`, response));
   }
 

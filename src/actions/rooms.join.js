@@ -1,14 +1,9 @@
-const {
-  collectionResponse,
-  modelResponse,
-  transform,
-  TYPE_USER,
-  TYPE_PIN,
-  TYPE_MESSAGE,
-} = require('../utils/response');
+const { collectionResponse } = require('../responses/message');
 const Errors = require('common-errors');
 const fetchRoom = require('./../fetchers/room');
+const { modelResponse: makeUserResponse } = require('../responses/user');
 const Promise = require('bluebird');
+const { transform } = require('../responses/pin');
 
 /**
  * @api {socket.io} <prefix>.rooms.join Join a room
@@ -32,10 +27,10 @@ function RoomsJoinAction(request) {
   const { socket, params } = request;
   const { id, before } = params;
   const { user } = socket;
-  const userResponse = modelResponse(user, TYPE_USER);
+  const userResponse = makeUserResponse(user);
 
   socket.on('disconnect', () =>
-    socket.broadcast.to(id).emit(`rooms.leave.${id}`, modelResponse(user, TYPE_USER))
+    socket.broadcast.to(id).emit(`rooms.leave.${id}`, userResponse)
   );
 
   return Promise
@@ -47,10 +42,10 @@ function RoomsJoinAction(request) {
       this.services.participant.add(id, user)
     ))
     .spread((messages, pin) => {
-      const response = collectionResponse(messages, TYPE_MESSAGE, { before });
+      const response = collectionResponse(messages, { before });
 
       if (pin) {
-        response.data.push(transform(pin, TYPE_PIN));
+        response.data.push(transform(pin));
       }
 
       return response;

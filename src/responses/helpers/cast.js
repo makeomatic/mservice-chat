@@ -1,8 +1,6 @@
 function cast(model, options) {
   for (const field of Object.keys(options)) {
-    if (model[field] !== undefined) {
-      model[field] = options[field].call(model, model[field]);
-    }
+    model[field] = options[field](model[field], model);
   }
 
   return model;
