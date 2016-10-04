@@ -5,13 +5,13 @@ const is = require('is');
 const mapValues = require('lodash/mapValues');
 const Promise = require('bluebird');
 
-const defaultDataMapper = (properties) => (value) => {
+const defaultDataMapper = properties => (value) => {
   if (is.fn(value) === true) {
     return value(properties);
   }
 
   return value;
-}
+};
 
 module.exports = superclass => class Mixin extends superclass {
   constructor(config, cassandraClient, socketIO, services) {
