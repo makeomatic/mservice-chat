@@ -1,4 +1,5 @@
 const Errors = require('common-errors');
+const Promise = require('bluebird');
 const { timeuuid } = require('express-cassandra');
 
 class ParticipantService
@@ -26,6 +27,10 @@ class ParticipantService
   }
 
   add(roomId, user) {
+    if (user.isGuest) {
+      return Promise.resolve();
+    }
+
     const { id, name, roles } = user;
 
     return this.create({ roomId, id, name, roles });
