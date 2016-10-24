@@ -45,7 +45,7 @@ function allowed(request) {
   }
 
   if (!participant.bannedAt) {
-    throw new Errors.NotPermittedError(`Participant #${params.id} isn\'t banned`);
+    throw new Errors.NotPermittedError(`Participant #${params.id} isn't banned`);
   }
 
   return Promise.resolve(request);

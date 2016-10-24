@@ -5,9 +5,7 @@
   "required": ["roomId", "message"],
   "properties": {
     "roomId": {
-      "format": "uuid",
-      "description": "Room id",
-      "type": "string"
+      "$ref": "common.json#/definitions/roomId"
     },
     "message": {
       "oneOf": [

@@ -161,6 +161,19 @@ describe('rooms.join', function testSuite() {
       .tap(() => client.disconnect());
   });
 
+  // depend on previous test
+  it('should not be able to create a participant if user is guest', () => {
+    const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
+
+    return connect(client)
+      .then(() => emit(client, action, { id: this.roomId }))
+      .then(() => chat.services.participant.find({ roomId: this.roomId }))
+      .then((participants) => {
+        assert.equal(participants.length, 1);
+      })
+      .tap(() => client.disconnect());
+  });
+
   it('should be able to emit "leave" event if client was disconnected', (done) => {
     const { userToken, secondUserToken, roomId } = this;
     const client1 = socketIOClient('http://0.0.0.0:3000', { query: `token=${userToken}` });

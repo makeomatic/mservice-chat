@@ -4,7 +4,12 @@ const { NotFoundError, HttpStatusError } = require('common-errors');
 function makeUser(userData) {
   const name = `${userData.firstName} ${userData.lastName}`;
 
-  return new LightUserModel(userData.username, name, userData.roles);
+  return new LightUserModel(
+    userData.username,
+    name,
+    userData.roles,
+    userData.stationChatId
+  );
 }
 
 function CheckNotFoundError(error) {
