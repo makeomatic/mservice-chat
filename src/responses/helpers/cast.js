@@ -1,7 +1,9 @@
+const forOwn = require('lodash/forOwn');
+
 function cast(model, options) {
-  for (const field of Object.keys(options)) {
-    model[field] = options[field](model[field], model);
-  }
+  forOwn(options, (value, field) => {
+    model[field] = options[field](value, model);
+  });
 
   return model;
 }
