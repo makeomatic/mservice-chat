@@ -1,9 +1,8 @@
-const forIn = require('lodash/forIn');
-
 function cast(model, options) {
-  forIn(options, (value, field) => {
-    model[field] = options[field](value, model);
-  });
+  // eslint-disable-next-line no-restricted-syntax
+  for (const field of Object.keys(options)) {
+    model[field] = options[field](model[field], model);
+  }
 
   return model;
 }
