@@ -9,7 +9,12 @@ class LightUserModel
     this.id = id;
     this.name = name;
     this.roles = roles;
-    this.roomId = roomId;
+
+    // non-enumeralbe
+    Object.defineProperty(this, 'roomId', {
+      enumerable: false,
+      value: roomId || null,
+    });
   }
 
   get isGuest() {
