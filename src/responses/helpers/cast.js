@@ -1,7 +1,7 @@
-const forOwn = require('lodash/forOwn');
+const forIn = require('lodash/forIn');
 
 function cast(model, options) {
-  forOwn(options, (value, field) => {
+  forIn(options, (value, field) => {
     model[field] = options[field](value, model);
   });
 

@@ -10,7 +10,7 @@ class LightUserModel
     this.name = name;
     this.roles = roles;
 
-    // non-enumeralbe
+    // non-enumerable
     Object.defineProperty(this, 'roomId', {
       enumerable: false,
       value: roomId || null,
