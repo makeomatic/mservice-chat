@@ -31,10 +31,10 @@
     "ms-socket.io-adapter-amqp": "^2.0.0",
     "ms-validation": "^3.0.0",
     "mservice": "^4.3.2",
-    "node-uuid": "^1.4.7",
     "socket.io": "^1.5.1",
     "socketio-wildcard": "^0.3.0",
-    "uid2": "0.0.3"
+    "uid2": "0.0.3",
+    "uuid": "^3.0.0"
   },
   "devDependencies": {
     "apidoc": "^0.16.1",
