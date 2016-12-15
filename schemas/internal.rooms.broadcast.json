@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["roomId", "event", "message"],
+  "properties": {
+    "roomId": {
+      "$ref": "common.json#/definitions/roomId"
+    },
+    "event": {
+      "description": "Name of the event",
+      "type": "string"
+    },
+    "message": {
+      "description": "Message",
+      "type": "object"
+    }
+  }
+}

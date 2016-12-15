@@ -32,7 +32,7 @@ module.exports = superclass => class Mixin extends superclass {
     }
 
     this.config = config;
-    this.model = Promise.promisifyAll(model);
+    this.model = model;
     this.services = services;
     this.socketIO = socketIO;
   }
