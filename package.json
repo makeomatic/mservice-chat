@@ -35,7 +35,7 @@
     "node-uuid": "^1.4.7",
     "socket.io": "^1.7.2",
     "socketio-wildcard": "^0.3.0",
-    "uid2": "0.0.3"
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "apidoc": "^0.16.1",
