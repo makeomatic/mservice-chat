@@ -2,8 +2,7 @@ const Errors = require('common-errors');
 const { datatypes } = require('express-cassandra');
 const { process } = require('ms-profanity');
 
-class MessageService
-{
+class MessageService {
   static castOptions = {
     id: 'Long',
     roomId: 'Uuid',

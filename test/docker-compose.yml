@@ -35,7 +35,7 @@ services:
         - "5672"
         - "15672"
         - "25672"
-      image: makeomatic/rabbitmq:3.6.2
+      image: makeomatic/rabbitmq:3.6.6
       container_name: rabbitmq
       hostname: rabbitmq
       volumes:
@@ -61,7 +61,7 @@ services:
       - redis-3
       - rabbitmq
       - redis-client
-    image: makeomatic/ms-users:6.5.0
+    image: makeomatic/ms-users:7.4.0
     hostname: ms-users
     container_name: ms-users
     volumes:
@@ -75,7 +75,7 @@ services:
 
   tester:
     container_name: tester
-    image: makeomatic/node:6.2.2-tester
+    image: makeomatic/node:7.4.0-tester
     links:
       - cassandra
       - rabbitmq
