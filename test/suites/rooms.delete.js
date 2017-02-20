@@ -46,7 +46,8 @@ describe('rooms.delete', function testSuite() {
         expect(response.body.message).to.be.equals('rooms.delete validation failed:' +
           ' data.id should match format "uuid"');
         done();
-      });
+      })
+      .catch(done);
   });
 
   it('should return error if user is not admin', () => {
@@ -78,7 +79,8 @@ describe('rooms.delete', function testSuite() {
         expect(response.body.message).to.be.equals('An attempt was made to perform' +
           ' an operation that is not permitted: Has not access');
         done();
-      });
+      })
+      .catch(done);
   });
 
   it('should delete room if user is admin and room creator', () => {

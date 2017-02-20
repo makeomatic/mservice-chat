@@ -57,6 +57,8 @@ describe('internal.rooms.broadcast', function suite() {
       .then(() => amqp.publishAndWait('chat.internal.rooms.broadcast', params))
       .then((response) => {
         assert.deepEqual(response, { meta: { status: 'success' } });
-      });
+        return null;
+      })
+      .catch(done);
   });
 });

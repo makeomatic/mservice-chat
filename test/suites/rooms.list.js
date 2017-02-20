@@ -31,7 +31,8 @@ describe('rooms.list', function testSuite() {
         expect(response.statusCode).to.be.equals(200);
         assert.equal(response.body.data.length > 1, true);
         done();
-      });
+      })
+      .catch(done);
   });
 
   after('delete first room', () => this.firstRoom.deleteAsync());
