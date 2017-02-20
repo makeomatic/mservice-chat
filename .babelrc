@@ -1,8 +1,7 @@
 {
   "plugins": [
     "transform-class-properties",
-    "transform-es2015-spread",
-    "transform-object-rest-spread",
+    ["transform-object-rest-spread", { "useBuiltIns": true }],
     "transform-strict-mode"
   ]
 }
