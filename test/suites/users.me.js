@@ -60,7 +60,8 @@ describe('users.me', function testSuite() {
           done();
         });
       });
-    });
+    })
+    .catch(done);
   });
 
   after('shutdown chat', () => chat.close());

@@ -1,11 +1,12 @@
 const assert = require('assert');
-const Chat = require('../../src');
-const { connect, emit } = require('../helpers/socketIO');
-const socketIOClient = require('socket.io-client');
-
-const chat = new Chat(global.SERVICES);
 
 describe('internal.rooms.broadcast', function suite() {
+  const { connect, emit } = require('../helpers/socketIO');
+  const socketIOClient = require('socket.io-client');
+  const Chat = require('../../src');
+
+  const chat = new Chat(global.SERVICES);
+
   before('start up chat', () => chat.connect());
 
   before('create room', () =>
@@ -57,6 +58,8 @@ describe('internal.rooms.broadcast', function suite() {
       .then(() => amqp.publishAndWait('chat.internal.rooms.broadcast', params))
       .then((response) => {
         assert.deepEqual(response, { meta: { status: 'success' } });
-      });
+        return null;
+      })
+      .catch(done);
   });
 });

@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const { collectionResponse } = require('../responses/pin');
 const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');

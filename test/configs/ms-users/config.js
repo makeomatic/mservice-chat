@@ -9,20 +9,7 @@ module.exports = {
     },
   },
   redis: {
-    hosts: [
-      {
-        host: 'redis-1',
-        port: 6379,
-      },
-      {
-        host: 'redis-2',
-        port: 6379,
-      },
-      {
-        host: 'redis-3',
-        port: 6379,
-      },
-    ],
+    hosts: [7000, 7001, 7002].map(port => ({ host: 'redis', port })),
   },
   admins: [
     {

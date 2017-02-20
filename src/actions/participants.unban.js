@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
 const fetchParticipant = require('../fetchers/participant');

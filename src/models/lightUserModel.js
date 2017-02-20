@@ -1,5 +1,4 @@
-class LightUserModel
-{
+class LightUserModel {
   static ROLE_ADMIN = 'admin';
   static ROLE_GUEST = 'guest';
   static ROLE_DJ = 'dj';

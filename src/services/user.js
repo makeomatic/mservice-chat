@@ -16,8 +16,14 @@ function CheckNotFoundError(error) {
   return error.status === 404;
 }
 
-class UserService
-{
+class UserService {
+  static metaFields = [
+    'firstName',
+    'lastName',
+    'avatar',
+    'alias',
+  ];
+
   constructor(config, amqp) {
     this.amqp = amqp;
     this.config = config;
@@ -46,6 +52,32 @@ class UserService
       .catch(HttpStatusError, CheckNotFoundError, () => {
         throw new NotFoundError(`User #${username} not found`);
       });
+  }
+
+  getMetadata(usernames, fields = UserService.metaFields) {
+    const { audience, prefix, postfix, cache, timeouts } = this.config;
+    const route = `${prefix}.${postfix.getMetadata}`;
+
+    const message = {
+      audience,
+      username: usernames,
+      fields: {
+        [audience]: fields,
+      },
+    };
+
+    const opts = {
+      timeout: timeouts.getMetadata,
+      cache: cache.getMetadata,
+    };
+
+    return this.amqp
+      .publishAndWait(route, message, opts)
+      .reduce((acc, user, idx) => {
+        const username = usernames[idx];
+        acc[username] = user[audience];
+        return acc;
+      }, {});
   }
 }
 

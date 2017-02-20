@@ -30,7 +30,8 @@ describe('rooms.create', function testSuite() {
         expect(response.body.message).to.be.equals('rooms.create validation failed:' +
           ' data should have required property \'name\'');
         done();
-      });
+      })
+      .catch(done);
   });
 
   it('should return error if user is not admin', () => {
@@ -52,10 +53,10 @@ describe('rooms.create', function testSuite() {
       });
   });
 
-  it('should be able create a room if the user is an admin', (done) => {
+  it('should be able create a room if the user is an admin', () => {
     const token = this.adminToken;
 
-    request(uri, { token, name: 'test room' })
+    return request(uri, { token, name: 'test room' })
       .then((response) => {
         expect(response.statusCode).to.be.equals(200);
         expect(response.body.data.attributes.name).to.be.equals('test room');
@@ -67,8 +68,7 @@ describe('rooms.create', function testSuite() {
       .then((room) => {
         expect(room.name).to.be.equals('test room');
         return room.deleteAsync();
-      })
-      .asCallback(done);
+      });
   });
 
   after('shutdown chat', () => chat.close());
