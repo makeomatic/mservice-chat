@@ -52,5 +52,4 @@ services:
     environment:
       NODE_ENV: "test"
       DEBUG: ${DEBUG}
-      SKIP_REBUILD: ${SKIP_REBUILD}
     command: tail -f /dev/null

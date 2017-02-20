@@ -1,3 +1,6 @@
 module.exports = {
-  logger: true,
+  logger: {
+    defaultLogger: true,
+    debug: process.env.NODE_ENV !== 'production',
+  },
 };
