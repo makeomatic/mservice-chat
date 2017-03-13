@@ -38,29 +38,33 @@ describe('users.me', function testSuite() {
   });
 
   it('should auth as an admin', (done) => {
-    chat.amqp.publishAndWait('users.login', {
-      username: 'root@foo.com',
-      password: 'rootpassword000000',
-      audience: '*.localhost',
-    })
-    .then((reply) => {
-      const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${reply.jwt}` });
-      client.on('error', done);
-      client.on('connect', () => {
-        client.emit(action, {}, (error, response) => {
-          const { id, type, attributes } = response.data;
+    chat
+      .amqp
+      .publishAndWait('users.login', {
+        username: 'root@foo.com',
+        password: 'rootpassword000000',
+        audience: '*.localhost',
+      })
+      .then((reply) => {
+        const client = socketIOClient('http://0.0.0.0:3000', { query: `token=${reply.jwt}` });
 
-          assert.equal(error, null);
-          assert.equal(type, 'user');
-          assert.equal(id, 'root@foo.com');
-          assert.equal(attributes.name, 'Root Admin');
-          assert.deepEqual(attributes.roles, ['admin', 'root']);
+        client.on('error', done);
+        client.on('connect', () => {
+          client.emit(action, {}, (error, response) => {
+            const { id, type, attributes } = response.data;
 
-          client.disconnect();
-          done();
+            assert.equal(error, null);
+            assert.equal(type, 'user');
+            assert.equal(id, 'root@foo.com');
+            assert.equal(attributes.name, 'Root Admin');
+            assert.deepEqual(attributes.roles, ['admin', 'root']);
+
+            client.disconnect();
+            done();
+          });
         });
-      });
-    });
+      })
+      .catch(done);
   });
 
   after('shutdown chat', () => chat.close());

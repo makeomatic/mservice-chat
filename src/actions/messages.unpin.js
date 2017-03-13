@@ -2,6 +2,7 @@ const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
 const fetchRoom = require('../fetchers/room')('roomId');
 const { successResponse } = require('../responses/success');
+const Promise = require('bluebird');
 
 /**
  * @api {http} <prefix>.messages.unpin Unpin last message

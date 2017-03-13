@@ -1,8 +1,7 @@
 const Errors = require('common-errors');
 const { uuid } = require('express-cassandra');
 
-class RoomService
-{
+class RoomService {
   static castOptions = {
     id: 'Uuid',
   };

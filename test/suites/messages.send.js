@@ -240,7 +240,8 @@ describe('messages.send', function testSuite() {
 
                   client.disconnect();
                   done();
-                });
+                })
+                .catch(done);
             });
           });
         });
@@ -299,7 +300,8 @@ describe('messages.send', function testSuite() {
 
               client.disconnect();
               done();
-            });
+            })
+            .catch(done);
         });
       });
     });

@@ -134,7 +134,8 @@ describe('messages.delete', function testSuite() {
               assert.equal(statusCode, 200);
               assert.equal(body.meta.status, 'success');
               done();
-            });
+            })
+            .catch(done);
         });
       });
     });
@@ -154,7 +155,8 @@ describe('messages.delete', function testSuite() {
               assert.equal(statusCode, 200);
               assert.equal(body.meta.status, 'success');
               done();
-            });
+            })
+            .catch(done);
         });
       });
     });

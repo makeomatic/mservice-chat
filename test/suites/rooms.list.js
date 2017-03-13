@@ -1,5 +1,4 @@
 const assert = require('assert');
-const { expect } = require('chai');
 const request = require('./../helpers/request');
 const Chat = require('../../src');
 
@@ -25,14 +24,13 @@ describe('rooms.list', function testSuite() {
       .then(room => (this.secondRoom = room));
   });
 
-  it('should return list of rooms', (done) => {
+  it('should return list of rooms', () => (
     request(uri)
       .then((response) => {
-        expect(response.statusCode).to.be.equals(200);
+        assert.equal(response.statusCode, 200);
         assert.equal(response.body.data.length > 1, true);
-        done();
-      });
-  });
+      })
+  ));
 
   after('delete first room', () => this.firstRoom.deleteAsync());
   after('delete second room', () => this.secondRoom.deleteAsync());

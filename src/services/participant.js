@@ -2,8 +2,7 @@ const Errors = require('common-errors');
 const Promise = require('bluebird');
 const { timeuuid } = require('express-cassandra');
 
-class ParticipantService
-{
+class ParticipantService {
   static castOptions = {
     roomId: 'Uuid',
     joinedAt: 'TimeUuid',

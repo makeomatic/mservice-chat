@@ -16,8 +16,7 @@ function CheckNotFoundError(error) {
   return error.status === 404;
 }
 
-class UserService
-{
+class UserService {
   constructor(config, amqp) {
     this.amqp = amqp;
     this.config = config;

@@ -3,6 +3,7 @@ const isElevated = require('../services/roles/isElevated');
 const fetchParticipant = require('../fetchers/participant');
 const fetchRoom = require('../fetchers/room');
 const { modelResponse, SERIALIZATION_GROUP_ADMIN } = require('../responses/participant');
+const Promise = require('bluebird');
 
 /**
  * @api {http} <prefix>.participants.unban Unban an user
