@@ -16,8 +16,7 @@ function indexCollection(collection) {
   return collection.reduce(indexCollectionReducer, {});
 }
 
-class PinService
-{
+class PinService {
   static castOptions = {
     roomId: 'Uuid',
     messageId: 'Long',

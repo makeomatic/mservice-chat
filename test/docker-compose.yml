@@ -2,7 +2,7 @@ version: '2'
 services:
   cassandra:
     container_name: cassandra
-    image: cassandra:3.5
+    image: cassandra:3
     hostname: cassandra
 
   redis-1:
@@ -35,7 +35,7 @@ services:
         - "5672"
         - "15672"
         - "25672"
-      image: makeomatic/rabbitmq:3.6.2
+      image: makeomatic/rabbitmq:3.6.6
       container_name: rabbitmq
       hostname: rabbitmq
       volumes:
@@ -61,7 +61,7 @@ services:
       - redis-3
       - rabbitmq
       - redis-client
-    image: makeomatic/ms-users:6.5.0
+    image: makeomatic/ms-users:7.7.2
     hostname: ms-users
     container_name: ms-users
     volumes:
@@ -70,12 +70,12 @@ services:
       DEBUG: 'ioredis:*'
       NODE_ENV: 'production'
       NCONF_FILE_PATH: '["/src/configs/ms-users/config.js"]'
-      MS_USERS__LOGGER: 'true'
+      MS_USERS__LOGGER__DEFAULT_LOGGER: 'true'
       MS_USERS__INIT_ADMIN_ACCOUNTS_DELAY: '1'
 
   tester:
     container_name: tester
-    image: makeomatic/node:6.2.2-tester
+    image: makeomatic/node:7.7.2-tester
     links:
       - cassandra
       - rabbitmq
@@ -85,5 +85,4 @@ services:
     environment:
       NODE_ENV: "test"
       DEBUG: ${DEBUG}
-      SKIP_REBUILD: ${SKIP_REBUILD}
     command: tail -f /dev/null

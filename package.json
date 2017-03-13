@@ -3,68 +3,68 @@
   "description": "mservice-chat",
   "main": "./lib/index.js",
   "scripts": {
-    "compile": "rm -rf ./lib; babel -d ./lib ./src",
+    "compile": "rimraf ./lib; babel -d ./lib ./src",
     "doc": "cd schemas && apidoc -i ./../src/actions -v -o ./../docs",
     "docker-release": "./docker-release.sh",
     "lint": "eslint . --ext .json --ext .js",
     "prepublish": "npm run lint && npm run compile",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "node ./bin/mservice.js | bunyan -o short",
-    "test": "npm run lint && ./test/docker.sh",
+    "test": "npm run lint && rimraf ./coverage && ./test/docker.sh",
     "test-dev": "SKIP_REBUILD=1 SKIP_SLEEP=1 ./test/docker.sh"
   },
   "dependencies": {
-    "bluebird": "^3.4.6",
+    "bluebird": "^3.5.0",
     "boom": "^4.2.0",
-    "bunyan": "^1.8.5",
+    "bunyan": "^1.8.8",
     "common-errors": "^1.0.0",
-    "express-cassandra": "^1.6.2",
+    "express-cassandra": "^1.7.5",
     "glob": "^7.1.1",
-    "hapi": "^16.0.1",
-    "is": "^3.2.0",
-    "lodash": "^4.17.2",
+    "hapi": "^16.1.0",
+    "is": "^3.2.1",
+    "lodash": "^4.17.4",
     "mixwith": "^0.1.1",
     "moment": "^2.17.1",
-    "ms-amqp-transport": "^7.0.1",
-    "ms-conf": "^2.3.0",
+    "ms-amqp-transport": "^7.1.0",
+    "ms-conf": "^2.4.0",
     "ms-flakeless": "^4.0.1",
     "ms-profanity": "^1.0.1",
     "ms-socket.io-adapter-amqp": "^3.0.1",
     "ms-validation": "^3.0.0",
-    "mservice": "^4.8.0",
-    "node-uuid": "^1.4.7",
-    "socket.io": "^1.7.2",
+    "mservice": "^6.0.1",
+    "socket.io": "^1.7.3",
     "socketio-wildcard": "^0.3.0",
     "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "apidoc": "^0.16.1",
-    "apidoc-plugin-schema": "^0.1.0",
-    "babel-cli": "^6.18.0",
+    "apidoc": "^0.17.5",
+    "apidoc-plugin-schema": "^0.1.1",
+    "babel-cli": "^6.24.0",
     "babel-eslint": "^7.1.1",
-    "babel-plugin-transform-class-properties": "^6.19.0",
-    "babel-plugin-transform-es2015-destructuring": "^6.19.0",
-    "babel-plugin-transform-es2015-spread": "^6.8.0",
-    "babel-plugin-transform-object-rest-spread": "^6.20.2",
-    "babel-plugin-transform-strict-mode": "^6.18.0",
-    "babel-register": "^6.18.0",
+    "babel-plugin-istanbul": "^4.0.0",
+    "babel-plugin-transform-class-properties": "^6.23.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-strict-mode": "^6.22.0",
+    "babel-register": "^6.24.0",
     "chai": "^3.5.0",
-    "chance": "^1.0.4",
+    "chance": "^1.0.6",
     "codecov": "^1.0.1",
-    "cz-conventional-changelog": "^1.2.0",
-    "eslint": "^3.12.2",
-    "eslint-config-airbnb-base": "^11.0.0",
+    "cross-env": "^3.2.3",
+    "cz-conventional-changelog": "^2.0.0",
+    "eslint": "^3.17.1",
+    "eslint-config-makeomatic": "^1.0.1",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-json": "^1.2.0",
-    "eslint-plugin-mocha": "^4.7.0",
-    "isparta": "^4.0.0",
-    "istanbul": "=0.4.4",
-    "json": "^9.0.4",
-    "latest-version-cli": "^1.0.0",
+    "eslint-plugin-mocha": "^4.8.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "json": "^9.0.6",
+    "latest-version-cli": "^1.1.0",
     "mocha": "^3.2.0",
+    "nyc": "^10.1.2",
     "request-promise": "^4.1.1",
+    "rimraf": "^2.6.1",
     "semantic-release": "^6.3.2",
-    "socket.io-client": "^1.7.2"
+    "socket.io-client": "^1.7.3"
   },
   "license": "MIT",
   "repository": {
@@ -78,5 +78,28 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "engines": {
+    "node": ">= 7.6.0",
+    "npm": ">= 3.0.0"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.js"
+    ],
+    "exclude": [
+      "src/**/*.spec.js"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "sourceMap": false,
+    "instrument": false,
+    "cache": true,
+    "reporter": [
+      "lcov",
+      "json",
+      "text-summary"
+    ]
   }
 }

@@ -18,10 +18,13 @@ const Chat = require(dir); // eslint-disable-line import/no-dynamic-require
 
 const chat = new Chat(configuration.get('/'));
 
-chat.connect()
+chat
+  .connect()
   .then(() => {
     const address = chat.http.info;
     chat.log.info(`connected on ${address.address}:${address.port}`);
+
+    return chat;
   })
   .catch((err) => {
     chat.log.fatal('Failed to start service', err);

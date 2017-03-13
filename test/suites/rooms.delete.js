@@ -37,15 +37,15 @@ describe('rooms.delete', function testSuite() {
   })
   );
 
-  it('should return error if request is not valid', (done) => {
+  it('should return error if request is not valid', () => {
     const token = this.firstAdminToken;
-    request(uri, { token, id: 'invalid-id' })
+
+    return request(uri, { token, id: 'invalid-id' })
       .then((response) => {
         expect(response.statusCode).to.be.equals(400);
         expect(response.body.name).to.be.equals('ValidationError');
         expect(response.body.message).to.be.equals('rooms.delete validation failed:' +
           ' data.id should match format "uuid"');
-        done();
       });
   });
 
@@ -68,16 +68,16 @@ describe('rooms.delete', function testSuite() {
       });
   });
 
-  it('should return error if user is not room creator', (done) => {
+  it('should return error if user is not room creator', () => {
     const id = this.room.id.toString();
     const token = this.secondAdminToken;
-    request(uri, { id, token })
+
+    return request(uri, { id, token })
       .then((response) => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
         expect(response.body.message).to.be.equals('An attempt was made to perform' +
           ' an operation that is not permitted: Has not access');
-        done();
       });
   });
 
