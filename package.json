@@ -3,14 +3,14 @@
   "description": "mservice-chat",
   "main": "./lib/index.js",
   "scripts": {
-    "compile": "rm -rf ./lib; babel -d ./lib ./src",
+    "compile": "rimraf ./lib; babel -d ./lib ./src",
     "doc": "cd schemas && apidoc -i ./../src/actions -v -o ./../docs",
     "docker-release": "./docker-release.sh",
     "lint": "eslint . --ext .json --ext .js",
     "prepublish": "npm run lint && npm run compile",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "node ./bin/mservice.js | bunyan -o short",
-    "test": "npm run lint && ./test/docker.sh",
+    "test": "npm run lint && rimraf ./coverage && ./test/docker.sh",
     "test-dev": "SKIP_REBUILD=1 SKIP_SLEEP=1 ./test/docker.sh"
   },
   "dependencies": {
@@ -41,15 +41,15 @@
     "apidoc-plugin-schema": "^0.1.1",
     "babel-cli": "^6.24.0",
     "babel-eslint": "^7.1.1",
+    "babel-plugin-istanbul": "^4.0.0",
     "babel-plugin-transform-class-properties": "^6.23.0",
-    "babel-plugin-transform-es2015-destructuring": "^6.23.0",
-    "babel-plugin-transform-es2015-spread": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-plugin-transform-strict-mode": "^6.22.0",
     "babel-register": "^6.24.0",
     "chai": "^3.5.0",
     "chance": "^1.0.6",
     "codecov": "^1.0.1",
+    "cross-env": "^3.2.3",
     "cz-conventional-changelog": "^2.0.0",
     "eslint": "^3.17.1",
     "eslint-config-makeomatic": "^1.0.1",
@@ -57,12 +57,12 @@
     "eslint-plugin-json": "^1.2.0",
     "eslint-plugin-mocha": "^4.8.0",
     "eslint-plugin-promise": "^3.5.0",
-    "isparta": "^4.0.0",
-    "istanbul": "=0.4.4",
     "json": "^9.0.6",
     "latest-version-cli": "^1.1.0",
     "mocha": "^3.2.0",
+    "nyc": "^10.1.2",
     "request-promise": "^4.1.1",
+    "rimraf": "^2.6.1",
     "semantic-release": "^6.3.2",
     "socket.io-client": "^1.7.3"
   },
@@ -78,5 +78,28 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "engines": {
+    "node": ">= 7.6.0",
+    "npm": ">= 3.0.0"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.js"
+    ],
+    "exclude": [
+      "src/**/*.spec.js"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "sourceMap": false,
+    "instrument": false,
+    "cache": true,
+    "reporter": [
+      "lcov",
+      "json",
+      "text-summary"
+    ]
   }
 }

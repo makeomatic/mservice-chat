@@ -75,7 +75,7 @@ services:
 
   tester:
     container_name: tester
-    image: makeomatic/node:7.6.0-tester
+    image: makeomatic/node:7.7.2-tester
     links:
       - cassandra
       - rabbitmq
@@ -85,5 +85,4 @@ services:
     environment:
       NODE_ENV: "test"
       DEBUG: ${DEBUG}
-      SKIP_REBUILD: ${SKIP_REBUILD}
     command: tail -f /dev/null
