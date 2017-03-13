@@ -5,7 +5,7 @@ ENV NCONF_NAMESPACE=MS_CHAT \
 
 WORKDIR /src
 
-COPY package.json yarn.lock .
+COPY package.json yarn.lock ./
 RUN \
   apk --no-cache add --virtual .buildDeps \
     build-base \
