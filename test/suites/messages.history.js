@@ -72,7 +72,7 @@ describe('messages.history', function suite() {
       });
   });
 
-  it.only('should be able to paginate last item', () => {
+  it('should be able to paginate last item', () => {
     const params = {
       before: this.messages.bar.id.toString(),
       limit: 2,
