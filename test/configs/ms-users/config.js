@@ -59,6 +59,7 @@ module.exports = {
         firstName: 'User',
         lastName: 'User',
         roles: [],
+        avatar: 'foto.jpg',
       },
     },
     {

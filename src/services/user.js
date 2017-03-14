@@ -8,7 +8,8 @@ function makeUser(userData) {
     userData.username,
     name,
     userData.roles,
-    userData.stationChatId
+    userData.stationChatId,
+    userData.avatar
   );
 }
 
@@ -17,6 +18,15 @@ function CheckNotFoundError(error) {
 }
 
 class UserService {
+  static metaFields = [
+    'firstName',
+    'lastName',
+    'roles',
+    'stationChatId',
+    'username',
+    'avatar',
+  ];
+
   constructor(config, amqp) {
     this.amqp = amqp;
     this.config = config;
@@ -45,6 +55,34 @@ class UserService {
       .catch(HttpStatusError, CheckNotFoundError, () => {
         throw new NotFoundError(`User #${username} not found`);
       });
+  }
+
+  getMetadata(usernames, fields = UserService.metaFields) {
+    const { audience, prefix, postfix, cache, timeouts } = this.config;
+    const route = `${prefix}.${postfix.getMetadata}`;
+
+    const message = {
+      audience,
+      username: usernames,
+      fields: {
+        [audience]: fields,
+      },
+    };
+
+    const opts = {
+      timeout: timeouts.getMetadata,
+      cache: cache.getMetadata,
+    };
+
+    return this.amqp
+      .publishAndWait(route, message, opts)
+      .reduce((users, user) => {
+        const id = user[audience].username;
+
+        users[id] = makeUser(user[audience]);
+
+        return users;
+      }, {});
   }
 }
 

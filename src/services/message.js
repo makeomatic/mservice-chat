@@ -1,6 +1,7 @@
 const Errors = require('common-errors');
 const { datatypes } = require('express-cassandra');
 const { process } = require('ms-profanity');
+const Promise = require('bluebird');
 
 class MessageService {
   static castOptions = {
@@ -37,7 +38,40 @@ class MessageService {
       query.id = { $lt: before };
     }
 
-    return this.find(query, { $desc: 'id' }, limit);
+    return Promise
+      .bind(this, [query, { $desc: 'id' }, limit])
+      .spread(this.find)
+      .then(this.fetchUsers);
+  }
+
+  fetchUsers(messages) {
+    const { user: userService } = this.services;
+    const usernames = messages
+      .reduce((users, message) => {
+        users.add(message.userId);
+
+        if (message.editedBy) {
+          users.add(message.editedBy.id);
+        }
+
+        return users;
+      }, new Set());
+
+    return userService
+      .getMetadata([...usernames])
+      .then(users =>
+        messages
+          .map((message) => {
+            const user = users[message.userId] || message.user;
+            const data = { user };
+
+            if (message.editedBy) {
+              data.editedBy = users[message.editedBy.id] || message.editedBy;
+            }
+
+            return Object.assign({}, message, data);
+          })
+      );
   }
 
   afterDelete(cond) {
