@@ -1,5 +1,6 @@
 const LightUserModel = require('../models/lightUserModel');
 const { NotFoundError, HttpStatusError } = require('common-errors');
+const Promise = require('bluebird');
 
 function makeUser(userData) {
   const name = `${userData.firstName} ${userData.lastName}`;
@@ -60,26 +61,25 @@ class UserService {
   getMetadata(usernames, fields = UserService.metaFields) {
     const { audience, prefix, postfix, cache, timeouts } = this.config;
     const route = `${prefix}.${postfix.getMetadata}`;
-
     const message = {
       audience,
-      username: usernames,
       fields: {
         [audience]: fields,
       },
     };
-
     const opts = {
       timeout: timeouts.getMetadata,
       cache: cache.getMetadata,
     };
 
-    return this.amqp
-      .publishAndWait(route, message, opts)
+    return Promise
+      .map(usernames, username =>
+        this.amqp.publishAndWait(route, Object.assign({ username }, message), opts)
+      )
       .reduce((users, user) => {
-        const id = user[audience].username;
+        const username = user[audience].username;
 
-        users[id] = makeUser(user[audience]);
+        users[username] = makeUser(user[audience]);
 
         return users;
       }, {});
