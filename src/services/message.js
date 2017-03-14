@@ -45,6 +45,10 @@ class MessageService {
   }
 
   fetchUsers(messages) {
+    if (messages.length === 0) {
+      return Promise.resolve(messages);
+    }
+
     const { user: userService } = this.services;
     const usernames = messages
       .reduce((users, message) => {
@@ -58,7 +62,7 @@ class MessageService {
       }, new Set());
 
     return userService
-      .getMetadata([...usernames])
+      .getMetadata(Array.from(usernames))
       .then(users =>
         messages
           .map((message) => {
