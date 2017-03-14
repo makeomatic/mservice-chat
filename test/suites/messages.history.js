@@ -90,6 +90,10 @@ describe('messages.history', function suite() {
         assert.equal(meta.last, first.id);
         assert.equal(first.attributes.roomId, params.roomId);
         assert.equal(first.attributes.text, 'foo');
+        assert.equal(first.attributes.user.id, 'user@foo.com');
+        assert.equal(first.attributes.user.name, 'User User');
+        assert.deepEqual(first.attributes.user.roles, []);
+        assert.equal(first.attributes.user.avatar, 'foto.jpg');
       });
   });
 

@@ -30,11 +30,6 @@ module.exports = {
             name: 'text',
             roles: 'set<text>',
           },
-          Message: {
-            id: 'bigint',
-            text: 'text',
-            user: 'frozen<"User">',
-          },
         },
       },
     },

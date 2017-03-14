@@ -4,10 +4,11 @@ class LightUserModel {
   static ROLE_DJ = 'dj';
   static ROLE_ROOT = 'root';
 
-  constructor(id, name, roles = [], roomId) {
+  constructor(id, name, roles = [], roomId, avatar) {
     this.id = id;
     this.name = name;
     this.roles = roles;
+    this.avatar = avatar;
 
     // non-enumerable
     Object.defineProperty(this, 'roomId', {

@@ -1,5 +1,6 @@
 const LightUserModel = require('../models/lightUserModel');
 const { NotFoundError, HttpStatusError } = require('common-errors');
+const Promise = require('bluebird');
 
 function makeUser(userData) {
   const name = `${userData.firstName} ${userData.lastName}`;
@@ -8,7 +9,8 @@ function makeUser(userData) {
     userData.username,
     name,
     userData.roles,
-    userData.stationChatId
+    userData.stationChatId,
+    userData.avatar
   );
 }
 
@@ -17,6 +19,15 @@ function CheckNotFoundError(error) {
 }
 
 class UserService {
+  static metaFields = [
+    'firstName',
+    'lastName',
+    'roles',
+    'stationChatId',
+    'username',
+    'avatar',
+  ];
+
   constructor(config, amqp) {
     this.amqp = amqp;
     this.config = config;
@@ -45,6 +56,33 @@ class UserService {
       .catch(HttpStatusError, CheckNotFoundError, () => {
         throw new NotFoundError(`User #${username} not found`);
       });
+  }
+
+  getMetadata(usernames, fields = UserService.metaFields) {
+    const { audience, prefix, postfix, cache, timeouts } = this.config;
+    const route = `${prefix}.${postfix.getMetadata}`;
+    const message = {
+      audience,
+      fields: {
+        [audience]: fields,
+      },
+    };
+    const opts = {
+      timeout: timeouts.getMetadata,
+      cache: cache.getMetadata,
+    };
+
+    return Promise
+      .map(usernames, username =>
+        this.amqp.publishAndWait(route, Object.assign({ username }, message), opts)
+      )
+      .reduce((users, user) => {
+        const username = user[audience].username;
+
+        users[username] = makeUser(user[audience]);
+
+        return users;
+      }, {});
   }
 }
 
