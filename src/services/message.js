@@ -73,7 +73,7 @@ class MessageService {
               data.editedBy = users[message.editedBy.id] || message.editedBy;
             }
 
-            return Object.assign({}, message, data);
+            return Object.assign({}, message.toJSON(), data);
           })
       );
   }
