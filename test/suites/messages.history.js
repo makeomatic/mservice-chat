@@ -94,6 +94,8 @@ describe('messages.history', function suite() {
         assert.equal(first.attributes.user.name, 'User User');
         assert.deepEqual(first.attributes.user.roles, []);
         assert.equal(first.attributes.user.avatar, 'foto.jpg');
+        // express-cassandra serialization issue
+        assert.equal(first.attributes._validators, undefined);
       });
   });
 
