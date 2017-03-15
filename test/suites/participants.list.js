@@ -70,7 +70,7 @@ describe('participants.list', function suite() {
       });
   });
 
-  it('should be able to paginate last item', () => {
+  it.only('should be able to paginate last item', () => {
     const params = {
       before: this.participants[2].joinedAt.toString(),
       limit: 2,
@@ -86,8 +86,17 @@ describe('participants.list', function suite() {
         assert.equal(meta.before, this.participants[2].joinedAt.toString());
         assert.equal(meta.count, 1);
         assert.equal(meta.last, first.attributes.joinedAt);
-        assert.equal(first.attributes.roomId, params.roomId);
         assert.equal(first.id, 'second.user@foo.com');
+        assert.equal(first.attributes.roomId, params.roomId);
+        // fetched user
+        assert.equal(first.attributes.user.id, 'second.user@foo.com');
+        assert.equal(first.attributes.user.name, 'SecondUser User');
+        assert.deepEqual(first.attributes.user.roles, []);
+        // old staff
+        assert.equal(first.attributes.name, 'SecondUser User');
+        assert.deepEqual(first.attributes.roles, []);
+        // express-cassandra serialization issue
+        assert.equal(first.attributes._validators, undefined);
       });
   });
 

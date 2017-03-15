@@ -10,10 +10,12 @@ module.exports = {
       type: 'varchar',
       rule: required,
     },
+    // should be dropped (breaks BC), used for default value if user not found
     name: {
       type: 'varchar',
       rule: required,
     },
+    // should be dropped (breaks BC), used for default value if user not found
     roles: {
       type: 'frozen',
       typeDef: '<set<varchar>>',
@@ -30,6 +32,7 @@ module.exports = {
     bannedAt: {
       type: 'timestamp',
     },
+    // should be replaced with `bannedById`
     bannedBy: {
       type: 'frozen',
       typeDef: '<"User">',
