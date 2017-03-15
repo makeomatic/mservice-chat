@@ -26,6 +26,7 @@ module.exports = {
       type: 'varchar',
       rule: required,
     },
+    // should be dropped, used for default value if user not found
     user: {
       type: 'frozen',
       typeDef: '<"User">',
@@ -34,6 +35,7 @@ module.exports = {
     editedAt: {
       type: 'timestamp',
     },
+    // should be replaced with `editedById`
     editedBy: {
       type: 'frozen',
       typeDef: '<"User">',

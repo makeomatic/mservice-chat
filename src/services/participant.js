@@ -55,7 +55,48 @@ class ParticipantService {
       query.joinedAt = { $gt: before };
     }
 
-    return this.find(query, { $asc: 'joinedAt' }, limit, options);
+    return Promise
+      .bind(this, [query, { $asc: 'joinedAt' }, limit, options])
+      .spread(this.find)
+      .then(this.fetchUsers);
+  }
+
+  fetchUsers(participants) {
+    if (participants.length === 0) {
+      return Promise.resolve(participants);
+    }
+
+    const { user: userService } = this.services;
+    const usernames = participants
+      .reduce((users, participant) => {
+        users.add(participant.id);
+
+        if (participant.bannedBy) {
+          users.add(participant.bannedBy.id);
+        }
+
+        return users;
+      }, new Set());
+
+    return userService
+      .getMetadata(Array.from(usernames))
+      .then(users =>
+        participants
+          .map((participant) => {
+            const user = users[participant.id] || {
+              id: participant.id,
+              name: participant.name,
+              roles: participant.roles,
+            };
+            const data = { user };
+
+            if (participant.bannedBy) {
+              data.editedBy = users[participant.bannedBy.id] || participant.bannedBy;
+            }
+
+            return Object.assign({}, participant.toJSON(), data);
+          })
+      );
   }
 }
 
