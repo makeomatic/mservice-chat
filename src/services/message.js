@@ -40,8 +40,8 @@ class MessageService {
 
     return Promise
       .bind(this, [query, { $desc: 'id' }, limit])
-      .spread(this.find)
-      .then(this.fetchUsers);
+      .spread(this.find);
+      // .then(this.fetchUsers);
   }
 
   fetchUsers(messages) {
