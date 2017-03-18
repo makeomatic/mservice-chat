@@ -11,8 +11,8 @@ module.exports = {
   redis: {
     hosts: Array.from({ length: 3 }).map((_, idx) => ({
       host: 'redis',
-      port: 7000 + idx
-    }),
+      port: 7000 + idx,
+    })),
   },
   admins: [
     {
