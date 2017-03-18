@@ -28,6 +28,8 @@ class Chat extends MService {
     this.services = {};
 
     this.on('plugin:connect:cassandra', (cassandra) => {
+      const hook = this.hook.bind(this);
+
       Object
         .keys(cassandraServices)
         .forEach((key) => {
@@ -35,7 +37,7 @@ class Chat extends MService {
           const Service = mix(cassandraServices[key]).with(CassandraMixin);
           const { socketIO, services } = this;
 
-          this.services[key] = new Service(serviceConfig, cassandra, socketIO, services);
+          this.services[key] = new Service(serviceConfig, cassandra, socketIO, services, hook);
         });
     });
 

@@ -14,7 +14,7 @@ const defaultDataMapper = properties => (value) => {
 };
 
 module.exports = superclass => class Mixin extends superclass {
-  constructor(config, cassandraClient, socketIO, services) {
+  constructor(config, cassandraClient, socketIO, services, hook) {
     super();
 
     if (superclass.modelName === undefined) {
@@ -35,6 +35,7 @@ module.exports = superclass => class Mixin extends superclass {
     this.model = model;
     this.services = services;
     this.socketIO = socketIO;
+    this.hook = hook;
   }
 
   getDefaultData(properties) {
