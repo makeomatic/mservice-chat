@@ -24,7 +24,7 @@ services:
 
   ms-users:
     links:
-      - redis-
+      - redis
       - rabbitmq
     image: makeomatic/ms-users:7.7.2
     hostname: ms-users
