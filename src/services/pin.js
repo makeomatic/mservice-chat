@@ -49,6 +49,7 @@ class PinService {
 
     return this
       .pin(roomId, message, user)
+      .tap(() => this.hook.call(this, 'broadcast:pin', id))
       .then(pinResponse)
       .tap(response => this.socketIO.in(id).emit(`messages.pin.${id}`, response));
   }
@@ -73,6 +74,7 @@ class PinService {
 
     return this
       .unpin(roomId, admin)
+      .tap(() => this.hook.call(this, 'broadcast:unpin', id))
       .then(() => userResponse(admin))
       .tap(response => this.socketIO.in(id).emit(`messages.unpin.${id}`, response));
   }
