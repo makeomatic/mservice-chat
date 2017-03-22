@@ -89,7 +89,14 @@ class MessageService {
 
     return pinService
       .find(query)
-      .each(pin => pin.deleteAsync());
+      .each((pin) => {
+        // async action - notify if we are removing currently pinned data
+        if (!pin.unpinnedAt) {
+          this.hook('broadcast:unpin', roomId.toString());
+        }
+
+        return pin.deleteAsync();
+      });
   }
 
   edit(message, text, user) { // eslint-disable-line class-methods-use-this
