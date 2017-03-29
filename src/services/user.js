@@ -44,16 +44,21 @@ class UserService {
       .then(response => makeUser(response.metadata[audience]));
   }
 
-  getById(username) {
+  getById(_username, checkedLowercase) {
     const { audience, prefix, postfix, timeouts } = this.config;
 
     const route = `${prefix}.${postfix.getMetadata}`;
     const timeout = timeouts.getMetadata;
+    const username = checkedLowercase ? _username : _username.toLowerCase();
 
     return this.amqp
       .publishAndWait(route, { username, audience }, { timeout })
       .then(response => makeUser(response[audience]))
       .catch(HttpStatusError, CheckNotFoundError, () => {
+        if (!checkedLowercase && username !== _username) {
+          return this.getById(_username, true);
+        }
+
         throw new NotFoundError(`User #${username} not found`);
       });
   }
@@ -67,20 +72,28 @@ class UserService {
         [audience]: fields,
       },
     };
+
     const opts = {
       timeout: timeouts.getMetadata,
       cache: cache.getMetadata,
     };
 
     return Promise
-      .map(usernames, username =>
-        this.amqp.publishAndWait(route, Object.assign({ username }, message), opts)
-      )
+      .bind(this, usernames)
+      .map(function fetchMetadata(username) {
+        return this.amqp
+          .publishAndWait(route, Object.assign({ username }, message), opts)
+          .catch(CheckNotFoundError, (err) => {
+            if (username.toLowerCase() !== username) {
+              return fetchMetadata(username.toLowerCase());
+            }
+
+            throw err;
+          });
+      })
       .reduce((users, user) => {
         const username = user[audience].username;
-
         users[username] = makeUser(user[audience]);
-
         return users;
       }, {});
   }

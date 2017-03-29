@@ -66,7 +66,7 @@ class MessageService {
       .then(users =>
         messages
           .map((message) => {
-            const user = users[message.userId] || message.user;
+            const user = users[message.userId] || users[message.userId.toLowerCase()] || message.user;
             const data = { user };
 
             if (message.editedBy) {

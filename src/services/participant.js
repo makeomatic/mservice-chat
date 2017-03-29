@@ -83,7 +83,7 @@ class ParticipantService {
       .then(users =>
         participants
           .map((participant) => {
-            const user = users[participant.id] || {
+            const user = users[participant.id] || users[participant.id.toLowerCase()] || {
               id: participant.id,
               name: participant.name,
               roles: participant.roles,
