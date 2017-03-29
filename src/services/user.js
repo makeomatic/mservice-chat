@@ -85,7 +85,7 @@ class UserService {
           .publishAndWait(route, Object.assign({ username }, message), opts)
           .catch(CheckNotFoundError, (err) => {
             if (username.toLowerCase() !== username) {
-              return fetchMetadata(username.toLowerCase());
+              return fetchMetadata.call(this, username.toLowerCase());
             }
 
             throw err;
