@@ -35,11 +35,11 @@ describe('rooms.size', function testSuite() {
       client1.emit('chat.rooms.join', { id: roomId }, () => {
         client2.emit('chat.rooms.join', { id: roomId }, () => {
           client2.emit(action, { roomId }, (err1, res1) => {
-            assert.equal(res1.data.size, 2);
+            assert.equal(res1.data.attributes.size, 2);
             client2.emit('chat.rooms.leave', { roomId }, () => {
               client2.disconnect();
               client1.emit(action, { roomId }, (err2, res2) => {
-                assert.equal(res2.data.size, 1);
+                assert.equal(res2.data.attributes.size, 1);
                 client1.disconnect();
                 done();
               });
