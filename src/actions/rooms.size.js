@@ -9,9 +9,18 @@
 
 function RoomsSizeAction(request) {
   const { params, socket } = request;
-  const room = socket.adapter.rooms[params.roomId];
+  const roomId = params.roomId;
+  const room = socket.adapter.rooms[roomId];
 
-  return { data: { size: room.length } };
+  return {
+    data: {
+      id: roomId,
+      type: 'room',
+      attributes: {
+        size: room.length,
+      },
+    },
+  };
 }
 
 RoomsSizeAction.auth = 'token';

@@ -145,7 +145,20 @@
     },
     "roomSize": {
       "description": "`room` size",
-      "type": "object"
+      "type": "object",
+      "required": ["attributes", "id"],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/roomId"
+        },
+        "type": {
+          "type": "string"
+        },
+        "attributes": {
+          "type": "object",
+          "required": ["size"]
+        }
+      }
     },
     "collectionMeta": {
       "description": "Collection metadata",
