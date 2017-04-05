@@ -156,7 +156,12 @@
         },
         "attributes": {
           "type": "object",
-          "required": ["size"]
+          "required": ["size"],
+          "properties": {
+            "size": {
+              "type": "integer"
+            }
+          }
         }
       }
     },
