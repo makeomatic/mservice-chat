@@ -143,6 +143,28 @@
       "type": "string",
       "format": "uuid"
     },
+    "roomSize": {
+      "description": "`room` size",
+      "type": "object",
+      "required": ["attributes", "id"],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/roomId"
+        },
+        "type": {
+          "type": "string"
+        },
+        "attributes": {
+          "type": "object",
+          "required": ["size"],
+          "properties": {
+            "size": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
     "collectionMeta": {
       "description": "Collection metadata",
       "type": "object",

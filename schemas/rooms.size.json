@@ -1,0 +1,11 @@
+{
+  "id": "rooms.size",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["roomId"],
+  "properties": {
+    "roomId": {
+      "$ref": "common.json#/definitions/roomId"
+    }
+  }
+}
