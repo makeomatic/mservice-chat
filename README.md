@@ -1,5 +1,7 @@
 # MService Chat
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/makeomatic/mservice-chat.svg)](https://greenkeeper.io/)
+
 [![npm version](https://badge.fury.io/js/mservice-chat.svg)](https://badge.fury.io/js/mservice-chat)
 [![Build Status](https://semaphoreci.com/api/v1/makeomatic/mservice-chat/branches/master/shields_badge.svg)](https://semaphoreci.com/makeomatic/mservice-chat)
 [![codecov](https://codecov.io/gh/makeomatic/mservice-chat/branch/master/graph/badge.svg)](https://codecov.io/gh/makeomatic/mservice-chat)
