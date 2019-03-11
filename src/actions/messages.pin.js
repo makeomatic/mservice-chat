@@ -1,8 +1,8 @@
+const Promise = require('bluebird');
 const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
 const fetchRoom = require('../fetchers/room')('roomId');
 const fetchMessage = require('../fetchers/message')();
-const Promise = require('bluebird');
 
 /**
  * @api {http} <prefix>.messages.pin Pin a message
@@ -12,7 +12,7 @@ const Promise = require('bluebird');
  * @apiSchema {jsonschema=../../schemas/messages.pin.json} apiParam
  * @apiSchema {jsonschema=../../schemas/messages.pin.response.json} apiSuccess
  */
- /**
+/**
   * @api {socket.io} messages.pin.<roomId> Pin a message
   * @apiDescription Fired when somebody pin a message
   * @apiVersion 1.0.0

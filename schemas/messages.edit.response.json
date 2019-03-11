@@ -1,4 +1,4 @@
 {
-  "id": "messages.edit.response",
+  "$id": "messages.edit.response",
   "$ref": "common.json#/definitions/successResponse"
 }

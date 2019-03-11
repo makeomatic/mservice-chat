@@ -1,7 +1,10 @@
 class LightUserModel {
   static ROLE_ADMIN = 'admin';
+
   static ROLE_GUEST = 'guest';
+
   static ROLE_DJ = 'dj';
+
   static ROLE_ROOT = 'root';
 
   constructor(id, name, roles = [], roomId, avatar) {

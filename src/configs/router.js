@@ -1,7 +1,7 @@
-const { ActionTransport, routerExtension } = require('mservice');
+const { ActionTransport, routerExtension } = require('@microfleet/core');
+const path = require('path');
 const auth = require('../auth/token');
 const fetcher = require('../fetchers/extension');
-const path = require('path');
 
 const { amqp, http, socketIO } = ActionTransport;
 
@@ -15,7 +15,7 @@ module.exports = {
     extensions: {
       enabled: ['postValidate', 'postRequest', 'preRequest', 'preResponse'],
       register: [
-        routerExtension('audit/log'),
+        routerExtension('audit/log')(),
         fetcher,
       ],
     },

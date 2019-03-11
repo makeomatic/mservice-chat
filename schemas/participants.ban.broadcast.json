@@ -1,4 +1,4 @@
 {
-  "id": "participants.ban.broadcast",
+  "$id": "participants.ban.broadcast",
   "$ref": "participants.json#/definitions/response"
 }

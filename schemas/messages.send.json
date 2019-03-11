@@ -1,5 +1,5 @@
 {
-  "id": "messages.send",
+  "$id": "messages.send",
   "additionalProperties": false,
   "type": "object",
   "required": ["roomId", "message"],

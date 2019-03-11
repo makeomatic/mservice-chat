@@ -45,8 +45,8 @@ describe('messages.last-pin', function suite() {
         assert.equal(statusCode, 404);
         assert.equal(body.statusCode, 404);
         assert.equal(body.error, 'Not Found');
-        assert.equal(body.message, 'Not Found:' +
-          ' "Room #123e4567-e89b-12d3-a456-426655440000 not found"');
+        assert.equal(body.message, 'Not Found:'
+          + ' "Room #123e4567-e89b-12d3-a456-426655440000 not found"');
         assert.equal(body.name, 'NotFoundError');
       });
   });

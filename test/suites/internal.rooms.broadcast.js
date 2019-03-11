@@ -1,21 +1,19 @@
 const assert = require('assert');
-const Chat = require('../../src');
-const { connect, emit } = require('../helpers/socketIO');
 const socketIOClient = require('socket.io-client');
 
-const chat = new Chat(global.SERVICES);
-
 describe('internal.rooms.broadcast', function suite() {
+  const Chat = require('../../src');
+  const { connect, emit } = require('../helpers/socketIO');
+  const chat = new Chat(global.SERVICES);
+
   before('start up chat', () => chat.connect());
 
-  before('create room', () =>
-    chat.services.room
-      .create({ name: 'test room', createdBy: 'admin@foo.com' })
-      .tap((createdRoom) => {
-        this.room = createdRoom;
-        this.roomId = createdRoom.id.toString();
-      })
-  );
+  before('create room', () => chat.services.room
+    .create({ name: 'test room', createdBy: 'admin@foo.com' })
+    .tap((createdRoom) => {
+      this.room = createdRoom;
+      this.roomId = createdRoom.id.toString();
+    }));
 
   after('shutdown chat', () => chat.close());
 
@@ -27,8 +25,8 @@ describe('internal.rooms.broadcast', function suite() {
       .reflect()
       .then(inspection => inspection.error())
       .then((response) => {
-        assert.equal(response.code, 400);
-        assert.equal(response.name, 'ValidationError');
+        assert.equal(response.statusCode, 400);
+        assert.equal(response.name, 'HttpStatusError');
         assert.equal(response.message, 'internal.rooms.broadcast validation failed: data should'
           + ' have required property \'event\', data should have required property \'message\'');
       });

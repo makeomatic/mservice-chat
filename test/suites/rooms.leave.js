@@ -1,18 +1,17 @@
 const assert = require('assert');
-const Chat = require('../../src');
-const { login } = require('../helpers/users');
 const socketIOClient = require('socket.io-client');
 
-const action = 'chat.rooms.leave';
-const chat = new Chat(global.SERVICES);
-
 describe('rooms.leave', function testSuite() {
+  const Chat = require('../../src');
+  const { login } = require('../helpers/users');
+
+  const action = 'chat.rooms.leave';
+  const chat = new Chat(global.SERVICES);
+
   before('start up chat', () => chat.connect());
 
-  before('login user', () =>
-    login(chat.amqp, 'user@foo.com', 'userpassword000000')
-      .tap(({ jwt }) => (this.userToken = jwt))
-  );
+  before('login user', () => login(chat.amqp, 'user@foo.com', 'userpassword000000')
+    .tap(({ jwt }) => (this.userToken = jwt)));
 
   before('create room', () => {
     const params = { name: 'test', createdBy: 'admin@foo.com' };
@@ -30,9 +29,9 @@ describe('rooms.leave', function testSuite() {
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, { id: '1' }, (error) => {
-        assert.equal(error.name, 'ValidationError');
-        assert.equal(error.message, 'rooms.leave validation failed:' +
-          ' data.id should match format "uuid"');
+        assert.equal(error.name, 'HttpStatusError');
+        assert.equal(error.message, 'rooms.leave validation failed:'
+          + ' data.id should match format "uuid"');
 
         client.disconnect();
         done();
@@ -46,8 +45,8 @@ describe('rooms.leave', function testSuite() {
     client.on('connect', () => {
       client.emit(action, { id: '00000000-0000-0000-0000-000000000000' }, (error) => {
         assert.equal(error.name, 'NotFoundError');
-        assert.equal(error.message, 'Not Found:' +
-          ' "Room #00000000-0000-0000-0000-000000000000 not found"');
+        assert.equal(error.message, 'Not Found:'
+          + ' "Room #00000000-0000-0000-0000-000000000000 not found"');
 
         client.disconnect();
         done();

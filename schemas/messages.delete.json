@@ -1,5 +1,5 @@
 {
-  "id": "messages.delete",
+  "$id": "messages.delete",
   "additionalProperties": false,
   "type": "object",
   "required": ["id", "roomId", "token"],

@@ -1,16 +1,17 @@
 const assert = require('assert');
-const Chat = require('../../src');
-const { create } = require('../helpers/messages');
-const request = require('./../helpers/request');
 const { uuid } = require('express-cassandra');
 
-const chat = new Chat(global.SERVICES);
-const fakeRoomId = '00000000-0000-0000-0000-000000000000';
-const roomId = uuid();
-const messages = ['foo', 'bar', 'baz', 'qux'];
-const uri = 'http://0.0.0.0:3000/api/chat/messages/history';
-
 describe('messages.history', function suite() {
+  const Chat = require('../../src');
+  const { create } = require('../helpers/messages');
+  const request = require('./../helpers/request');
+
+  const chat = new Chat(global.SERVICES);
+  const fakeRoomId = '00000000-0000-0000-0000-000000000000';
+  const roomId = uuid();
+  const messages = ['foo', 'bar', 'baz', 'qux'];
+  const uri = 'http://0.0.0.0:3000/api/chat/messages/history';
+
   before('start up chat', () => chat.connect());
   before('create messages', () => {
     const params = { roomId };

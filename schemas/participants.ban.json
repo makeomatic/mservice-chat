@@ -1,5 +1,5 @@
 {
-  "id": "participants.ban",
+  "$id": "participants.ban",
   "additionalProperties": false,
   "type": "object",
   "required": ["id", "roomId", "reason", "token"],

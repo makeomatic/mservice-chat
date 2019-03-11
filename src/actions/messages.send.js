@@ -1,8 +1,8 @@
 const Errors = require('common-errors');
+const Promise = require('bluebird');
 const fetchParticipant = require('../fetchers/participant');
 const fetchRoom = require('../fetchers/room');
 const isElevated = require('../services/roles/isElevated');
-const Promise = require('bluebird');
 const { modelResponse } = require('../responses/message');
 
 /**
@@ -17,7 +17,7 @@ const { modelResponse } = require('../responses/message');
  * @apiParam (Payload) {String} [message.type] - `sticky` if sticky message
  * @apiSchema {jsonschema=../../schemas/messages.send.response.json} apiSuccess
  */
- /**
+/**
   * @api {socket.io} messages.send.<roomId> Send message to a room
   * @apiDescription Fired when somebody sends message to a room
   * @apiVersion 1.0.0
@@ -56,7 +56,9 @@ function messageSendAction(request) {
 }
 
 function allowed(request) {
-  const { participant, params, room, socket } = request;
+  const {
+    participant, params, room, socket,
+  } = request;
   const { user } = socket;
 
   if (!socket.rooms[room.id.toString()]) {

@@ -1,8 +1,8 @@
 const Errors = require('common-errors');
+const Promise = require('bluebird');
 const fetchMessage = require('../fetchers/message')();
 const fetchRoom = require('../fetchers/room')('roomId');
 const isElevated = require('../services/roles/isElevated');
-const Promise = require('bluebird');
 const { successResponse } = require('../responses/success');
 const { modelResponse } = require('../responses/message');
 
@@ -14,7 +14,7 @@ const { modelResponse } = require('../responses/message');
  * @apiSchema {jsonschema=../../schemas/messages.delete.json} apiParam
  * @apiSchema {jsonschema=../../schemas/messages.delete.response.json} apiSuccess
  */
- /**
+/**
   * @api {socket.io} messages.delete.<roomId> Delete a message
   * @apiDescription Fired when somebody delete a message
   * @apiVersion 1.0.0

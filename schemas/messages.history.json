@@ -1,5 +1,5 @@
 {
-  "id": "messages.history",
+  "$id": "messages.history",
   "additionalProperties": false,
   "type": "object",
   "required": ["roomId"],

@@ -1,8 +1,8 @@
-const { collectionResponse } = require('../responses/pin');
 const Errors = require('common-errors');
+const Promise = require('bluebird');
+const { collectionResponse } = require('../responses/pin');
 const isElevated = require('../services/roles/isElevated');
 const fetchRoom = require('../fetchers/room')('roomId');
-const Promise = require('bluebird');
 
 /**
  * @api {http} <prefix>.messages.pins-history Get pins history

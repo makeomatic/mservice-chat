@@ -1,6 +1,6 @@
-const LightUserModel = require('../models/lightUserModel');
 const { NotFoundError, HttpStatusError } = require('common-errors');
 const Promise = require('bluebird');
+const LightUserModel = require('../models/lightUserModel');
 
 function makeUser(userData) {
   const name = `${userData.firstName} ${userData.lastName}`;
@@ -34,7 +34,9 @@ class UserService {
   }
 
   login(token) {
-    const { audience, prefix, postfix, timeouts } = this.config;
+    const {
+      audience, prefix, postfix, timeouts,
+    } = this.config;
 
     const route = `${prefix}.${postfix.verify}`;
     const timeout = timeouts.verify;
@@ -45,7 +47,9 @@ class UserService {
   }
 
   getById(_username, checkedLowercase) {
-    const { audience, prefix, postfix, timeouts } = this.config;
+    const {
+      audience, prefix, postfix, timeouts,
+    } = this.config;
 
     const route = `${prefix}.${postfix.getMetadata}`;
     const timeout = timeouts.getMetadata;
@@ -64,7 +68,9 @@ class UserService {
   }
 
   getMetadata(usernames, fields = UserService.metaFields) {
-    const { audience, prefix, postfix, cache, timeouts } = this.config;
+    const {
+      audience, prefix, postfix, cache, timeouts,
+    } = this.config;
     const route = `${prefix}.${postfix.getMetadata}`;
     const message = {
       audience,
@@ -92,7 +98,7 @@ class UserService {
           });
       })
       .reduce((users, user) => {
-        const username = user[audience].username;
+        const { username } = user[audience];
         users[username] = makeUser(user[audience]);
         return users;
       }, {});

@@ -1,4 +1,4 @@
 {
-  "id": "participants.list.response",
+  "$id": "participants.list.response",
   "$ref": "participants.json#/definitions/collectionResponse"
 }

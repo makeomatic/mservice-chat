@@ -1,13 +1,13 @@
 const assert = require('assert');
 const Chance = require('chance');
-const { create } = require('../helpers/messages');
-const request = require('./../helpers/request');
 const socketIOClient = require('socket.io-client');
 
-const chance = new Chance();
-const Chat = require('../../src');
-
 describe('messages.delete', function testSuite() {
+  const { create } = require('../helpers/messages');
+  const request = require('./../helpers/request');
+  const Chat = require('../../src');
+
+  const chance = new Chance();
   const chat = new Chat(global.SERVICES);
   const uri = 'http://0.0.0.0:3000/api/chat/messages/delete';
   const admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
@@ -80,9 +80,9 @@ describe('messages.delete', function testSuite() {
     return request(uri, params)
       .then(({ statusCode, body }) => {
         assert.equal(statusCode, 400);
-        assert.equal(body.name, 'ValidationError');
-        assert.equal(body.message, 'messages.delete validation failed:' +
-          ' data.id should be string');
+        assert.equal(body.name, 'HttpStatusError');
+        assert.equal(body.message, 'messages.delete validation failed:'
+          + ' data.id should be string');
       });
   });
 
@@ -115,8 +115,8 @@ describe('messages.delete', function testSuite() {
       .then(({ statusCode, body }) => {
         assert.equal(statusCode, 403);
         assert.equal(body.name, 'NotPermittedError');
-        assert.equal(body.message, 'An attempt was made to perform an operation that' +
-          ' is not permitted: Has not access');
+        assert.equal(body.message, 'An attempt was made to perform an operation that'
+          + ' is not permitted: Has not access');
       });
   });
 
@@ -183,13 +183,11 @@ describe('messages.delete', function testSuite() {
     });
   });
 
-  it('should be able to remove last pinned message', () =>
-    request(uri, { token: adminToken, id: this.messageId, roomId: room.id.toString() })
-      .then(() => chat.services.pin.last(room.id.toString()))
-      .then((pin) => {
-        assert.equal(pin, null);
-      })
-  );
+  it('should be able to remove last pinned message', () => request(uri, { token: adminToken, id: this.messageId, roomId: room.id.toString() })
+    .then(() => chat.services.pin.last(room.id.toString()))
+    .then((pin) => {
+      assert.equal(pin, null);
+    }));
 
   after('delete first room', () => room.deleteAsync());
   after('shutdown chat', () => chat.close());

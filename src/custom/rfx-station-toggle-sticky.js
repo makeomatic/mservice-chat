@@ -2,7 +2,11 @@ const Promise = require('bluebird');
 
 function getOwners(roomId) {
   const { amqp, config } = this;
-  const { users: { audience, prefix, postfix, timeouts } } = config;
+  const {
+    users: {
+      audience, prefix, postfix, timeouts,
+    },
+  } = config;
   const route = `${prefix}.${postfix.list}`;
   const timeout = timeouts.list;
   const filter = {
@@ -19,7 +23,11 @@ function getOwners(roomId) {
 
 function update(hasChatSticky = false, roomId) {
   const { amqp, config } = this;
-  const { users: { audience, prefix, postfix, timeouts } } = config;
+  const {
+    users: {
+      audience, prefix, postfix, timeouts,
+    },
+  } = config;
   const route = `${prefix}.${postfix.updateMetadata}`;
   const timeout = timeouts.updateMetadata;
   const metadata = {

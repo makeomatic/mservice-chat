@@ -1,9 +1,9 @@
+const Promise = require('bluebird');
 const Errors = require('common-errors');
 const isElevated = require('../services/roles/isElevated');
 const fetchParticipant = require('../fetchers/participant');
 const fetchRoom = require('../fetchers/room');
 const { modelResponse, SERIALIZATION_GROUP_ADMIN } = require('../responses/participant');
-const Promise = require('bluebird');
 
 /**
  * @api {http} <prefix>.participants.unban Unban an user
@@ -13,7 +13,7 @@ const Promise = require('bluebird');
  * @apiSchema {jsonschema=../../schemas/participants.unban.json} apiParam
  * @apiSchema {jsonschema=../../schemas/participants.unban.response.json} apiSuccess
  */
- /**
+/**
   * @api {socket.io} participants.unban.<roomId> Unban an user
   * @apiDescription Fired when somebody unban an user
   * @apiVersion 1.0.0
@@ -34,7 +34,9 @@ function participantsUnbanAction(request) {
 }
 
 function allowed(request) {
-  const { auth, participant, room, params } = request;
+  const {
+    auth, participant, room, params,
+  } = request;
   const admin = auth.credentials.user;
 
   if (isElevated(admin, room) !== true) {

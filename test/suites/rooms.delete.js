@@ -1,14 +1,15 @@
 const assert = require('assert');
 const Chance = require('chance');
-const Chat = require('../../src');
 const { expect } = require('chai');
-const request = require('./../helpers/request');
-
-const chance = new Chance();
-const chat = new Chat(global.SERVICES);
-const uri = 'http://0.0.0.0:3000/api/chat/rooms/delete';
 
 describe('rooms.delete', function testSuite() {
+  const Chat = require('../../src');
+  const request = require('./../helpers/request');
+
+  const chance = new Chance();
+  const chat = new Chat(global.SERVICES);
+  const uri = 'http://0.0.0.0:3000/api/chat/rooms/delete';
+
   before('start up chat', () => chat.connect());
 
   before('create room', () => {
@@ -25,8 +26,7 @@ describe('rooms.delete', function testSuite() {
     audience: '*.localhost',
   }).tap((reply) => {
     this.firstAdminToken = reply.jwt;
-  })
-  );
+  }));
 
   before('login second admin', () => chat.amqp.publishAndWait('users.login', {
     username: 'second.admin@foo.com',
@@ -34,8 +34,7 @@ describe('rooms.delete', function testSuite() {
     audience: '*.localhost',
   }).tap((reply) => {
     this.secondAdminToken = reply.jwt;
-  })
-  );
+  }));
 
   it('should return error if request is not valid', () => {
     const token = this.firstAdminToken;
@@ -43,9 +42,9 @@ describe('rooms.delete', function testSuite() {
     return request(uri, { token, id: 'invalid-id' })
       .then((response) => {
         expect(response.statusCode).to.be.equals(400);
-        expect(response.body.name).to.be.equals('ValidationError');
-        expect(response.body.message).to.be.equals('rooms.delete validation failed:' +
-          ' data.id should match format "uuid"');
+        expect(response.body.name).to.be.equals('HttpStatusError');
+        expect(response.body.message).to.be.equals('rooms.delete validation failed:'
+          + ' data.id should match format "uuid"');
       });
   });
 
@@ -63,8 +62,8 @@ describe('rooms.delete', function testSuite() {
       .then((response) => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
-        expect(response.body.message).to.be.equals('An attempt was made to perform' +
-          ' an operation that is not permitted: Has not access');
+        expect(response.body.message).to.be.equals('An attempt was made to perform'
+          + ' an operation that is not permitted: Has not access');
       });
   });
 
@@ -76,8 +75,8 @@ describe('rooms.delete', function testSuite() {
       .then((response) => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
-        expect(response.body.message).to.be.equals('An attempt was made to perform' +
-          ' an operation that is not permitted: Has not access');
+        expect(response.body.message).to.be.equals('An attempt was made to perform'
+          + ' an operation that is not permitted: Has not access');
       });
   });
 

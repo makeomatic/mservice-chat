@@ -1,4 +1,4 @@
 {
-  "id": "messages.unpin.broadcast",
+  "$id": "messages.unpin.broadcast",
   "$ref": "users.json#/definitions/response"
 }

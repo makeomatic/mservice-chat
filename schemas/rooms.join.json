@@ -1,5 +1,5 @@
 {
-  "id": "rooms.join",
+  "$id": "rooms.join",
   "additionalProperties": false,
   "type": "object",
   "required": ["id"],

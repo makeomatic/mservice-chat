@@ -1,5 +1,5 @@
 {
-  "id": "common.json",
+  "$id": "common.json",
   "definitions": {
     "message": {
       "description": "`message` object",

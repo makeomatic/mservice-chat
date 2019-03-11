@@ -1,28 +1,25 @@
 const assert = require('assert');
-const Chat = require('../../src');
-const { login } = require('../helpers/users');
-const { create } = require('../helpers/messages');
-const request = require('../helpers/request');
 const socketIOClient = require('socket.io-client');
 
-const chat = new Chat(global.SERVICES);
-const uri = 'http://0.0.0.0:3000/api/chat/messages/unpin';
-
 describe('messages.unpin', function suite() {
+  const Chat = require('../../src');
+  const { login } = require('../helpers/users');
+  const { create } = require('../helpers/messages');
+  const request = require('../helpers/request');
+
+  const chat = new Chat(global.SERVICES);
+  const uri = 'http://0.0.0.0:3000/api/chat/messages/unpin';
+
   before('start up chat', () => chat.connect());
 
-  before('login admin', () =>
-    login(chat.amqp, 'admin@foo.com', 'adminpassword00000')
-      .tap(({ jwt }) => {
-        this.adminToken = jwt;
-        this.admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
-      })
-  );
+  before('login admin', () => login(chat.amqp, 'admin@foo.com', 'adminpassword00000')
+    .tap(({ jwt }) => {
+      this.adminToken = jwt;
+      this.admin = { id: 'admin@foo.com', name: 'Admin Admin', roles: ['admin'] };
+    }));
 
-  before('login user', () =>
-    login(chat.amqp, 'user@foo.com', 'userpassword000000')
-      .tap(({ jwt }) => (this.userToken = jwt))
-  );
+  before('login user', () => login(chat.amqp, 'user@foo.com', 'userpassword000000')
+    .tap(({ jwt }) => (this.userToken = jwt)));
 
   before('create room', () => {
     const params = { name: 'test room', createdBy: 'admin@foo.com' };
@@ -49,9 +46,7 @@ describe('messages.unpin', function suite() {
 
   before('create pin', () => chat.services.pin.pin(this.room.id, this.message, this.admin));
 
-  before('create second pin', () =>
-    chat.services.pin.pin(this.room.id, this.secondMessage, this.admin)
-  );
+  before('create second pin', () => chat.services.pin.pin(this.room.id, this.secondMessage, this.admin));
 
   it('should not be able to pin if not authorized', () => {
     const params = { roomId: this.roomId };
@@ -63,9 +58,9 @@ describe('messages.unpin', function suite() {
         assert.equal(statusCode, 400);
         assert.equal(body.statusCode, 400);
         assert.equal(body.error, 'Bad Request');
-        assert.equal(body.message, 'messages.unpin validation failed:' +
-          ' data should have required property \'token\'');
-        assert.equal(body.name, 'ValidationError');
+        assert.equal(body.message, 'messages.unpin validation failed:'
+          + ' data should have required property \'token\'');
+        assert.equal(body.name, 'HttpStatusError');
       });
   });
 
@@ -98,8 +93,8 @@ describe('messages.unpin', function suite() {
         assert.equal(statusCode, 404);
         assert.equal(body.statusCode, 404);
         assert.equal(body.error, 'Not Found');
-        assert.equal(body.message, 'Not Found:' +
-          ' "Room #123e4567-e89b-12d3-a456-426655440000 not found"');
+        assert.equal(body.message, 'Not Found:'
+          + ' "Room #123e4567-e89b-12d3-a456-426655440000 not found"');
         assert.equal(body.name, 'NotFoundError');
       });
   });

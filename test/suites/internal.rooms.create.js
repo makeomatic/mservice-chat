@@ -17,12 +17,12 @@ describe('The `internal.rooms.create` action', function suite() {
 
         const response = inspection.error();
 
-        assert.equal(response.code, 400);
-        assert.equal(response.name, 'ValidationError');
+        assert.equal(response.statusCode, 400);
+        assert.equal(response.name, 'HttpStatusError');
         assert.equal(
           response.message,
-          'internal.rooms.create validation failed: data should have required property \'name\',' +
-            ' data should have required property \'createdBy\''
+          'internal.rooms.create validation failed: data should have required property \'name\','
+            + ' data should have required property \'createdBy\''
         );
       });
   });

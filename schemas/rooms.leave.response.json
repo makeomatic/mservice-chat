@@ -1,4 +1,4 @@
 {
-  "id": "rooms.leave.response",
+  "$id": "rooms.leave.response",
   "$ref": "common.json#/definitions/successResponse"
 }

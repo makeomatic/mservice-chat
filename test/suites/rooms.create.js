@@ -1,14 +1,15 @@
 const assert = require('assert');
 const Chance = require('chance');
-const Chat = require('../../src');
 const { expect } = require('chai');
-const request = require('./../helpers/request');
-
-const chance = new Chance();
-const chat = new Chat(global.SERVICES);
-const uri = 'http://0.0.0.0:3000/api/chat/rooms/create';
 
 describe('rooms.create', function testSuite() {
+  const Chat = require('../../src');
+  const request = require('./../helpers/request');
+
+  const chance = new Chance();
+  const chat = new Chat(global.SERVICES);
+  const uri = 'http://0.0.0.0:3000/api/chat/rooms/create';
+
   before('start up chat', () => chat.connect());
 
   before('login admin', () => chat.amqp.publishAndWait('users.login', {
@@ -17,8 +18,7 @@ describe('rooms.create', function testSuite() {
     audience: '*.localhost',
   }).tap((reply) => {
     this.adminToken = reply.jwt;
-  })
-  );
+  }));
 
   it('should return error if request is not valid', () => {
     const token = this.adminToken;
@@ -26,9 +26,9 @@ describe('rooms.create', function testSuite() {
     return request(uri, { token })
       .then((response) => {
         expect(response.statusCode).to.be.equals(400);
-        expect(response.body.name).to.be.equals('ValidationError');
-        expect(response.body.message).to.be.equals('rooms.create validation failed:' +
-          ' data should have required property \'name\'');
+        expect(response.body.name).to.be.equals('HttpStatusError');
+        expect(response.body.message).to.be.equals('rooms.create validation failed:'
+          + ' data should have required property \'name\'');
       });
   });
 
@@ -46,8 +46,8 @@ describe('rooms.create', function testSuite() {
       .then((response) => {
         expect(response.statusCode).to.be.equals(403);
         expect(response.body.name).to.be.equals('NotPermittedError');
-        expect(response.body.message).to.be.equals('An attempt was made to perform an operation' +
-          ' that is not permitted: Not an root');
+        expect(response.body.message).to.be.equals('An attempt was made to perform an operation'
+          + ' that is not permitted: Not an root');
       });
   });
 

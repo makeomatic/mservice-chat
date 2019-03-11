@@ -1,4 +1,4 @@
 {
-  "id": "rooms.leave.broadcast",
+  "$id": "rooms.leave.broadcast",
   "$ref": "users.json#/definitions/response"
 }
