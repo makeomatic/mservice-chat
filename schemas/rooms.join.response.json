@@ -1,4 +1,4 @@
 {
-  "id": "rooms.join.response",
+  "$id": "rooms.join.response",
   "$ref": "common.json#/definitions/messagesCollection"
 }

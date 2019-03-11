@@ -1,5 +1,5 @@
 {
-  "id": "participants.json",
+  "$id": "participants.json",
   "definitions": {
     "model": {
       "description": "`participant` object",

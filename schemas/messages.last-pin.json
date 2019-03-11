@@ -1,5 +1,5 @@
 {
-  "id": "messages.last-pin",
+  "$id": "messages.last-pin",
   "additionalProperties": false,
   "type": "object",
   "required": ["roomId"],

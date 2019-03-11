@@ -1,46 +1,32 @@
 version: '2'
 services:
   cassandra:
-    container_name: cassandra
     image: cassandra:3
     hostname: cassandra
 
   redis:
     hostname: redis
-    container_name: redis
-    image: makeomatic/redis-cluster:3.2.8
+    image: makeomatic/redis-cluster:3.2.9
 
   rabbitmq:
-      expose:
-        - "4369"
-        - "5672"
-        - "15672"
-        - "25672"
-      image: makeomatic/rabbitmq:3.6.6
-      container_name: rabbitmq
+      image: rabbitmq:alpine
       hostname: rabbitmq
-      volumes:
-        - ./configs/rabbitmq/rabbitmq.config:/usr/lib/rabbitmq/etc/rabbitmq/rabbitmq.config
 
   ms-users:
     links:
       - redis
       - rabbitmq
-    image: makeomatic/ms-users:7.7.2
+    image: makeomatic/ms-users
     hostname: ms-users
-    container_name: ms-users
     volumes:
       - ${PWD}/test/configs:/src/configs:ro
     environment:
-      DEBUG: 'ioredis:*'
       NODE_ENV: 'production'
-      NCONF_FILE_PATH: '["/src/configs/ms-users/config.js"]'
-      MS_USERS__LOGGER__DEFAULT_LOGGER: 'true'
+      NCONF_FILE_PATH: '["/src/configs/ms-users"]'
       MS_USERS__INIT_ADMIN_ACCOUNTS_DELAY: '1'
 
   tester:
-    container_name: tester
-    image: makeomatic/node:7.8.0-tester
+    image: makeomatic/node:10.15.3-tester
     links:
       - cassandra
       - rabbitmq
@@ -49,5 +35,5 @@ services:
       - ${PWD}:/src
     environment:
       NODE_ENV: "test"
-      DEBUG: ${DEBUG}
+      DEBUG: "*,-babel*,-mocha*"
     command: tail -f /dev/null

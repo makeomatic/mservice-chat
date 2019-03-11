@@ -5,7 +5,7 @@ module.exports = {
       attachSocketIO: true,
       port: 3000,
       handlerConfig: {
-        connection: {
+        server: {
           routes: {
             cors: {
               additionalHeaders: ['accept-language', 'x-xsrf-token'],

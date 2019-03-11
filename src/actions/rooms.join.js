@@ -1,8 +1,8 @@
-const { collectionResponse } = require('../responses/message');
 const Errors = require('common-errors');
+const Promise = require('bluebird');
+const { collectionResponse } = require('../responses/message');
 const fetchRoom = require('./../fetchers/room');
 const { modelResponse: makeUserResponse } = require('../responses/user');
-const Promise = require('bluebird');
 const { transform } = require('../responses/pin');
 
 /**
@@ -29,9 +29,7 @@ function RoomsJoinAction(request) {
   const { user } = socket;
   const userResponse = makeUserResponse(user);
 
-  socket.on('disconnect', () =>
-    socket.broadcast.to(id).emit(`rooms.leave.${id}`, userResponse)
-  );
+  socket.on('disconnect', () => socket.broadcast.to(id).emit(`rooms.leave.${id}`, userResponse));
 
   return Promise
     .fromCallback(callback => socket.join(id, callback))

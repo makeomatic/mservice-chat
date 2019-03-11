@@ -1,6 +1,6 @@
+const Promise = require('bluebird');
 const { modelResponse: pinResponse } = require('../responses/pin');
 const { modelResponse: userResponse } = require('../responses/user');
-const Promise = require('bluebird');
 
 function collectMessagesIds(pin) {
   return pin.messageId;

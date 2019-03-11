@@ -8,6 +8,10 @@ module.exports = {
       debug: true,
     },
   },
+  logger: {
+    defaultLogger: true,
+    debug: true,
+  },
   redis: {
     hosts: Array.from({ length: 3 }).map((_, idx) => ({
       host: 'redis',

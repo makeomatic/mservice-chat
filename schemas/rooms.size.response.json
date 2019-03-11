@@ -1,4 +1,4 @@
 {
-  "id": "rooms.size.response",
+  "$id": "rooms.size.response",
   "$ref": "common.json#/definitions/roomSize"
 }

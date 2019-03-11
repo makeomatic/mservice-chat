@@ -1,5 +1,5 @@
 {
-  "id": "messages.edit",
+  "$id": "messages.edit",
   "additionalProperties": false,
   "type": "object",
   "required": ["id", "roomId", "text", "token"],

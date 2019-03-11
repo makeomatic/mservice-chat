@@ -1,4 +1,4 @@
 {
-  "id": "messages.send.broadcast",
+  "$id": "messages.send.broadcast",
   "$ref": "common.json#/definitions/messageResponse"
 }

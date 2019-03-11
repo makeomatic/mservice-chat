@@ -8,6 +8,7 @@ module.exports = {
     },
     message: {
       type: 'frozen',
+      typeDef: '<"Message">',
       virtual: {
         get: function getMessage() {
           return this.message;

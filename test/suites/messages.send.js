@@ -1,32 +1,27 @@
 const assert = require('assert');
-const Chat = require('../../src');
-const { connect, emit } = require('../helpers/socketIO');
 const { expect } = require('chai');
-const { login } = require('../helpers/users');
 const Promise = require('bluebird');
 const socketIOClient = require('socket.io-client');
 
-const action = 'chat.messages.send';
-const chat = new Chat(global.SERVICES);
-const fakeRoomId = '00000000-0000-0000-0000-000000000000';
-
 describe('messages.send', function testSuite() {
+  const Chat = require('../../src');
+  const { connect, emit } = require('../helpers/socketIO');
+  const { login } = require('../helpers/users');
+
+  const action = 'chat.messages.send';
+  const chat = new Chat(global.SERVICES);
+  const fakeRoomId = '00000000-0000-0000-0000-000000000000';
+
   before('start up chat', () => chat.connect());
 
-  before('login admin', () =>
-    login(chat.amqp, 'admin@foo.com', 'adminpassword00000')
-        .tap(({ jwt }) => (this.adminToken = jwt))
-  );
+  before('login admin', () => login(chat.amqp, 'admin@foo.com', 'adminpassword00000')
+    .tap(({ jwt }) => (this.adminToken = jwt)));
 
-  before('login user', () =>
-    login(chat.amqp, 'user@foo.com', 'userpassword000000')
-      .tap(({ jwt }) => (this.userToken = jwt))
-  );
+  before('login user', () => login(chat.amqp, 'user@foo.com', 'userpassword000000')
+    .tap(({ jwt }) => (this.userToken = jwt)));
 
-  before('login second user', () =>
-    login(chat.amqp, 'second.user@foo.com', 'seconduserpassword')
-      .tap(({ jwt }) => (this.secondUserToken = jwt))
-  );
+  before('login second user', () => login(chat.amqp, 'second.user@foo.com', 'seconduserpassword')
+    .tap(({ jwt }) => (this.secondUserToken = jwt)));
 
   before('create room', () => {
     const params = { name: 'test room', createdBy: 'admin@foo.com' };
@@ -62,7 +57,7 @@ describe('messages.send', function testSuite() {
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, { roomId: fakeRoomId, message: { foo: 'bar' } }, (error) => {
-        expect(error.name).to.be.equals('ValidationError');
+        expect(error.name).to.be.equals('HttpStatusError');
         client.disconnect();
         done();
       });
@@ -74,7 +69,7 @@ describe('messages.send', function testSuite() {
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, { roomId: fakeRoomId, message: { text: 'bar', foo: 'baz' } }, (error) => {
-        expect(error.name).to.be.equals('ValidationError');
+        expect(error.name).to.be.equals('HttpStatusError');
         client.disconnect();
         done();
       });
@@ -89,7 +84,7 @@ describe('messages.send', function testSuite() {
         roomId: '00000000-0000-0000-0000-000000000000',
         message: { type: 'sticky', foo: 'bar' },
       }, (error) => {
-        expect(error.name).to.be.equals('ValidationError');
+        expect(error.name).to.be.equals('HttpStatusError');
         client.disconnect();
         done();
       });
@@ -101,9 +96,9 @@ describe('messages.send', function testSuite() {
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, { roomId: '1', message: { text: 'foo' } }, (error) => {
-        expect(error.name).to.be.equals('ValidationError');
-        expect(error.message).to.be.equals('messages.send validation failed:' +
-          ' data.roomId should match format "uuid"');
+        expect(error.name).to.be.equals('HttpStatusError');
+        expect(error.message).to.be.equals('messages.send validation failed:'
+          + ' data.roomId should match format "uuid"');
         client.disconnect();
         done();
       });
@@ -144,8 +139,8 @@ describe('messages.send', function testSuite() {
 
         client.emit(action, { roomId: this.room.id.toString(), message }, (error) => {
           expect(error.name).to.be.equals('NotPermittedError');
-          expect(error.message).to.be.equals('An attempt was made to perform an operation' +
-            ' that is not permitted: Access denied for message type "sticky"');
+          expect(error.message).to.be.equals('An attempt was made to perform an operation'
+            + ' that is not permitted: Access denied for message type "sticky"');
           client.disconnect();
           done();
         });
@@ -186,14 +181,14 @@ describe('messages.send', function testSuite() {
     const client = socketIOClient('http://0.0.0.0:3000', {
       query: `token=${this.secondUserToken}`,
     });
-    const roomId = this.roomId;
+    const { roomId } = this;
 
     client.on('error', done);
     client.on('connect', () => {
       client.emit('chat.rooms.join', { id: roomId }, () => {
         client.emit(action, { roomId, message: { text: 'foo' } }, (error) => {
-          assert.equal(error.message, 'An attempt was made to perform an operation that' +
-            ' is not permitted: User #second.user@foo.com is banned');
+          assert.equal(error.message, 'An attempt was made to perform an operation that'
+            + ' is not permitted: User #second.user@foo.com is banned');
           assert.equal(error.name, 'NotPermittedError');
 
           client.disconnect();

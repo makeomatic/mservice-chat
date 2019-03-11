@@ -1,6 +1,6 @@
 const assert = require('assert');
-const Chat = require('../../src');
 const socketIOClient = require('socket.io-client');
+const Chat = require('../../src');
 
 const action = 'chat.users.me';
 const chat = new Chat(global.SERVICES);
@@ -29,8 +29,8 @@ describe('users.me', function testSuite() {
   it('should return invalid token error', (done) => {
     const client = socketIOClient('http://0.0.0.0:3000', { query: 'token=invalidToken' });
     client.on('error', (error) => {
-      assert.equal(error, 'An attempt was made to perform an operation' +
-        ' without authentication: Auth failed');
+      assert.equal(error, 'An attempt was made to perform an operation'
+        + ' without authentication: Auth failed');
 
       client.disconnect();
       done();

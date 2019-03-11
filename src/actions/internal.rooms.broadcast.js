@@ -1,4 +1,4 @@
-const { ActionTransport } = require('mservice');
+const { ActionTransport } = require('@microfleet/core');
 const { successResponse } = require('../responses/success');
 
 /**

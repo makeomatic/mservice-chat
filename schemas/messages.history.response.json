@@ -1,4 +1,4 @@
 {
-  "id": "messages.history.response",
+  "$id": "messages.history.response",
   "$ref": "common.json#/definitions/messagesCollection"
 }

@@ -9,24 +9,20 @@ const chat = new Chat(global.SERVICES);
 describe('rooms.size', function testSuite() {
   before('start up chat', () => chat.connect());
 
-  before('login user', () =>
-    login(chat.amqp, 'user@foo.com', 'userpassword000000')
-      .tap(({ jwt }) => (this.userToken = jwt))
-  );
+  before('login user', () => login(chat.amqp, 'user@foo.com', 'userpassword000000')
+    .tap(({ jwt }) => (this.userToken = jwt)));
 
-  before('create room', () =>
-    chat.services.room
-      .create({ name: 'test', createdBy: 'admin@foo.com' })
-      .tap((room) => {
-        this.room = room;
-        this.roomId = room.id.toString();
-      })
-  );
+  before('create room', () => chat.services.room
+    .create({ name: 'test', createdBy: 'admin@foo.com' })
+    .tap((room) => {
+      this.room = room;
+      this.roomId = room.id.toString();
+    }));
 
   it('should be able to return number of users in the room including guests', (done) => {
     const client1 = socketIOClient('http://0.0.0.0:3000', { query: `token=${this.userToken}` });
     const client2 = socketIOClient('http://0.0.0.0:3000');
-    const roomId = this.roomId;
+    const { roomId } = this;
 
     client1.on('error', done);
     client2.on('error', done);

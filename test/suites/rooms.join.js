@@ -1,37 +1,32 @@
 const assert = require('assert');
-const Chat = require('../../src');
-const { create } = require('../helpers/messages');
-const { connect, emit } = require('../helpers/socketIO');
 const is = require('is');
-const { login } = require('../helpers/users');
 const { expect } = require('chai');
 const socketIOClient = require('socket.io-client');
 const Promise = require('bluebird');
 
-const action = 'chat.rooms.join';
-const chat = new Chat(global.SERVICES);
-
 describe('rooms.join', function testSuite() {
+  const Chat = require('../../src');
+  const { create } = require('../helpers/messages');
+  const { connect, emit } = require('../helpers/socketIO');
+  const { login } = require('../helpers/users');
+
+  const action = 'chat.rooms.join';
+  const chat = new Chat(global.SERVICES);
+
   before('start up chat', () => chat.connect());
 
-  before('login user', () =>
-    login(chat.amqp, 'user@foo.com', 'userpassword000000')
-      .tap(({ jwt }) => (this.userToken = jwt))
-  );
+  before('login user', () => login(chat.amqp, 'user@foo.com', 'userpassword000000')
+    .tap(({ jwt }) => (this.userToken = jwt)));
 
-  before('login second user', () =>
-    login(chat.amqp, 'second.user@foo.com', 'seconduserpassword')
-      .tap(({ jwt }) => (this.secondUserToken = jwt))
-  );
+  before('login second user', () => login(chat.amqp, 'second.user@foo.com', 'seconduserpassword')
+    .tap(({ jwt }) => (this.secondUserToken = jwt)));
 
-  before('create room', () =>
-    chat.services.room
-      .create({ name: 'test', createdBy: 'admin@foo.com' })
-      .tap((room) => {
-        this.room = room;
-        this.roomId = room.id.toString();
-      })
-  );
+  before('create room', () => chat.services.room
+    .create({ name: 'test', createdBy: 'admin@foo.com' })
+    .tap((room) => {
+      this.room = room;
+      this.roomId = room.id.toString();
+    }));
 
   before('create messages', () => {
     const messages = ['foo', 'bar'];
@@ -55,7 +50,7 @@ describe('rooms.join', function testSuite() {
     client.on('error', done);
     client.on('connect', () => {
       client.emit(action, { id: '1' }, (error) => {
-        expect(error.name).to.be.equals('ValidationError');
+        expect(error.name).to.be.equals('HttpStatusError');
         expect(error.message).to.be
           .equals('rooms.join validation failed: data.id should match format "uuid"');
         client.disconnect();
@@ -70,8 +65,8 @@ describe('rooms.join', function testSuite() {
     client.on('connect', () => {
       client.emit(action, { id: '00000000-0000-0000-0000-000000000000' }, (error) => {
         expect(error.name).to.be.equals('NotFoundError');
-        expect(error.message).to.be.equals('Not Found:' +
-          ' "Room #00000000-0000-0000-0000-000000000000 not found"');
+        expect(error.message).to.be.equals('Not Found:'
+          + ' "Room #00000000-0000-0000-0000-000000000000 not found"');
         client.disconnect();
         done();
       });

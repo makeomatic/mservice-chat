@@ -32,7 +32,9 @@ class ParticipantService {
 
     const { id, name, roles } = user;
 
-    return this.create({ roomId, id, name, roles });
+    return this.create({
+      roomId, id, name, roles,
+    });
   }
 
   updateActivity(roomId, id) {
@@ -80,23 +82,21 @@ class ParticipantService {
 
     return userService
       .getMetadata(Array.from(usernames))
-      .then(users =>
-        participants
-          .map((participant) => {
-            const user = users[participant.id] || users[participant.id.toLowerCase()] || {
-              id: participant.id,
-              name: participant.name,
-              roles: participant.roles,
-            };
-            const data = { user };
+      .then(users => participants
+        .map((participant) => {
+          const user = users[participant.id] || users[participant.id.toLowerCase()] || {
+            id: participant.id,
+            name: participant.name,
+            roles: participant.roles,
+          };
+          const data = { user };
 
-            if (participant.bannedBy) {
-              data.editedBy = users[participant.bannedBy.id] || participant.bannedBy;
-            }
+          if (participant.bannedBy) {
+            data.editedBy = users[participant.bannedBy.id] || participant.bannedBy;
+          }
 
-            return Object.assign({}, participant.toJSON(), data);
-          })
-      );
+          return Object.assign({}, participant.toJSON(), data);
+        }));
   }
 }
 

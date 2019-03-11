@@ -1,5 +1,5 @@
 {
-  "id": "rooms.delete",
+  "$id": "rooms.delete",
   "additionalProperties": false,
   "type": "object",
   "required": ["id", "token"],

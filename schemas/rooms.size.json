@@ -1,5 +1,5 @@
 {
-  "id": "rooms.size",
+  "$id": "rooms.size",
   "additionalProperties": false,
   "type": "object",
   "required": ["roomId"],

@@ -1,0 +1,7 @@
+{
+  "node": "10.15.3",
+  "rebuild": ["ms-flakeless"],
+  "arbitrary_exec": [
+    "apk add perl"
+  ]
+}

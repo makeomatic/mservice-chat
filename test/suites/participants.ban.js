@@ -1,32 +1,27 @@
 const assert = require('assert');
-const Chat = require('../../src');
 const is = require('is');
-const { isISODate } = require('../helpers/asserts');
-const { login } = require('../helpers/users');
 const Promise = require('bluebird');
-const request = require('../helpers/request');
 const socketIOClient = require('socket.io-client');
 
-const chat = new Chat(global.SERVICES);
-const uri = 'http://0.0.0.0:3000/api/chat/participants/ban';
-
 describe('participants.ban', function suite() {
+  const Chat = require('../../src');
+  const { isISODate } = require('../helpers/asserts');
+  const { login } = require('../helpers/users');
+  const request = require('../helpers/request');
+
+  const chat = new Chat(global.SERVICES);
+  const uri = 'http://0.0.0.0:3000/api/chat/participants/ban';
+
   before('start up chat', () => chat.connect());
 
-  before('login root admin', () =>
-    login(chat.amqp, 'root@foo.com', 'rootpassword000000')
-      .tap(({ jwt }) => (this.rootToken = jwt))
-  );
+  before('login root admin', () => login(chat.amqp, 'root@foo.com', 'rootpassword000000')
+    .tap(({ jwt }) => (this.rootToken = jwt)));
 
-  before('login admin', () =>
-    login(chat.amqp, 'admin@foo.com', 'adminpassword00000')
-      .tap(({ jwt }) => (this.adminToken = jwt))
-  );
+  before('login admin', () => login(chat.amqp, 'admin@foo.com', 'adminpassword00000')
+    .tap(({ jwt }) => (this.adminToken = jwt)));
 
-  before('login user', () =>
-    login(chat.amqp, 'user@foo.com', 'userpassword000000')
-      .tap(({ jwt }) => (this.userToken = jwt))
-  );
+  before('login user', () => login(chat.amqp, 'user@foo.com', 'userpassword000000')
+    .tap(({ jwt }) => (this.userToken = jwt)));
 
   before('create room', () => {
     const params = { name: 'test room', createdBy: 'admin@foo.com' };
@@ -80,9 +75,9 @@ describe('participants.ban', function suite() {
         assert.equal(statusCode, 400);
         assert.equal(body.statusCode, 400);
         assert.equal(body.error, 'Bad Request');
-        assert.equal(body.message, 'participants.ban validation failed:' +
-          ' data should have required property \'token\'');
-        assert.equal(body.name, 'ValidationError');
+        assert.equal(body.message, 'participants.ban validation failed:'
+          + ' data should have required property \'token\'');
+        assert.equal(body.name, 'HttpStatusError');
       });
   });
 
@@ -100,9 +95,9 @@ describe('participants.ban', function suite() {
         assert.equal(statusCode, 400);
         assert.equal(body.statusCode, 400);
         assert.equal(body.error, 'Bad Request');
-        assert.equal(body.message, 'participants.ban validation failed:' +
-          ' data should have required property \'reason\'');
-        assert.equal(body.name, 'ValidationError');
+        assert.equal(body.message, 'participants.ban validation failed:'
+          + ' data should have required property \'reason\'');
+        assert.equal(body.name, 'HttpStatusError');
       });
   });
 
@@ -142,8 +137,8 @@ describe('participants.ban', function suite() {
         assert.equal(statusCode, 404);
         assert.equal(body.statusCode, 404);
         assert.equal(body.error, 'Not Found');
-        assert.equal(body.message, 'Not Found:' +
-          ' "Room #123e4567-e89b-12d3-a456-426655440000 not found"');
+        assert.equal(body.message, 'Not Found:'
+          + ' "Room #123e4567-e89b-12d3-a456-426655440000 not found"');
         assert.equal(body.name, 'NotFoundError');
       });
   });
@@ -163,8 +158,8 @@ describe('participants.ban', function suite() {
         assert.equal(statusCode, 404);
         assert.equal(body.statusCode, 404);
         assert.equal(body.error, 'Not Found');
-        assert.equal(body.message, 'Not Found:' +
-          ' "Participant #non.existent.user@foo.com not found"');
+        assert.equal(body.message, 'Not Found:'
+          + ' "Participant #non.existent.user@foo.com not found"');
         assert.equal(body.name, 'NotFoundError');
       });
   });

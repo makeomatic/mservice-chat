@@ -1,4 +1,4 @@
 {
-  "id": "messages.pins-history.response",
+  "$id": "messages.pins-history.response",
   "$ref": "common.json#/definitions/pinsCollection"
 }

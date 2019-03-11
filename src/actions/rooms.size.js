@@ -6,10 +6,9 @@
 * @apiSchema {jsonschema=../../schemas/rooms.size.json} apiParam
 * @apiSchema {jsonschema=../../schemas/rooms.size.response.json} apiSuccess
 */
-
 function RoomsSizeAction(request) {
   const { params, socket } = request;
-  const roomId = params.roomId;
+  const { roomId } = params;
   const room = socket.adapter.rooms[roomId];
 
   return {

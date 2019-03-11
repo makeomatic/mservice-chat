@@ -1,4 +1,4 @@
 {
-  "id": "users.unban.response",
+  "$id": "users.unban.response",
   "$ref": "participants.json#/definitions/response"
 }

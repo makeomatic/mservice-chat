@@ -1,15 +1,16 @@
 const assert = require('assert');
-const Chat = require('../../src');
 const Promise = require('bluebird');
-const request = require('./../helpers/request');
 const { uuid } = require('express-cassandra');
 
-const chat = new Chat(global.SERVICES);
-const fakeRoomId = '00000000-0000-0000-0000-000000000000';
-const roomId = uuid();
-const uri = 'http://0.0.0.0:3000/api/chat/participants/list';
-
 describe('participants.list', function suite() {
+  const Chat = require('../../src');
+  const request = require('./../helpers/request');
+
+  const chat = new Chat(global.SERVICES);
+  const fakeRoomId = '00000000-0000-0000-0000-000000000000';
+  const roomId = uuid();
+  const uri = 'http://0.0.0.0:3000/api/chat/participants/list';
+
   before('start up chat', () => chat.connect());
 
   before('create participants', () => {

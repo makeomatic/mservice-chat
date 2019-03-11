@@ -63,19 +63,17 @@ class MessageService {
 
     return userService
       .getMetadata(Array.from(usernames))
-      .then(users =>
-        messages
-          .map((message) => {
-            const user = users[message.userId] || users[message.userId.toLowerCase()] || message.user;
-            const data = { user };
+      .then(users => messages
+        .map((message) => {
+          const user = users[message.userId] || users[message.userId.toLowerCase()] || message.user;
+          const data = { user };
 
-            if (message.editedBy) {
-              data.editedBy = users[message.editedBy.id] || message.editedBy;
-            }
+          if (message.editedBy) {
+            data.editedBy = users[message.editedBy.id] || message.editedBy;
+          }
 
-            return Object.assign({}, message.toJSON(), data);
-          })
-      );
+          return Object.assign({}, message.toJSON(), data);
+        }));
   }
 
   afterDelete(cond) {

@@ -1,4 +1,4 @@
-const { ActionTransport } = require('mservice');
+const { ActionTransport } = require('@microfleet/core');
 
 /**
  * @api {amqp} <prefix>.internal.rooms.create Create a room, for internal use only

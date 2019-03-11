@@ -1,6 +1,10 @@
 {
   "extends": "makeomatic",
+  "parser": "babel-eslint",
   "plugins": [
     "json"
-  ]
+  ],
+  "rules": {
+    "no-return-assign": 0
+  }
 }

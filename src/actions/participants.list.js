@@ -1,10 +1,10 @@
+const moment = require('moment');
+const { timeuuidFromDate } = require('express-cassandra');
 const {
   collectionResponse,
   SERIALIZATION_GROUP_ADMIN,
   SERIALIZATION_GROUP_USER,
 } = require('../responses/participant');
-const moment = require('moment');
-const { timeuuidFromDate } = require('express-cassandra');
 
 /**
  * @api {http} <prefix>.participants.list Get list of participants

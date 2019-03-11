@@ -1,6 +1,6 @@
+const Promise = require('bluebird');
 const Errors = require('common-errors');
 const fetchRoom = require('./../fetchers/room')();
-const Promise = require('bluebird');
 const { successResponse } = require('../responses/success');
 const { modelResponse } = require('../responses/user');
 
@@ -12,7 +12,7 @@ const { modelResponse } = require('../responses/user');
  * @apiSchema {jsonschema=../../schemas/rooms.leave.json} apiParam
  * @apiSchema {jsonschema=../../schemas/rooms.leave.response.json} apiSuccess
  */
- /**
+/**
   * @api {socket.io} rooms.leave.<roomId> Leave a room
   * @apiDescription Fired when somebody leaves a room
   * @apiVersion 1.0.0
